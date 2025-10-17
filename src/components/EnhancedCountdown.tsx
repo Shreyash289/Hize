@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { X } from "lucide-react"
 
 // Posters carousel replacing the previous 4 circular countdown circles
@@ -90,27 +90,28 @@ export default function EnhancedCountdown() {
         onMouseLeave={() => setIsPaused(false)}
       >
         <div className="mx-auto max-w-6xl px-6">
-          <div className="relative mx-auto w-full max-w-[900px] aspect-square overflow-hidden rounded-3xl border border-orange-500/20 bg-black">
-            <AnimatePresence mode="wait">
+          <div className="relative mx-auto w-full max-w-[900px] aspect-square overflow-hidden rounded-3xl border border-orange-500/20 bg-black will-change-transform">
+            {posters.map((src, i) => (
               <motion.div
-                key={currentIndex}
+                key={src}
                 className="absolute inset-0"
-                initial={{ opacity: 0, scale: 1.02 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.98 }}
-                transition={{ duration: 0.45, ease: "easeOut" }}
-                onClick={() => setLightboxImage(posters[currentIndex])}
+                style={{ willChange: "opacity" }}
+                animate={{ opacity: i === currentIndex ? 1 : 0 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                onClick={() => i === currentIndex && setLightboxImage(src)}
               >
                 <Image
-                  src={posters[currentIndex]}
-                  alt={`Poster ${currentIndex + 1}`}
+                  src={src}
+                  alt={`Poster ${i + 1}`}
                   fill
-                  priority={currentIndex === 0}
+                  priority={i === 0}
+                  loading={i === 0 ? "eager" : "lazy"}
                   sizes="(max-width: 1024px) 100vw, 900px"
                   style={{ objectFit: "contain" }}
+                  unoptimized
                 />
               </motion.div>
-            </AnimatePresence>
+            ))}
 
             <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/50 via-transparent to-black/20" />
 
@@ -148,43 +149,41 @@ export default function EnhancedCountdown() {
       </div>
 
       {/* Lightbox */}
-      <AnimatePresence>
-        {lightboxImage && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl"
+      {lightboxImage && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl"
+          onClick={() => setLightboxImage(null)}
+        >
+          <button
+            className="absolute top-4 right-4 z-[10000] p-3 rounded-full bg-orange-600 hover:bg-orange-500 transition-colors shadow-2xl shadow-orange-500/50"
             onClick={() => setLightboxImage(null)}
           >
-            <button
-              className="absolute top-4 right-4 z-[10000] p-3 rounded-full bg-orange-600 hover:bg-orange-500 transition-colors shadow-2xl shadow-orange-500/50"
-              onClick={() => setLightboxImage(null)}
-            >
-              <X className="w-6 h-6 text-white" />
-            </button>
+            <X className="w-6 h-6 text-white" />
+          </button>
 
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              className="relative max-w-5xl max-h-[90vh] w-full"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-orange-500/50 bg-black">
-                <img
-                  src={lightboxImage}
-                  alt="Poster enlarged"
-                  className="w-full h-full object-contain"
-                />
-                <div className="absolute inset-0 ring-1 ring-inset ring-orange-500/30 rounded-3xl pointer-events-none" />
-              </div>
-            </motion.div>
+          <motion.div
+            initial={{ scale: 0.98, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.98, opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="relative max-w-5xl max-h-[90vh] w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-orange-500/50 bg-black">
+              <img
+                src={lightboxImage}
+                alt="Poster enlarged"
+                className="w-full h-full object-contain"
+              />
+              <div className="absolute inset-0 ring-1 ring-inset ring-orange-500/30 rounded-3xl pointer-events-none" />
+            </div>
           </motion.div>
-        )}
-      </AnimatePresence>
+        </motion.div>
+      )}
     </>
   )
 }
