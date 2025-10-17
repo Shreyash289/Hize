@@ -79,7 +79,7 @@ export default function EnhancedCountdown() {
         onMouseLeave={() => setIsPaused(false)}
       >
         <div className="mx-auto max-w-6xl px-6">
-          <div className="relative h-[60vh] md:h-[70vh] overflow-hidden rounded-3xl border border-orange-500/20 bg-black">
+          <div className="relative mx-auto w-full max-w-[900px] aspect-square overflow-hidden rounded-3xl border border-orange-500/20 bg-black">
             <AnimatePresence mode="wait">
               <motion.img
                 key={currentIndex}
