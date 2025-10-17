@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { X } from "lucide-react"
 
@@ -23,6 +24,16 @@ export default function EnhancedCountdown() {
 
   const next = () => goTo(currentIndex + 1)
   const prev = () => goTo(currentIndex - 1)
+
+  useEffect(() => {
+    // Preload all posters in the background to reduce perceived delay
+    posters.forEach((src) => {
+      const img = new window.Image()
+      img.decoding = "async"
+      img.loading = "eager"
+      img.src = src
+    })
+  }, [])
 
   useEffect(() => {
     if (isPaused) return
@@ -81,24 +92,24 @@ export default function EnhancedCountdown() {
         <div className="mx-auto max-w-6xl px-6">
           <div className="relative mx-auto w-full max-w-[900px] aspect-square overflow-hidden rounded-3xl border border-orange-500/20 bg-black">
             <AnimatePresence mode="wait">
-              <motion.img
+              <motion.div
                 key={currentIndex}
-                src={posters[currentIndex]}
-                alt={`Poster ${currentIndex + 1}`}
-                className="absolute inset-0 w-full h-full object-contain"
-                initial={{ opacity: 0, scale: 1.05 }}
+                className="absolute inset-0"
+                initial={{ opacity: 0, scale: 1.02 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.98 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
+                transition={{ duration: 0.45, ease: "easeOut" }}
                 onClick={() => setLightboxImage(posters[currentIndex])}
-                onError={(e) => {
-                  const img = e.currentTarget as HTMLImageElement
-                  if (!img.dataset.fallback) {
-                    img.dataset.fallback = "1"
-                    img.src = img.src.replace("/poster/", "/posters/")
-                  }
-                }}
-              />
+              >
+                <Image
+                  src={posters[currentIndex]}
+                  alt={`Poster ${currentIndex + 1}`}
+                  fill
+                  priority={currentIndex === 0}
+                  sizes="(max-width: 1024px) 100vw, 900px"
+                  style={{ objectFit: "contain" }}
+                />
+              </motion.div>
             </AnimatePresence>
 
             <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/50 via-transparent to-black/20" />
