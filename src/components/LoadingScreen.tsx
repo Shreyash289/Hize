@@ -51,8 +51,8 @@ export default function LoadingScreen({ onLoadingComplete }: LoadingScreenProps)
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
             >
-              <h1 className="text-8xl md:text-9xl font-black tracking-tighter bg-gradient-to-r from-orange-500 via-orange-300 to-orange-500 bg-clip-text text-transparent">
-                HIZE
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter bg-gradient-to-r from-orange-500 via-orange-300 to-orange-500 bg-clip-text text-transparent text-center">
+                IEEE CS SYP HIZE
               </h1>
             </motion.div>
 

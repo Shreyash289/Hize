@@ -158,10 +158,10 @@ export default function Home() {
           <motion.div className="relative">
             <h1 className="text-8xl md:text-[14rem] font-black tracking-tighter relative">
               <span className="absolute inset-0 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent blur-2xl opacity-60">
-                HIZE
+                IEEE CS SYP HIZE
               </span>
               <span className="relative bg-gradient-to-r from-orange-600 via-orange-400 to-orange-500 bg-clip-text text-transparent">
-                HIZE
+                IEEE CS SYP HIZE
               </span>
             </h1>
 
