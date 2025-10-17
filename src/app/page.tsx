@@ -169,7 +169,7 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="text-7xl md:text-8xl font-black bg-gradient-to-r from-zinc-800 to-zinc-900 bg-clip-text text-transparent tracking-wider mt-4"
+              className="text-7xl md:text-8xl font-black bg-gradient-to-r from-orange-600 via-orange-400 to-orange-500 bg-clip-text text-transparent tracking-wider mt-4"
             >
               2026
             </motion.p>

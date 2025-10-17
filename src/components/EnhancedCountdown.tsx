@@ -97,7 +97,7 @@ export default function EnhancedCountdown() {
                 className="absolute inset-0"
                 style={{ willChange: "opacity" }}
                 animate={{ opacity: i === currentIndex ? 1 : 0 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
                 onClick={() => i === currentIndex && setLightboxImage(src)}
               >
                 <Image
@@ -107,6 +107,8 @@ export default function EnhancedCountdown() {
                   priority={i === 0}
                   loading={i === 0 ? "eager" : "lazy"}
                   sizes="(max-width: 1024px) 100vw, 900px"
+                  placeholder="blur"
+                  blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbGw9JyMyMjIyMjInLz48L3N2Zz4="
                   style={{ objectFit: "contain" }}
                   unoptimized
                 />
