@@ -79,13 +79,13 @@ export default function EnhancedCountdown() {
         onMouseLeave={() => setIsPaused(false)}
       >
         <div className="mx-auto max-w-6xl px-6">
-          <div className="relative aspect-[16/6] md:aspect-[16/5] overflow-hidden rounded-3xl border border-orange-500/20 bg-black">
+          <div className="relative h-[60vh] md:h-[70vh] overflow-hidden rounded-3xl border border-orange-500/20 bg-black">
             <AnimatePresence mode="wait">
               <motion.img
                 key={currentIndex}
                 src={posters[currentIndex]}
                 alt={`Poster ${currentIndex + 1}`}
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-contain"
                 initial={{ opacity: 0, scale: 1.05 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.98 }}
