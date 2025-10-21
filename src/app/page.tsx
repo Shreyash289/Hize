@@ -202,6 +202,41 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
+            className="mt-12 max-w-6xl mx-auto"
+          >
+            <div className="relative p-8 md:p-12 rounded-3xl bg-gradient-to-br from-black/40 to-zinc-900/40 backdrop-blur-xl border border-orange-500/20">
+              <div className="space-y-6 text-orange-100/90 font-serif leading-relaxed">
+                <p className="text-lg md:text-xl">
+                  At the IEEE High Impact Zonal Events (HIZE), we don't just showcase the future — we create it. The stage is now set for our high-impact Zonal Events 2.0, led by <span className="text-orange-400 font-semibold">Abhinav Gambhir, Architect at Microsoft</span>. This marks the culmination of an inspiring journey that has brought together some of the most creative and driven tech minds from across the country.
+                </p>
+                
+                <p className="text-lg md:text-xl">
+                  Every edition of HIZE is built on a foundation of <span className="text-orange-500 font-semibold">excellence</span>, <span className="text-orange-400 font-semibold">inclusivity</span>, and <span className="text-orange-300 font-semibold">innovation</span>. From expert-led workshops and panel discussions to dynamic hackathons and startup showcases, the series cultivates a rich environment for skill development and networking. Participants not only gain technical mastery but also experience the collaborative energy that defines the IEEE ecosystem.
+                </p>
+                
+                <p className="text-lg md:text-xl">
+                  Backed by the global legacy of IEEE and the forward-thinking vision of the IEEE Computer Society, HIZE has become one of India's most anticipated student-driven technology movements. It's more than just a set of events — it's a <span className="text-orange-500 font-semibold">transformative journey</span> that shapes today's learners into tomorrow's leaders.
+                </p>
+              </div>
+              
+              <motion.div
+                className="absolute -inset-[1px] bg-gradient-to-r from-orange-600/20 via-orange-500/20 to-orange-600/20 rounded-3xl blur-xl -z-10"
+                animate={{
+                  opacity: [0.3, 0.6, 0.3],
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.6 }}
           >
             <EnhancedCountdown />
           </motion.div>
@@ -209,7 +244,7 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.6 }}
+            transition={{ delay: 0.7, duration: 0.6 }}
             className="pt-12 flex flex-col items-center gap-4"
           >
             <motion.button
