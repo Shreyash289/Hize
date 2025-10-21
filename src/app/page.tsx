@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Code2, Lightbulb, Mic2, Mail, Phone, ArrowDown, ChevronUp, X } from "lucide-react"
+import { Code2, Lightbulb, Mic2, Mail, Phone, ArrowDown, ChevronUp, X, FileText, Download } from "lucide-react"
 import LoadingScreen from "@/components/LoadingScreen"
 import DynamicBackground from "@/components/DynamicBackground"
 import ScrollProgress from "@/components/ScrollProgress"
@@ -80,7 +80,7 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null)
   const sectionsRef = useRef<HTMLElement[]>([])
 
-  const sections = ["Hero", "Events", "Guests", "Partners", "Contact"]
+  const sections = ["Hero", "Events", "Guests", "Partners", "Previous Events", "Contact"]
 
   useEffect(() => {
     if (!loadingComplete) return
@@ -423,6 +423,74 @@ export default function Home() {
 
       <section
         ref={(el) => el && (sectionsRef.current[4] = el)}
+        className="relative min-h-screen flex flex-col items-center justify-center px-6 py-20"
+      >
+        <div className="max-w-7xl mx-auto w-full relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-20"
+          >
+            <h2 className="text-6xl md:text-8xl font-bold tracking-tight mb-6 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
+              PREVIOUS EVENTS
+            </h2>
+            <p className="text-xl text-orange-200/80 font-serif max-w-2xl mx-auto">
+              Discover details about our past HIZE events and achievements
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="relative p-12 rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20"
+          >
+            <div className="text-center space-y-8">
+              <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-orange-600 to-orange-400 flex items-center justify-center shadow-lg mx-auto">
+                <FileText className="w-12 h-12 text-white" />
+              </div>
+
+              <div>
+                <h3 className="text-4xl md:text-5xl font-bold mb-4">
+                  HIZE 2024 Event Details
+                </h3>
+                <p className="text-lg text-slate-400 font-serif max-w-3xl mx-auto leading-relaxed">
+                  Get comprehensive insights into our previous HIZE 2024 event, including event highlights, 
+                  participant achievements, keynote sessions, and memorable moments that made it a success.
+                </p>
+              </div>
+
+              <motion.a
+                href="/HIZE-2024.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-600 to-orange-400 font-bold text-lg text-black shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 transition-all duration-300"
+              >
+                <Download className="w-6 h-6" />
+                Download HIZE 2024 Details
+              </motion.a>
+
+              <div className="pt-4">
+                <p className="text-sm text-slate-500 font-mono">
+                  PDF Document • Previous Event Information
+                </p>
+              </div>
+            </div>
+
+            <motion.div
+              className="absolute -inset-[1px] bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 rounded-3xl opacity-20 blur-2xl -z-10"
+            />
+          </motion.div>
+        </div>
+      </section>
+
+      <section
+        ref={(el) => el && (sectionsRef.current[5] = el)}
         className="relative min-h-screen flex flex-col items-center justify-center px-6 py-20"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
