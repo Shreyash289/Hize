@@ -499,7 +499,7 @@ export default function Home() {
               </div>
 
               <motion.a
-                href="/HIZE-2024.pdf"
+                href="https://www.ieeecshize.com/events"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
@@ -507,12 +507,12 @@ export default function Home() {
                 className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-600 to-orange-400 font-bold text-lg text-black shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 transition-all duration-300"
               >
                 <Download className="w-6 h-6" />
-                Download HIZE 2024 Details
+                View HIZE 2024 Events
               </motion.a>
 
               <div className="pt-4">
                 <p className="text-sm text-slate-500 font-mono">
-                  PDF Document • Previous Event Information
+                  Previous Event Information
                 </p>
               </div>
             </div>
