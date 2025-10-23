@@ -506,8 +506,7 @@ export default function Home() {
                 whileTap={{ scale: 0.95 }}
                 className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-600 to-orange-400 font-bold text-lg text-black shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 transition-all duration-300"
               >
-                <Download className="w-6 h-6" />
-                View HIZE 2024 Events
+                View our previous events
               </motion.a>
 
               <div className="pt-4">
