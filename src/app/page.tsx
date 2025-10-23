@@ -207,7 +207,7 @@ export default function Home() {
             <div className="relative p-8 md:p-12 rounded-3xl bg-gradient-to-br from-black/40 to-zinc-900/40 backdrop-blur-xl border border-orange-500/20">
               <div className="space-y-6 text-orange-100/90 font-serif leading-relaxed">
                 <p className="text-lg md:text-xl">
-                  At the IEEE High Impact Zonal Events (HIZE), we don't just showcase the future — we create it. The stage is now set for our high-impact Zonal Events 2.0, led by <span className="text-orange-400 font-semibold">Abhinav Gambhir, Architect at Microsoft</span>. This marks the culmination of an inspiring journey that has brought together some of the most creative and driven tech minds from across the country.
+                  At the IEEE High Impact Zonal Events (HIZE), we don't just showcase the future — we create it. The stage is now set for our high-impact Zonal Events 2.0, led by <span className="text-orange-400 font-semibold">Abhinav Gambhir, Associate Director at Oracle</span>. This marks the culmination of an inspiring journey that has brought together some of the most creative and driven tech minds from across the country.
                 </p>
                 
                 <p className="text-lg md:text-xl">
