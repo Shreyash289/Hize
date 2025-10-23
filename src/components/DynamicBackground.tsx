@@ -15,19 +15,41 @@ export default function DynamicBackground() {
 
     let animationFrameId: number
     let time = 0
+    let isVisible = true
 
+    // iOS Safari performance optimization
+    const devicePixelRatio = window.devicePixelRatio || 1
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      const width = window.innerWidth
+      const height = window.innerHeight
+      
+      // iOS Safari optimization
+      if (isIOS) {
+        canvas.width = width
+        canvas.height = height
+        canvas.style.width = width + 'px'
+        canvas.style.height = height + 'px'
+      } else {
+        canvas.width = width * devicePixelRatio
+        canvas.height = height * devicePixelRatio
+        canvas.style.width = width + 'px'
+        canvas.style.height = height + 'px'
+        ctx.scale(devicePixelRatio, devicePixelRatio)
+      }
     }
 
     const drawGradientMesh = () => {
-      const width = canvas.width
-      const height = canvas.height
+      if (!isVisible) return
+      
+      const width = isIOS ? canvas.width : canvas.width / devicePixelRatio
+      const height = isIOS ? canvas.height : canvas.height / devicePixelRatio
 
-      ctx.clearRect(0, 0, width, height)
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-      time += 0.002
+      // iOS Safari performance: reduce animation speed on mobile
+      time += isIOS ? 0.001 : 0.002
 
       const gradient1 = ctx.createRadialGradient(
         width * (0.3 + Math.sin(time) * 0.15),
@@ -118,10 +140,17 @@ export default function DynamicBackground() {
       resizeCanvas()
     }
 
+    // iOS Safari visibility handling
+    const handleVisibilityChange = () => {
+      isVisible = !document.hidden
+    }
+
     window.addEventListener("resize", handleResize)
+    document.addEventListener("visibilitychange", handleVisibilityChange)
 
     return () => {
       window.removeEventListener("resize", handleResize)
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
       cancelAnimationFrame(animationFrameId)
     }
   }, [])

@@ -26,20 +26,45 @@ export default function ParticleBackground() {
 
     let animationFrameId: number
     let particles: Particle[] = []
+    let isVisible = true
+
+    // iOS Safari performance optimization
+    const devicePixelRatio = window.devicePixelRatio || 1
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      const width = window.innerWidth
+      const height = window.innerHeight
+      
+      // iOS Safari optimization
+      if (isIOS) {
+        canvas.width = width
+        canvas.height = height
+        canvas.style.width = width + 'px'
+        canvas.style.height = height + 'px'
+      } else {
+        canvas.width = width * devicePixelRatio
+        canvas.height = height * devicePixelRatio
+        canvas.style.width = width + 'px'
+        canvas.style.height = height + 'px'
+        ctx.scale(devicePixelRatio, devicePixelRatio)
+      }
     }
 
     const createParticles = () => {
       particles = []
-      const particleCount = Math.floor((canvas.width * canvas.height) / 15000)
+      const width = isIOS ? canvas.width : canvas.width / devicePixelRatio
+      const height = isIOS ? canvas.height : canvas.height / devicePixelRatio
+      
+      // Reduce particle count on iOS for better performance
+      const particleCount = isIOS 
+        ? Math.floor((width * height) / 25000) 
+        : Math.floor((width * height) / 15000)
       
       for (let i = 0; i < particleCount; i++) {
         particles.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
+          x: Math.random() * width,
+          y: Math.random() * height,
           width: Math.random() * 80 + 40,
           height: Math.random() * 3 + 1,
           speedX: Math.random() * 0.5 + 0.2,
@@ -66,19 +91,27 @@ export default function ParticleBackground() {
     }
 
     const animate = () => {
+      if (!isVisible) {
+        animationFrameId = requestAnimationFrame(animate)
+        return
+      }
+      
+      const width = isIOS ? canvas.width : canvas.width / devicePixelRatio
+      const height = isIOS ? canvas.height : canvas.height / devicePixelRatio
+      
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       particles.forEach((particle) => {
         particle.x += particle.speedX
         particle.y += particle.speedY
 
-        if (particle.x > canvas.width + 100) {
+        if (particle.x > width + 100) {
           particle.x = -100
         }
-        if (particle.y > canvas.height + 50) {
+        if (particle.y > height + 50) {
           particle.y = -50
         } else if (particle.y < -50) {
-          particle.y = canvas.height + 50
+          particle.y = height + 50
         }
 
         drawParticle(particle)
@@ -96,10 +129,17 @@ export default function ParticleBackground() {
       createParticles()
     }
 
+    // iOS Safari visibility handling
+    const handleVisibilityChange = () => {
+      isVisible = !document.hidden
+    }
+
     window.addEventListener("resize", handleResize)
+    document.addEventListener("visibilitychange", handleVisibilityChange)
 
     return () => {
       window.removeEventListener("resize", handleResize)
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
       cancelAnimationFrame(animationFrameId)
     }
   }, [])

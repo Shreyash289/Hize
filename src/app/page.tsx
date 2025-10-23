@@ -77,32 +77,52 @@ export default function Home() {
   const [loadingComplete, setLoadingComplete] = useState(false)
   const [activeSection, setActiveSection] = useState(0)
   const [lightboxImage, setLightboxImage] = useState<string | null>(null)
+  const [isIOS, setIsIOS] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const sectionsRef = useRef<HTMLElement[]>([])
 
   const sections = ["Hero", "Events", "Guests", "Partners", "Previous Events", "Contact"]
 
+  // Detect iOS device
+  useEffect(() => {
+    const checkIOS = () => {
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+             (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    }
+    setIsIOS(checkIOS())
+  }, [])
+
   useEffect(() => {
     if (!loadingComplete) return
 
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + window.innerHeight / 2
+    let ticking = false
 
-      sectionsRef.current.forEach((section, index) => {
-        if (section) {
-          const { offsetTop, offsetHeight } = section
-          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-            setActiveSection(index)
-          }
-        }
-      })
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scrollPosition = window.scrollY + window.innerHeight / 2
+
+          sectionsRef.current.forEach((section, index) => {
+            if (section) {
+              const { offsetTop, offsetHeight } = section
+              if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+                setActiveSection(index)
+              }
+            }
+          })
+          ticking = false
+        })
+        ticking = true
+      }
     }
 
-    window.addEventListener("scroll", handleScroll)
+    // iOS Safari scroll optimization
+    const scrollOptions = isIOS ? { passive: true } : false
+    window.addEventListener("scroll", handleScroll, scrollOptions)
     handleScroll()
 
     return () => window.removeEventListener("scroll", handleScroll)
-  }, [loadingComplete])
+  }, [loadingComplete, isIOS])
 
   const scrollToSection = (index: number) => {
     sectionsRef.current[index]?.scrollIntoView({ behavior: "smooth" })

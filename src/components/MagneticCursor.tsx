@@ -7,8 +7,18 @@ export default function MagneticCursor() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [cursorVariant, setCursorVariant] = useState("default")
   const [isVisible, setIsVisible] = useState(false)
+  const [isTouchDevice, setIsTouchDevice] = useState(false)
 
   useEffect(() => {
+    // Detect touch devices (iOS, Android, etc.)
+    const checkTouchDevice = () => {
+      return 'ontouchstart' in window || navigator.maxTouchPoints > 0
+    }
+    
+    setIsTouchDevice(checkTouchDevice())
+    
+    // Don't initialize cursor on touch devices
+    if (checkTouchDevice()) return
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY })
       setIsVisible(true)
@@ -58,7 +68,7 @@ export default function MagneticCursor() {
     },
   }
 
-  if (!isVisible) return null
+  if (!isVisible || isTouchDevice) return null
 
   return (
     <>

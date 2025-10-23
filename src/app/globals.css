@@ -122,9 +122,27 @@
     @apply border-border outline-ring/50;
   }
   
+  html {
+    /* iOS Safari viewport fixes */
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    /* Prevent zoom on input focus */
+    -webkit-text-size-adjust: none;
+    /* Fix iOS Safari bounce scrolling */
+    overscroll-behavior: none;
+  }
+  
   body {
     @apply bg-background text-foreground;
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    /* iOS Safari specific fixes */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Prevent iOS Safari bounce */
+    overscroll-behavior: none;
+    /* Fix iOS Safari 100vh issue */
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -174,6 +192,68 @@
 
   .dark .clay-button:hover {
     box-shadow: 0px 6px 20px rgba(255, 140, 66, 0.4);
+  }
+
+  /* iOS Safari specific fixes */
+  .backdrop-blur-xl {
+    /* Fallback for iOS Safari */
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+  
+  @supports (backdrop-filter: blur(24px)) {
+    .backdrop-blur-xl {
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+  }
+
+  /* Fix iOS Safari canvas rendering issues */
+  canvas {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  /* iOS Safari touch improvements */
+  button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Fix iOS Safari input zoom */
+  input, textarea, select {
+    font-size: 16px;
+  }
+
+  /* iOS Safari scroll improvements */
+  .overflow-x-hidden {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Fix iOS Safari flexbox issues */
+  .flex {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    flex: 1;
+  }
+
+  /* iOS Safari gradient fixes */
+  .bg-gradient-to-r {
+    background-image: linear-gradient(to right, var(--tw-gradient-stops));
+  }
+
+  /* iOS Safari animation performance */
+  .will-change-transform {
+    will-change: transform;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  /* iOS Safari text rendering */
+  .bg-clip-text {
+    -webkit-background-clip: text;
+    background-clip: text;
   }
 }
 

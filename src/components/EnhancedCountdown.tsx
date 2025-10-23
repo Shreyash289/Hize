@@ -65,18 +65,42 @@ export default function EnhancedCountdown() {
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
+    
     let startX = 0
-    const onStart = (e: TouchEvent) => (startX = e.touches[0].clientX)
+    let startY = 0
+    let isScrolling = false
+    
+    const onStart = (e: TouchEvent) => {
+      startX = e.touches[0].clientX
+      startY = e.touches[0].clientY
+      isScrolling = false
+    }
+    
+    const onMove = (e: TouchEvent) => {
+      if (!isScrolling) {
+        const deltaX = Math.abs(e.touches[0].clientX - startX)
+        const deltaY = Math.abs(e.touches[0].clientY - startY)
+        isScrolling = deltaY > deltaX
+      }
+    }
+    
     const onEnd = (e: TouchEvent) => {
+      if (isScrolling) return
+      
       const dx = e.changedTouches[0].clientX - startX
       if (Math.abs(dx) < 30) return
+      
       if (dx < 0) next()
       else prev()
     }
+    
     el.addEventListener("touchstart", onStart, { passive: true })
+    el.addEventListener("touchmove", onMove, { passive: true })
     el.addEventListener("touchend", onEnd, { passive: true })
+    
     return () => {
       el.removeEventListener("touchstart", onStart)
+      el.removeEventListener("touchmove", onMove)
       el.removeEventListener("touchend", onEnd)
     }
   }, [])
