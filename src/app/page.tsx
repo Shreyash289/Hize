@@ -490,10 +490,10 @@ export default function Home() {
 
               <div>
                 <h3 className="text-4xl md:text-5xl font-bold mb-4">
-                  HIZE 2024 Event Details
+                  Previous HIZE Event Details
                 </h3>
                 <p className="text-lg text-slate-400 font-serif max-w-3xl mx-auto leading-relaxed">
-                  Get comprehensive insights into our previous HIZE 2024 event, including event highlights, 
+                  Get comprehensive insights into our previous HIZE event, including event highlights, 
                   participant achievements, keynote sessions, and memorable moments that made it a success.
                 </p>
               </div>
