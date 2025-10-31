@@ -3,6 +3,7 @@
 import { motion } from "framer-motion"
 import Navigation from "@/components/Navigation"
 import { Mail, Phone } from "lucide-react"
+import facultyContacts from "@/lib/facultyContacts"
 
 const coordinators = [
   {
@@ -157,6 +158,69 @@ export default function ContactPage() {
                   </div>
                   <span className="text-sm font-mono">{coordinator.phone}</span>
                 </motion.a>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Faculty Team section (added from provided list) */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="space-y-4 mt-16 mb-8"
+        >
+          <h2 className="text-4xl font-semibold tracking-tight">FACULTY TEAM</h2>
+          <p className="text-md text-muted-foreground font-serif max-w-2xl">
+            Official list of faculty in-charge for HIZE 2026 (as provided).
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {facultyContacts.map((f, idx) => (
+            <motion.div
+              key={f.name + idx}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.05, duration: 0.5 }}
+              className="clay-card p-8 space-y-6 bg-gradient-to-br from-card via-secondary to-accent"
+            >
+              <div>
+                <h3 className="text-2xl font-bold mb-2">{f.name}</h3>
+                <p className="text-muted-foreground font-serif">{f.designation}</p>
+                {f.role ? <p className="text-sm text-muted-foreground mt-1">{f.role}</p> : null}
+              </div>
+
+              <div className="space-y-4 pt-4 border-t border-border">
+                {f.email ? (
+                  <motion.a
+                    href={`mailto:${f.email}`}
+                    whileHover={{ x: 4 }}
+                    className="flex items-center gap-3 clay-button bg-secondary hover:bg-accent p-4 rounded-xl group transition-colors"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0">
+                      <Mail className="w-5 h-5" />
+                    </div>
+                    <span className="text-sm font-mono break-all">{f.email}</span>
+                  </motion.a>
+                ) : null}
+
+                {f.phone ? (
+                  <motion.a
+                    href={`tel:${f.phone.replace(/\s/g, '')}`}
+                    whileHover={{ x: 4 }}
+                    className="flex items-center gap-3 clay-button bg-secondary hover:bg-accent p-4 rounded-xl group transition-colors"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0">
+                      <Phone className="w-5 h-5" />
+                    </div>
+                    <span className="text-sm font-mono">{f.phone}</span>
+                  </motion.a>
+                ) : null}
+
+                {f.responsibilities ? (
+                  <p className="text-sm text-muted-foreground">{f.responsibilities}</p>
+                ) : null}
               </div>
             </motion.div>
           ))}
