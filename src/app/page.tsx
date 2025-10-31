@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Code2, Lightbulb, Mic2, Mail, Phone, ArrowDown, ChevronUp, X, FileText, Download } from "lucide-react"
-import facultyContacts from "@/lib/facultyContacts"
+import { facultyContacts } from "@/lib/facultyContacts"
 import LoadingScreen from "@/components/LoadingScreen"
 import DynamicBackground from "@/components/DynamicBackground"
 import ScrollProgress from "@/components/ScrollProgress"
@@ -546,7 +546,7 @@ export default function Home() {
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {facultyContacts.map((coordinator, index) => (
+            {facultyContacts && facultyContacts.map((coordinator, index) => (
               <motion.div
                 key={coordinator.name}
                 initial={{ opacity: 0, y: 50 }}

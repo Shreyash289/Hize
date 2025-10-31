@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 import Navigation from "@/components/Navigation"
 import { Mail, Phone } from "lucide-react"
-import facultyContacts from "@/lib/facultyContacts"
+import { facultyContacts } from "@/lib/facultyContacts"
 
 // coordinators list removed — rendering the canonical facultyContacts data instead
 
@@ -26,7 +26,7 @@ export default function ContactPage() {
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {facultyContacts.map((coordinator, index) => (
+          {facultyContacts && facultyContacts.map((coordinator, index) => (
             <motion.div
               key={coordinator.name + index}
               initial={{ opacity: 0, y: 30 }}
