@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Code2, Lightbulb, Mic2, Mail, Phone, ArrowDown, ChevronUp, X, FileText, Download } from "lucide-react"
+import facultyContacts from "@/lib/facultyContacts"
 import LoadingScreen from "@/components/LoadingScreen"
 import DynamicBackground from "@/components/DynamicBackground"
 import ScrollProgress from "@/components/ScrollProgress"
@@ -52,26 +53,7 @@ const speakers = [
   }
 ]
 
-const coordinators = [
-  {
-    name: "Dr. Priya Sharma",
-    role: "Faculty Coordinator, Computer Science",
-    email: "priya.sharma@example.edu",
-    phone: "+91 12345 67890"
-  },
-  {
-    name: "Prof. Arjun Mehta",
-    role: "Events Lead, Information Technology",
-    email: "arjun.mehta@example.edu",
-    phone: "+91 98765 43210"
-  },
-  {
-    name: "Dr. Neha Kapoor",
-    role: "Workshops & Outreach",
-    email: "neha.kapoor@example.edu",
-    phone: "+91 11122 23334"
-  }
-]
+// removed local placeholder coordinators — using canonical facultyContacts
 
 export default function Home() {
   const [loadingComplete, setLoadingComplete] = useState(false)
@@ -564,7 +546,7 @@ export default function Home() {
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {coordinators.map((coordinator, index) => (
+            {facultyContacts.map((coordinator, index) => (
               <motion.div
                 key={coordinator.name}
                 initial={{ opacity: 0, y: 50 }}
@@ -575,7 +557,7 @@ export default function Home() {
               >
                 <div>
                   <h3 className="text-2xl font-bold mb-2">{coordinator.name}</h3>
-                  <p className="text-slate-400 font-serif">{coordinator.role}</p>
+                  <p className="text-slate-400 font-serif">{coordinator.designation || coordinator.role}</p>
                 </div>
 
                 <div className="space-y-4 pt-4 border-t border-white/10">
