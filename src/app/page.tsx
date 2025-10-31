@@ -545,43 +545,57 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {facultyContacts.map((coordinator, index) => (
               <motion.div
                 key={coordinator.name}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.2, duration: 0.8 }}
+                transition={{ delay: index * 0.1, duration: 0.8 }}
                 className="relative p-8 rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20 space-y-6"
               >
                 <div>
                   <h3 className="text-2xl font-bold mb-2">{coordinator.name}</h3>
-                  <p className="text-slate-400 font-serif">{coordinator.designation || coordinator.role}</p>
+                  <p className="text-slate-300 font-serif">{coordinator.designation}</p>
+                  {coordinator.role && (
+                    <p className="text-sm text-orange-400 mt-1 font-semibold">{coordinator.role}</p>
+                  )}
                 </div>
 
                 <div className="space-y-4 pt-4 border-t border-white/10">
-                  <motion.a
-                    href={`mailto:${coordinator.email}`}
-                    whileHover={{ x: 5 }}
-                    className="flex items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-orange-600 to-orange-400 flex items-center justify-center flex-shrink-0">
-                      <Mail className="w-5 h-5" />
-                    </div>
-                    <span className="text-sm font-mono break-all">{coordinator.email}</span>
-                  </motion.a>
+                  {coordinator.email && (
+                    <motion.a
+                      href={`mailto:${coordinator.email}`}
+                      whileHover={{ x: 5 }}
+                      className="flex items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-orange-600 to-orange-400 flex items-center justify-center flex-shrink-0">
+                        <Mail className="w-5 h-5" />
+                      </div>
+                      <span className="text-sm font-mono break-all">{coordinator.email}</span>
+                    </motion.a>
+                  )}
 
-                  <motion.a
-                    href={`tel:${coordinator.phone.replace(/\s/g, '')}`}
-                    whileHover={{ x: 5 }}
-                    className="flex items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-orange-400 to-orange-600 flex items-center justify-center flex-shrink-0">
-                      <Phone className="w-5 h-5" />
+                  {coordinator.phone && (
+                    <motion.a
+                      href={`tel:${coordinator.phone.replace(/\s/g, '')}`}
+                      whileHover={{ x: 5 }}
+                      className="flex items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-orange-400 to-orange-600 flex items-center justify-center flex-shrink-0">
+                        <Phone className="w-5 h-5" />
+                      </div>
+                      <span className="text-sm font-mono">{coordinator.phone}</span>
+                    </motion.a>
+                  )}
+
+                  {coordinator.responsibilities && (
+                    <div className="pt-2">
+                      <p className="text-xs text-slate-500 mb-1 font-semibold uppercase tracking-wide">Responsibilities</p>
+                      <p className="text-sm text-slate-400 leading-relaxed">{coordinator.responsibilities}</p>
                     </div>
-                    <span className="text-sm font-mono">{coordinator.phone}</span>
-                  </motion.a>
+                  )}
                 </div>
 
                 <motion.div

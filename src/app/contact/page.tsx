@@ -36,10 +36,10 @@ export default function ContactPage() {
             >
               <div>
                 <h3 className="text-2xl font-bold mb-2">{coordinator.name}</h3>
-                <p className="text-muted-foreground font-serif">{coordinator.designation || coordinator.role}</p>
-                {coordinator.role && coordinator.designation ? (
-                  <p className="text-sm text-muted-foreground mt-1">{coordinator.role}</p>
-                ) : null}
+                <p className="text-muted-foreground font-serif">{coordinator.designation}</p>
+                {coordinator.role && (
+                  <p className="text-sm text-primary mt-1 font-semibold">{coordinator.role}</p>
+                )}
               </div>
 
               <div className="space-y-4 pt-4 border-t border-border">
@@ -70,7 +70,10 @@ export default function ContactPage() {
                 ) : null}
 
                 {coordinator.responsibilities ? (
-                  <p className="text-sm text-muted-foreground">{coordinator.responsibilities}</p>
+                  <div className="pt-2">
+                    <p className="text-xs text-muted-foreground mb-1 font-semibold uppercase tracking-wide">Responsibilities</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{coordinator.responsibilities}</p>
+                  </div>
                 ) : null}
               </div>
             </motion.div>
