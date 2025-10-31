@@ -1,11 +1,11 @@
 export const facultyContacts = [
   {
     name: "Dr. Godfrey Winster S",
-    designation: "Associate Professor, SRMIST",
+    designation: "Associate Professor",
     role: "SPOC",
     email: "godfreys@srmist.edu.in",
     phone: "9962594141",
-    responsibilities: "SPOC"
+    responsibilities: "Overall Coordination"
   },
   {
     name: "Dr. K. Vijaya",
@@ -45,7 +45,7 @@ export const facultyContacts = [
     role: "Coordinator",
     email: "kishorea1@srmist.edu.in",
     phone: "9043103219",
-    responsibilities: "Design of Brochure, Publicity, All campus advertising Board, Certificate and Printing"
+    responsibilities: "Design of Brochure, Publicity, Campus Advertising Boards, Certificates and Printing"
   },
   {
     name: "Dr. S. Gnanavel",
@@ -53,7 +53,7 @@ export const facultyContacts = [
     role: "Co-Coordinator",
     email: "gnanaves1@srmist.edu.in",
     phone: "9976985204",
-    responsibilities: "Hall arrangement and venue coordination"
+    responsibilities: "Hall Arrangement and Venue Coordination"
   },
   {
     name: "Dr. M. Sindhuja",
@@ -61,7 +61,7 @@ export const facultyContacts = [
     role: "Co-Coordinator",
     email: "sindhujm1@srmist.edu.in",
     phone: "9840297677",
-    responsibilities: "Report preparation, Photography, IEEE events video for Inaugural function, video for valedictory"
+    responsibilities: "Report Preparation, Photography, IEEE Event Videos (Inaugural and Valedictory)"
   },
   {
     name: "Dr. S. S. Saranya",
@@ -77,7 +77,7 @@ export const facultyContacts = [
     role: "Co-Coordinator",
     email: "arulalav@srmist.edu.in",
     phone: "8015648194",
-    responsibilities: "Guest Memento, participants kit purchase"
+    responsibilities: "Guest Memento, Participants Kit Purchase"
   },
   {
     name: "Dr. T. Ragunthar",
@@ -85,7 +85,7 @@ export const facultyContacts = [
     role: "Co-Coordinator",
     email: "raguntht@srmist.edu.in",
     phone: "9600191718",
-    responsibilities: "Website Design, Development and Updating at regular interval"
+    responsibilities: "Website Design, Development and Regular Updates"
   },
   {
     name: "Dr. C. Muralidharan",
@@ -101,7 +101,7 @@ export const facultyContacts = [
     role: "Co-Coordinator",
     email: "balamurg1@srmist.edu.in",
     phone: "9629308990",
-    responsibilities: "Website Design, Development and Updating at regular interval"
+    responsibilities: "Website Design, Development and Regular Updates"
   },
   {
     name: "Dr. K. Vijiyakumar",
@@ -117,7 +117,7 @@ export const facultyContacts = [
     role: "Co-Coordinator",
     email: "gokulakd@srmist.edu.in",
     phone: "9629879934",
-    responsibilities: "Participants Registration and accommodation"
+    responsibilities: "Participants Registration and Accommodation"
   },
   {
     name: "Dr. Ramkumar Jayaraman",
@@ -125,7 +125,7 @@ export const facultyContacts = [
     role: "Co-Coordinator",
     email: "ramkumaj@srmist.edu.in",
     phone: "9894425770",
-    responsibilities: "Participants Registration and accommodation"
+    responsibilities: "Participants Registration and Accommodation"
   }
 ]
 
