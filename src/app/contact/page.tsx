@@ -6,22 +6,100 @@ import { Mail, Phone } from "lucide-react"
 
 const coordinators = [
   {
-    name: "Dr. Priya Sharma",
-    role: "Faculty Coordinator, Computer Science",
-    email: "priya.sharma@example.edu",
-    phone: "+91 12345 67890"
+    name: "Dr. Godfrey Winster S",
+    role: "SPOC — Associate Professor, SRMIST",
+    email: "godfreys@srmist.edu.in",
+    phone: "9962594141"
   },
   {
-    name: "Prof. Arjun Mehta",
-    role: "Events Lead, Information Technology",
-    email: "arjun.mehta@example.edu",
-    phone: "+91 98765 43210"
+    name: "Dr. K. Vijaya",
+    role: "Coordinator — Professor — Program Schedule, Inauguration, Valedictory",
+    email: "vijayak@srmist.edu.in",
+    phone: "9444146212"
   },
   {
-    name: "Dr. Neha Kapoor",
-    role: "Workshops & Outreach",
-    email: "neha.kapoor@example.edu",
-    phone: "+91 11122 23334"
+    name: "Dr. M. Baskar",
+    role: "Coordinator — Associate Professor — Finance, Sponsor, Purchase",
+    email: "baskarm1@srmist.edu.in",
+    phone: "8248485987"
+  },
+  {
+    name: "Dr. N. Arunachalam",
+    role: "Coordinator — Associate Professor — Guest Hospitality and Logistics",
+    email: "arunachn@srmist.edu.in",
+    phone: "9944342292"
+  },
+  {
+    name: "Dr. J. Selvin Paul Peter",
+    role: "Coordinator — Associate Professor — Students Hospitality",
+    email: "selvinpj@srmist.edu.in",
+    phone: "9986563360"
+  },
+  {
+    name: "Dr. K. Kishore Anthuvan Sahayaraj",
+    role: "Coordinator — Assistant Professor — Design of Brochure, Publicity, All campus advertising Board, Certificate and Printing",
+    email: "kishorea1@srmist.edu.in",
+    phone: "9043103219"
+  },
+  {
+    name: "Dr. S. Gnanavel",
+    role: "Co-Coordinator — Associate Professor — Hall arrangement and venue coordination",
+    email: "gnanaves1@srmist.edu.in",
+    phone: "9976985204"
+  },
+  {
+    name: "Dr. M. Sindhuja",
+    role: "Co-Coordinator — Assistant Professor — Report preparation, Photography, IEEE events video for Inaugural function, video for valedictory",
+    email: "sindhujm1@srmist.edu.in",
+    phone: "9840297677"
+  },
+  {
+    name: "Dr. S. S. Saranya",
+    role: "Co-Coordinator — Assistant Professor — Program Schedule, Inauguration, Valedictory",
+    email: "saranyas6@srmist.edu.in",
+    phone: "7904942221"
+  },
+  {
+    name: "Dr. V. Arulalan",
+    role: "Co-Coordinator — Assistant Professor — Guest Memento, participants kit purchase",
+    email: "arulalav@srmist.edu.in",
+    phone: "8015648194"
+  },
+  {
+    name: "Dr. T. Ragunthar",
+    role: "Co-Coordinator — Assistant Professor — Website Design, Development and Updating at regular interval",
+    email: "raguntht@srmist.edu.in",
+    phone: "9600191718"
+  },
+  {
+    name: "Dr. C. Muralidharan",
+    role: "Co-Coordinator — Assistant Professor — Guest Coordination",
+    email: "muralidc@srmist.edu.in",
+    phone: "9585579526"
+  },
+  {
+    name: "Dr. G. Balamurugan",
+    role: "Co-Coordinator — Assistant Professor — Website Design, Development and Updating at regular interval",
+    email: "balamurg1@srmist.edu.in",
+    phone: "9629308990"
+  },
+  {
+    name: "Dr. K. Vijiyakumar",
+    role: "Co-Coordinator — Assistant Professor — Guest Hospitality and Logistics",
+    email: "vijiyakk@srmist.edu.in",
+    phone: "9994472250"
+  },
+  {
+    name: "Dr. D. Gokulakrishnan",
+    role: "Co-Coordinator — Assistant Professor — Participants Registration and accommodation",
+    email: "gokulakd@srmist.edu.in",
+    phone: "9629879934"
+  },
+  {
+    name: "Dr. Ramkumar Jayaraman",
+    role: "Co-Coordinator — Assistant Professor — Participants Registration and accommodation",
+    email: "ramkumaj@srmist.edu.in",
+    phone: "9894425770"
   }
 ]
 
