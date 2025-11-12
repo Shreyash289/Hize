@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import Link from 'next/link'
 import { Code2, Lightbulb, Mic2, Mail, Phone, ArrowDown, ChevronUp, X, FileText, Download } from "lucide-react"
 import facultyContacts from "@/lib/facultyContacts"
 import LoadingScreen from "@/components/LoadingScreen"
@@ -249,13 +250,15 @@ export default function Home() {
             transition={{ delay: 0.7, duration: 0.6 }}
             className="pt-12 flex flex-col items-center gap-4"
           >
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-12 py-5 rounded-2xl bg-gradient-to-r from-orange-600 to-orange-400 font-black text-xl text-black shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 transition-all"
-            >
-              REGISTER NOW
-            </motion.button>
+            <Link href="/register" passHref>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-12 py-5 rounded-2xl bg-gradient-to-r from-orange-600 to-orange-400 font-black text-xl text-black shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 transition-all"
+              >
+                REGISTER NOW
+              </motion.button>
+            </Link>
 
             <motion.div
               animate={{ y: [0, 12, 0] }}
