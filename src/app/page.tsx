@@ -299,12 +299,10 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.2, duration: 0.8 }}
-                whileHover={{ y: -10, rotateY: 5 }}
                 className="group relative"
                 style={{ transformStyle: "preserve-3d" }}
               >
                 <div className="relative p-8 rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20 overflow-hidden">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${event.color} opacity-0 group-hover:opacity-20 transition-opacity duration-500`} />
 
                   <div className="relative z-10 space-y-6">
                     <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${event.color} flex items-center justify-center shadow-lg`}>
@@ -328,14 +326,10 @@ export default function Home() {
                       </p>
                     </div>
 
-                    <button className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-orange-600 to-orange-400 hover:shadow-lg hover:shadow-orange-500/50 transition-all duration-300">
+                    <button className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-orange-600 to-orange-400 transition-all duration-300">
                       View Details
                     </button>
                   </div>
-
-                  <motion.div
-                    className="absolute -inset-[1px] bg-gradient-to-r from-orange-600 to-orange-400 rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10"
-                  />
                 </div>
               </motion.div>
             ))}
@@ -586,10 +580,6 @@ export default function Home() {
                     <span className="text-sm font-mono">{coordinator.phone}</span>
                   </motion.a>
                 </div>
-
-                <motion.div
-                  className="absolute -inset-[1px] bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 rounded-3xl opacity-0 hover:opacity-100 blur-xl transition-opacity duration-500 -z-10"
-                />
               </motion.div>
             ))}
           </div>

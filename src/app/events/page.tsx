@@ -53,8 +53,7 @@ export default function EventsPage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.2, duration: 0.6 }}
-              whileHover={{ scale: 1.02 }}
-              className={`clay-card p-8 bg-gradient-to-br ${event.gradient} group cursor-pointer`}
+              className={`clay-card no-hover-glow p-8 bg-gradient-to-br ${event.gradient} group cursor-pointer`}
             >
               <div className="space-y-6">
                 <div className="w-16 h-16 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center clay-button">
@@ -78,7 +77,7 @@ export default function EventsPage() {
                   </p>
                 </div>
 
-                <button className="w-full clay-button bg-primary text-primary-foreground py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors">
+                <button className="w-full clay-button no-hover-glow bg-primary text-primary-foreground py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors">
                   View details
                 </button>
               </div>

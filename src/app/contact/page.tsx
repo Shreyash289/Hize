@@ -128,7 +128,7 @@ export default function ContactPage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.2, duration: 0.6 }}
-              className="clay-card p-8 space-y-6 bg-gradient-to-br from-card via-secondary to-accent"
+              className="clay-card no-hover-glow p-8 space-y-6 bg-gradient-to-br from-card via-secondary to-accent"
             >
               <div>
                 <h3 className="text-2xl font-bold mb-2">{coordinator.name}</h3>
@@ -139,7 +139,7 @@ export default function ContactPage() {
                 <motion.a
                   href={`mailto:${coordinator.email}`}
                   whileHover={{ x: 4 }}
-                  className="flex items-center gap-3 clay-button bg-secondary hover:bg-accent p-4 rounded-xl group transition-colors"
+                  className="flex items-center gap-3 clay-button no-hover-glow bg-secondary hover:bg-accent p-4 rounded-xl group transition-colors"
                 >
                   <div className="w-10 h-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0">
                     <Mail className="w-5 h-5" />
@@ -150,7 +150,7 @@ export default function ContactPage() {
                 <motion.a
                   href={`tel:${coordinator.phone.replace(/\s/g, '')}`}
                   whileHover={{ x: 4 }}
-                  className="flex items-center gap-3 clay-button bg-secondary hover:bg-accent p-4 rounded-xl group transition-colors"
+                  className="flex items-center gap-3 clay-button no-hover-glow bg-secondary hover:bg-accent p-4 rounded-xl group transition-colors"
                 >
                   <div className="w-10 h-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0">
                     <Phone className="w-5 h-5" />

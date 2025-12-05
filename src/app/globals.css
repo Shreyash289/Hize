@@ -194,6 +194,25 @@
     box-shadow: 0px 6px 20px rgba(255, 140, 66, 0.4);
   }
 
+  /* Disable hover glow for events and contact sections */
+  .no-hover-glow.clay-card:hover {
+    transform: none;
+    box-shadow: var(--shadow);
+  }
+
+  .no-hover-glow.clay-button:hover {
+    transform: none;
+    box-shadow: 0px 4px 12px rgba(255, 140, 66, 0.2);
+  }
+
+  .dark .no-hover-glow.clay-card:hover {
+    box-shadow: var(--shadow);
+  }
+
+  .dark .no-hover-glow.clay-button:hover {
+    box-shadow: 0px 4px 12px rgba(255, 140, 66, 0.2);
+  }
+
   /* iOS Safari specific fixes */
   .backdrop-blur-xl {
     /* Fallback for iOS Safari */
