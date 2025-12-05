@@ -299,17 +299,17 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.2, duration: 0.8 }}
-                className="group relative"
+                className="group relative h-full flex flex-col"
                 style={{ transformStyle: "preserve-3d" }}
               >
-                <div className="relative p-8 rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20 overflow-hidden">
+                <div className="relative p-8 rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20 overflow-hidden h-full flex flex-col">
 
-                  <div className="relative z-10 space-y-6">
+                  <div className="relative z-10 flex flex-col flex-grow space-y-6">
                     <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${event.color} flex items-center justify-center shadow-lg`}>
                       <event.icon className="w-8 h-8 text-white" />
                     </div>
 
-                    <div>
+                    <div className="flex-grow">
                       <h3 className="text-3xl font-bold mb-3">{event.title}</h3>
                       <div className="flex gap-2 flex-wrap mb-4">
                         {event.tags.map((tag) => (
