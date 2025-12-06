@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Image from "next/image"
 import Navigation from "@/components/Navigation"
 import { Mail, Phone } from "lucide-react"
 import facultyContacts from "@/lib/facultyContacts"
@@ -32,16 +33,15 @@ export default function ContactPage() {
               transition={{ delay: index * 0.2, duration: 0.6 }}
               className="clay-card overflow-hidden group"
             >
-              <div className="aspect-[3/4] bg-gradient-to-br from-secondary via-accent to-muted relative overflow-hidden">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.4 }}
-                  className="w-full h-full"
-                  style={{
-                    backgroundImage: `url(${coordinator.image})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                  }}
+              <div className="aspect-[3/4] relative overflow-hidden bg-gradient-to-br from-secondary via-accent to-muted">
+                <Image
+                  src={coordinator.image}
+                  alt={coordinator.name}
+                  fill
+                  className="object-cover transition-transform duration-400 group-hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  unoptimized
+                  priority={index < 3}
                 />
               </div>
               <div className="p-6 space-y-4">
