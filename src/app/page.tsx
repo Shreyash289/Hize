@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from 'next/link'
 import { Code2, Lightbulb, Mic2, Mail, Phone, ArrowDown, ChevronUp, X, FileText, Download } from "lucide-react"
+import Image from "next/image"
 import facultyContacts from "@/lib/facultyContacts"
 import LoadingScreen from "@/components/LoadingScreen"
 import DynamicBackground from "@/components/DynamicBackground"
@@ -552,9 +553,20 @@ export default function Home() {
                 transition={{ delay: index * 0.2, duration: 0.8 }}
                 className="relative p-8 rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20 space-y-6"
               >
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">{coordinator.name}</h3>
-                  <p className="text-slate-400 font-serif">{coordinator.designation || coordinator.role}</p>
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-orange-500/30">
+                    <Image
+                      src={coordinator.image}
+                      alt={coordinator.name}
+                      fill
+                      className="object-cover"
+                      sizes="96px"
+                    />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="text-2xl font-bold mb-2">{coordinator.name}</h3>
+                    <p className="text-slate-400 font-serif">{coordinator.designation || coordinator.role}</p>
+                  </div>
                 </div>
 
                 <div className="space-y-4 pt-4 border-t border-white/10">
