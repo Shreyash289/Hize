@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Abhinav Gambhir",
+    "title": "Associate Director, Oracle",
+    "image": "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=1200&fit=crop",
+    "bio": "Expert in cloud engineering and developer relations."
+  },
+  {
+    "name": "Priya Sharma",
+    "title": "Senior ML Engineer, Acme AI",
+    "image": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=1200&fit=crop",
+    "bio": "Works on production ML systems and on-device AI."
+  },
+  {
+    "name": "Rohit Menon",
+    "title": "CTO, StartupX",
+    "image": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=1200&fit=crop",
+    "bio": "Founder & technology leader focused on scalable infra."
+  }
+]

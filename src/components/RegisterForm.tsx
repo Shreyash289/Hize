@@ -84,14 +84,14 @@ export default function RegisterForm() {
   };
   
   return (
-    <div className="min-h-screen bg-gradient-to-br flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl bg-gradient-to-br from-gray-800/90 to-gray-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-700 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-black to-orange-950/60 flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl bg-gradient-to-br from-black/95 to-orange-900/40 backdrop-blur-xl rounded-3xl shadow-2xl border border-orange-800 overflow-hidden">
         <div className="p-8">
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-1">Event Registration</h1>
-              <p className="text-gray-400 text-sm">
+              <h1 className="text-3xl font-bold text-orange-400 mb-1">Event Registration</h1>
+              <p className="text-orange-200 text-sm">
                 {isEditMode ? 'Update your information' : 'Fill in your details to register'}
               </p>
             </div>
@@ -101,7 +101,7 @@ export default function RegisterForm() {
                 {!isEditable ? (
                   <button
                     onClick={() => setIsEditable(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition font-medium"
+                    className="flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition font-medium"
                   >
                     <Edit2 className="w-4 h-4" />
                     Edit
@@ -109,7 +109,7 @@ export default function RegisterForm() {
                 ) : (
                   <button
                     onClick={() => setIsEditable(false)}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition font-medium"
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition font-medium"
                   >
                     <Lock className="w-4 h-4" />
                     Lock
@@ -121,12 +121,12 @@ export default function RegisterForm() {
           
           {/* Login Link */}
           {!isEditMode && (
-            <div className="mb-6 p-4 bg-blue-600/20 border border-blue-500/30 rounded-lg">
-              <p className="text-sm text-gray-300">
+            <div className="mb-6 p-4 bg-orange-600/10 border border-orange-500/20 rounded-lg">
+              <p className="text-sm text-orange-200">
                 Already registered?{' '}
                 <button
                   onClick={() => setShowLogin(true)}
-                  className="text-blue-400 hover:text-blue-300 font-semibold underline"
+                  className="text-orange-300 hover:text-orange-200 font-semibold underline"
                 >
                   Login to edit your information
                 </button>
@@ -137,8 +137,8 @@ export default function RegisterForm() {
           {/* Form Fields */}
           <div className="space-y-5">
             <div>
-              <label className="block text-sm font-semibold text-gray-300 mb-2">
-                Full Name <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-orange-200 mb-2">
+                Full Name <span className="text-orange-400">*</span>
               </label>
               <input
                 name="name"
@@ -146,13 +146,13 @@ export default function RegisterForm() {
                 value={formData.name}
                 onChange={handleChange}
                 disabled={!isEditable}
-                className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 bg-black/60 border border-orange-800 rounded-lg text-orange-100 placeholder-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-semibold text-gray-300 mb-2">
-                Registration Number <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-orange-200 mb-2">
+                Registration Number <span className="text-orange-400">*</span>
               </label>
               <input
                 name="regNo"
@@ -160,13 +160,13 @@ export default function RegisterForm() {
                 value={formData.regNo}
                 onChange={handleChange}
                 disabled={!isEditable}
-                className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 bg-black/60 border border-orange-800 rounded-lg text-orange-100 placeholder-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-semibold text-gray-300 mb-2">
-                Email Address <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-orange-200 mb-2">
+                Email Address <span className="text-orange-400">*</span>
               </label>
               <input
                 name="email"
@@ -175,12 +175,12 @@ export default function RegisterForm() {
                 value={formData.email}
                 onChange={handleChange}
                 disabled={!isEditable}
-                className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 bg-black/60 border border-orange-800 rounded-lg text-orange-100 placeholder-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-semibold text-gray-300 mb-2">
+              <label className="block text-sm font-semibold text-orange-200 mb-2">
                 Department
               </label>
               <input
@@ -189,12 +189,12 @@ export default function RegisterForm() {
                 value={formData.department}
                 onChange={handleChange}
                 disabled={!isEditable}
-                className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 bg-black/60 border border-orange-800 rounded-lg text-orange-100 placeholder-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-semibold text-gray-300 mb-2">
+              <label className="block text-sm font-semibold text-orange-200 mb-2">
                 College Name
               </label>
               <input
@@ -203,12 +203,12 @@ export default function RegisterForm() {
                 value={formData.college}
                 onChange={handleChange}
                 disabled={!isEditable}
-                className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 bg-black/60 border border-orange-800 rounded-lg text-orange-100 placeholder-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-semibold text-gray-300 mb-2">
+              <label className="block text-sm font-semibold text-orange-200 mb-2">
                 Upload College ID Card
               </label>
               <ImageUpload
@@ -234,7 +234,7 @@ export default function RegisterForm() {
                     });
                     setFile(null);
                   }}
-                  className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition"
+                  className="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white font-semibold rounded-lg transition"
                 >
                   Cancel
                 </button>
@@ -244,7 +244,7 @@ export default function RegisterForm() {
                 <button
                   onClick={handleSubmit}
                   disabled={loading || uploading}
-                  className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg"
+                  className="px-8 py-3 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg"
                 >
                   {loading || uploading ? (
                     <>

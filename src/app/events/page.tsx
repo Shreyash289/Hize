@@ -1,38 +1,82 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import Navigation from "@/components/Navigation"
 import { Code2, Lightbulb, Mic2 } from "lucide-react"
+import EventCard, { EventItem } from "@/components/EventCard"
 
-const events = [
+const ICON_MAP: Record<string, any> = {
+  Code2,
+  Lightbulb,
+  Mic2,
+}
+
+// fallback defaults shown while events.json isn't available
+const DEFAULT_EVENTS: EventItem[] = [
   {
-    icon: Code2,
+    icon: "Code2",
     title: "Hackathon",
     tags: ["48 hrs", "Team"],
-    description: "Build innovative solutions in an intense 48-hour coding marathon. Collaborate with talented developers and bring your ideas to life.",
-    gradient: "from-card via-secondary to-accent"
+    description:
+      "Build innovative solutions in an intense 48-hour coding marathon. Collaborate with talented developers and bring your ideas to life.",
+    gradient: "from-card via-secondary to-accent",
   },
   {
-    icon: Lightbulb,
+    icon: "Lightbulb",
     title: "AI Workshop",
     tags: ["Intermediate", "Hands-on"],
-    description: "Dive deep into artificial intelligence and machine learning with hands-on projects and expert guidance.",
-    gradient: "from-accent via-card to-secondary"
+    description:
+      "Dive deep into artificial intelligence and machine learning with hands-on projects and expert guidance.",
+    gradient: "from-accent via-card to-secondary",
   },
   {
-    icon: Mic2,
+    icon: "Mic2",
     title: "Keynote Series",
     tags: ["Leaders", "Trends"],
-    description: "Hear from industry leaders about the latest trends, innovations, and future directions in technology.",
-    gradient: "from-secondary via-accent to-card"
-  }
+    description:
+      "Hear from industry leaders about the latest trends, innovations, and future directions in technology.",
+    gradient: "from-secondary via-accent to-card",
+  },
 ]
 
 export default function EventsPage() {
+  const [eventsData, setEventsData] = useState<EventItem[]>(DEFAULT_EVENTS)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let mounted = true
+    fetch("/data/events.json", { cache: "no-store" })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch events.json")
+        return res.json()
+      })
+      .then((data) => {
+        if (!mounted) return
+        if (Array.isArray(data) && data.length > 0) {
+          setEventsData(data as EventItem[])
+        } else {
+          // keep defaults if the file is empty or malformed
+          setEventsData(DEFAULT_EVENTS)
+        }
+      })
+      .catch(() => {
+        // on error, keep DEFAULT_EVENTS
+        if (mounted) setEventsData(DEFAULT_EVENTS)
+      })
+      .finally(() => {
+        if (mounted) setLoading(false)
+      })
+
+    return () => {
+      mounted = false
+    }
+  }, [])
+
   return (
     <div className="min-h-screen">
       <Navigation />
-      
+
       <main className="max-w-7xl mx-auto px-6 py-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -46,45 +90,25 @@ export default function EventsPage() {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {events.map((event, index) => (
-            <motion.div
-              key={event.title}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.2, duration: 0.6 }}
-              whileHover={{ scale: 1.02 }}
-              className={`clay-card p-8 bg-gradient-to-br ${event.gradient} group cursor-pointer`}
-            >
-              <div className="space-y-6">
-                <div className="w-16 h-16 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center clay-button">
-                  <event.icon className="w-8 h-8" />
-                </div>
-
-                <div>
-                  <h3 className="text-3xl font-bold mb-3">{event.title}</h3>
-                  <div className="flex gap-2 flex-wrap mb-4">
-                    {event.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-sm font-medium font-mono"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground font-serif leading-relaxed">
-                    {event.description}
-                  </p>
-                </div>
-
-                <button className="w-full clay-button bg-primary text-primary-foreground py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors">
-                  View details
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="py-24 text-center text-muted-foreground">Loading events…</div>
+        ) : eventsData.length === 0 ? (
+          <div className="py-24 text-center text-muted-foreground">No events available.</div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {eventsData.map((event, index) => {
+              const Icon = ICON_MAP[event.icon ?? ""] ?? undefined
+              return (
+                <EventCard
+                  key={`${event.title ?? "event"}-${index}`}
+                  event={event}
+                  index={index}
+                  Icon={Icon}
+                />
+              )
+            })}
+          </div>
+        )}
       </main>
 
       <footer className="border-t border-border mt-20 py-8">

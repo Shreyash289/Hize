@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from 'next/link'
-import { Code2, Lightbulb, Mic2, Mail, Phone, ArrowDown, ChevronUp, X, FileText, Download } from "lucide-react"
+import { Code2, Lightbulb, Mic2, Mail, Phone, ArrowDown, ChevronUp, X, FileText } from "lucide-react"
+import Image from "next/image"
 import facultyContacts from "@/lib/facultyContacts"
 import LoadingScreen from "@/components/LoadingScreen"
 import DynamicBackground from "@/components/DynamicBackground"
@@ -12,49 +13,25 @@ import EnhancedCountdown from "@/components/EnhancedCountdown"
 import MagneticCursor from "@/components/MagneticCursor"
 import Marquee from "react-fast-marquee"
 
-const events = [
-  {
-    icon: Code2,
-    title: "Hackathon",
-    tags: ["48 hrs", "Team"],
-    description: "Build innovative solutions in an intense 48-hour coding marathon. Collaborate with talented developers and bring your ideas to life.",
-    color: "from-orange-600 to-orange-400"
-  },
-  {
-    icon: Lightbulb,
-    title: "AI Workshop",
-    tags: ["Intermediate", "Hands-on"],
-    description: "Dive deep into artificial intelligence and machine learning with hands-on projects and expert guidance.",
-    color: "from-orange-500 to-orange-300"
-  },
-  {
-    icon: Mic2,
-    title: "Keynote Series",
-    tags: ["Leaders", "Trends"],
-    description: "Hear from industry leaders about the latest trends, innovations, and future directions in technology.",
-    color: "from-orange-700 to-orange-500"
-  }
-]
+interface Speaker {
+  name: string
+  title?: string
+  image?: string
+}
 
-const speakers = [
-  {
-    name: "Speaker Name",
-    title: "Title, Company",
-    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=1200&fit=crop"
-  },
-  {
-    name: "Speaker Name",
-    title: "Title, Company",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=1200&fit=crop"
-  },
-  {
-    name: "Speaker Name",
-    title: "Title, Company",
-    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=1200&fit=crop"
-  }
-]
+interface EventItem {
+  icon?: string
+  title: string
+  tags?: string[]
+  description?: string
+  color?: string
+}
 
-// removed local placeholder coordinators — using canonical facultyContacts
+const ICON_MAP: Record<string, any> = {
+  Code2,
+  Lightbulb,
+  Mic2,
+}
 
 export default function Home() {
   const [loadingComplete, setLoadingComplete] = useState(false)
@@ -62,14 +39,57 @@ export default function Home() {
   const [lightboxImage, setLightboxImage] = useState<string | null>(null)
   const [isIOS, setIsIOS] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
-  const sectionsRef = useRef<HTMLElement[]>([])
+  const sectionsRef = useRef<(HTMLElement | null)[]>([])
+  const [speakers, setSpeakers] = useState<Speaker[]>([])
+  const [eventsData, setEventsData] = useState<EventItem[] | null>(null) // null = loading, [] = loaded empty
+
+  useEffect(() => {
+    let mounted = true
+    fetch("/data/speakers.json", { cache: "no-store" })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to load speakers")
+        return res.json()
+      })
+      .then((data) => {
+        if (mounted) setSpeakers(data as Speaker[])
+      })
+      .catch(() => {
+        // silently ignore; keep speakers empty
+      })
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  useEffect(() => {
+    let mounted = true
+    // Load events exclusively from public/data/events.json (no defaults)
+    fetch("/data/events.json", { cache: "no-store" })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to load events")
+        return res.json()
+      })
+      .then((data) => {
+        if (mounted) {
+          // Validate it's an array
+          if (Array.isArray(data)) setEventsData(data as EventItem[])
+          else setEventsData([])
+        }
+      })
+      .catch(() => {
+        if (mounted) setEventsData([])
+      })
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   const sections = ["Hero", "Events", "Guests", "Partners", "Previous Events", "Contact"]
 
   // Detect iOS device
   useEffect(() => {
     const checkIOS = () => {
-      return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
     }
     setIsIOS(checkIOS())
@@ -130,7 +150,7 @@ export default function Home() {
       />
 
       <section
-        ref={(el) => el && (sectionsRef.current[0] = el)}
+        ref={(el) => { sectionsRef.current[0] = el }}
         className="relative min-h-screen flex flex-col items-center justify-center px-6 py-20"
       >
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -250,7 +270,7 @@ export default function Home() {
             transition={{ delay: 0.7, duration: 0.6 }}
             className="pt-12 flex flex-col items-center gap-4"
           >
-            <Link href="/register" passHref>
+            <Link href="/register">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -272,7 +292,7 @@ export default function Home() {
       </section>
 
       <section
-        ref={(el) => el && (sectionsRef.current[1] = el)}
+        ref={(el) => { sectionsRef.current[1] = el }}
         className="relative min-h-screen flex flex-col items-center justify-center px-6 py-20"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -292,59 +312,66 @@ export default function Home() {
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {events.map((event, index) => (
-              <motion.div
-                key={event.title}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.2, duration: 0.8 }}
-                whileHover={{ y: -10, rotateY: 5 }}
-                className="group relative"
-                style={{ transformStyle: "preserve-3d" }}
-              >
-                <div className="relative p-8 rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20 overflow-hidden">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${event.color} opacity-0 group-hover:opacity-20 transition-opacity duration-500`} />
-
-                  <div className="relative z-10 space-y-6">
-                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${event.color} flex items-center justify-center shadow-lg`}>
-                      <event.icon className="w-8 h-8 text-white" />
-                    </div>
-
-                    <div>
-                      <h3 className="text-3xl font-bold mb-3">{event.title}</h3>
-                      <div className="flex gap-2 flex-wrap mb-4">
-                        {event.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm text-sm font-medium"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      <p className="text-slate-400 font-serif leading-relaxed">
-                        {event.description}
-                      </p>
-                    </div>
-
-                    <button className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-orange-600 to-orange-400 hover:shadow-lg hover:shadow-orange-500/50 transition-all duration-300">
-                      View Details
-                    </button>
-                  </div>
-
+            {eventsData === null ? (
+              <div className="col-span-3 text-center py-12">
+                <p className="text-slate-400">Loading events…</p>
+              </div>
+            ) : eventsData.length === 0 ? (
+              <div className="col-span-3 text-center py-12">
+                <p className="text-slate-400">No events available.</p>
+              </div>
+            ) : (
+              eventsData.map((event, index) => {
+                const Icon = event.icon ? ICON_MAP[event.icon] ?? Code2 : Code2
+                return (
                   <motion.div
-                    className="absolute -inset-[1px] bg-gradient-to-r from-orange-600 to-orange-400 rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10"
-                  />
-                </div>
-              </motion.div>
-            ))}
+                    key={event.title ?? index}
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.2, duration: 0.8 }}
+                    className="group relative h-full flex flex-col"
+                    style={{ transformStyle: "preserve-3d" }}
+                  >
+                    <div className="relative p-8 rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20 overflow-hidden h-full flex flex-col">
+
+                      <div className="relative z-10 flex flex-col flex-grow space-y-6">
+                        <div className={`w-16 h-16 rounded-2xl ${event.color ?? "bg-gradient-to-br from-orange-600 to-orange-400"} flex items-center justify-center shadow-lg`}>
+                          <Icon className="w-8 h-8 text-white" />
+                        </div>
+
+                        <div className="flex-grow">
+                          <h3 className="text-3xl font-bold mb-3">{event.title}</h3>
+                          <div className="flex gap-2 flex-wrap mb-4">
+                            {(event.tags ?? []).map((tag) => (
+                              <span
+                                key={tag}
+                                className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm text-sm font-medium"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                          <p className="text-slate-400 font-serif leading-relaxed">
+                            {event.description}
+                          </p>
+                        </div>
+
+                        <button className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-orange-600 to-orange-400 transition-all duration-300">
+                          View Details
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )
+              })
+            )}
           </div>
         </div>
       </section>
 
       <section
-        ref={(el) => el && (sectionsRef.current[2] = el)}
+        ref={(el) => { sectionsRef.current[2] = el }}
         className="relative min-h-screen flex flex-col items-center justify-center px-6 py-20"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -373,19 +400,19 @@ export default function Home() {
                 transition={{ delay: index * 0.2, duration: 0.8 }}
                 whileHover={{ y: -10 }}
                 className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20 cursor-pointer"
-                onClick={() => setLightboxImage(speaker.image)}
+                onClick={() => setLightboxImage(speaker.image ?? null)}
               >
                 <div className="relative aspect-square overflow-hidden">
                   <div className="w-full h-full overflow-hidden">
                     <div
                       className="w-full h-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-125"
                       style={{
-                        backgroundImage: `url(${speaker.image})`,
+                        backgroundImage: `url(${speaker.image || ''})`,
                         filter: "grayscale(100%)",
                       }}
                     />
                   </div>
-                  <div 
+                  <div
                     className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent group-hover:from-orange-900/70 group-hover:via-orange-950/30 group-hover:to-transparent transition-all duration-700"
                   />
                 </div>
@@ -405,7 +432,7 @@ export default function Home() {
       </section>
 
       <section
-        ref={(el) => el && (sectionsRef.current[3] = el)}
+        ref={(el) => { sectionsRef.current[3] = el }}
         className="relative min-h-screen flex flex-col items-center justify-center px-6 py-20"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -441,7 +468,7 @@ export default function Home() {
 
               <div className="pt-8">
                 <Marquee speed={40} gradient={false} pauseOnHover={true}>
-                  {["IEEE Computer Society", "SYP Activities", "School of Computing", "CTECH"].map((partner, index) => (
+                  {["IEEE Computer Society", "SYP Activities", "School of Computing", "CTECH"].map((partner) => (
                     <motion.div
                       key={partner}
                       whileHover={{ scale: 1.05 }}
@@ -462,7 +489,7 @@ export default function Home() {
       </section>
 
       <section
-        ref={(el) => el && (sectionsRef.current[4] = el)}
+        ref={(el) => { sectionsRef.current[4] = el }}
         className="relative min-h-screen flex flex-col items-center justify-center px-6 py-20"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -529,7 +556,7 @@ export default function Home() {
       </section>
 
       <section
-        ref={(el) => el && (sectionsRef.current[5] = el)}
+        ref={(el) => { sectionsRef.current[5] = el }}
         className="relative min-h-screen flex flex-col items-center justify-center px-6 py-20"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -558,9 +585,20 @@ export default function Home() {
                 transition={{ delay: index * 0.2, duration: 0.8 }}
                 className="relative p-8 rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20 space-y-6"
               >
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">{coordinator.name}</h3>
-                  <p className="text-slate-400 font-serif">{coordinator.designation || coordinator.role}</p>
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-orange-500/30">
+                    <Image
+                      src={coordinator.image}
+                      alt={coordinator.name}
+                      fill
+                      className="object-cover"
+                      sizes="96px"
+                    />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="text-2xl font-bold mb-2">{coordinator.name}</h3>
+                    <p className="text-slate-400 font-serif">{coordinator.designation || coordinator.role}</p>
+                  </div>
                 </div>
 
                 <div className="space-y-4 pt-4 border-t border-white/10">
@@ -586,10 +624,6 @@ export default function Home() {
                     <span className="text-sm font-mono">{coordinator.phone}</span>
                   </motion.a>
                 </div>
-
-                <motion.div
-                  className="absolute -inset-[1px] bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 rounded-3xl opacity-0 hover:opacity-100 blur-xl transition-opacity duration-500 -z-10"
-                />
               </motion.div>
             ))}
           </div>
