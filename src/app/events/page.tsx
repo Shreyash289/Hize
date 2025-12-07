@@ -13,32 +13,7 @@ const ICON_MAP: Record<string, any> = {
 }
 
 // fallback defaults shown while events.json isn't available
-const DEFAULT_EVENTS: EventItem[] = [
-  {
-    icon: "Code2",
-    title: "Hackathon",
-    tags: ["48 hrs", "Team"],
-    description:
-      "Build innovative solutions in an intense 48-hour coding marathon. Collaborate with talented developers and bring your ideas to life.",
-    gradient: "from-card via-secondary to-accent",
-  },
-  {
-    icon: "Lightbulb",
-    title: "AI Workshop",
-    tags: ["Intermediate", "Hands-on"],
-    description:
-      "Dive deep into artificial intelligence and machine learning with hands-on projects and expert guidance.",
-    gradient: "from-accent via-card to-secondary",
-  },
-  {
-    icon: "Mic2",
-    title: "Keynote Series",
-    tags: ["Leaders", "Trends"],
-    description:
-      "Hear from industry leaders about the latest trends, innovations, and future directions in technology.",
-    gradient: "from-secondary via-accent to-card",
-  },
-]
+const DEFAULT_EVENTS: EventItem[] = []
 
 export default function EventsPage() {
   const [eventsData, setEventsData] = useState<EventItem[]>(DEFAULT_EVENTS)
