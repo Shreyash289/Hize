@@ -29,12 +29,13 @@ export default function Navigation({ sections, onSectionClick, activeSection }: 
   }, [])
 
   const homepageLinks = [
-    { label: "Events", section: 1 },
-    { label: "Guests", section: 2 },
-    { label: "Partners", section: 3 },
-    { label: "Previous Events", section: 4 },
-    { label: "Student Team", section: 5 },
-    { label: "Contact", section: 6 },
+    { label: "Venue Map", section: 1 },
+    { label: "Events", section: 2 },
+    { label: "Guests", section: 3 },
+    { label: "Partners", section: 4 },
+    { label: "Previous Events", section: 5 },
+    { label: "Student Team", section: 6 },
+    { label: "Contact", section: 7 },
   ]
 
   const regularLinks = [

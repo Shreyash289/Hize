@@ -9,29 +9,29 @@ import dynamic from "next/dynamic"
 import facultyContacts from "@/lib/facultyContacts"
 
 // Lazy load heavy components for better initial load performance with loading states
-const LoadingScreen = dynamic(() => import("@/components/LoadingScreen"), { 
+const LoadingScreen = dynamic(() => import("@/components/LoadingScreen"), {
   ssr: false,
   loading: () => <div className="fixed inset-0 bg-black flex items-center justify-center"><div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div></div>
 })
-const DynamicBackground = dynamic(() => import("@/components/DynamicBackground"), { 
+const DynamicBackground = dynamic(() => import("@/components/DynamicBackground"), {
   ssr: false,
   loading: () => <div className="fixed inset-0 bg-black"></div>
 })
 const ScrollProgress = dynamic(() => import("@/components/ScrollProgress"), { ssr: false })
-const EnhancedCountdown = dynamic(() => import("@/components/EnhancedCountdown"), { 
+const EnhancedCountdown = dynamic(() => import("@/components/EnhancedCountdown"), {
   ssr: false,
   loading: () => <div className="h-32 bg-gradient-to-r from-orange-600/20 to-orange-400/20 rounded-2xl animate-pulse"></div>
 })
 const MagneticCursor = dynamic(() => import("@/components/MagneticCursor"), { ssr: false })
-const Marquee = dynamic(() => import("react-fast-marquee").then(mod => ({ default: mod.default })), { 
+const Marquee = dynamic(() => import("react-fast-marquee").then(mod => ({ default: mod.default })), {
   ssr: false,
   loading: () => <div className="h-20 bg-gradient-to-r from-orange-600/10 to-orange-400/10 rounded-xl animate-pulse"></div>
 })
 const SpeakerCard = dynamic(() => import('@/components/SpeakerCard'), { ssr: false })
 const Navigation = dynamic(() => import('@/components/Navigation'), { ssr: false })
-const Timeline = dynamic(() => import('@/components/Timeline'), { 
+const Timeline = dynamic(() => import('@/components/Timeline'), {
   ssr: false,
-  loading: () => <div className="max-w-7xl mx-auto px-4 py-16"><div className="space-y-8">{[1,2,3].map(i => <div key={i} className="h-64 bg-gradient-to-br from-black/60 to-zinc-900/60 rounded-2xl animate-pulse"></div>)}</div></div>
+  loading: () => <div className="max-w-7xl mx-auto px-4 py-16"><div className="space-y-8">{[1, 2, 3].map(i => <div key={i} className="h-64 bg-gradient-to-br from-black/60 to-zinc-900/60 rounded-2xl animate-pulse"></div>)}</div></div>
 })
 
 interface Speaker {
@@ -52,11 +52,67 @@ interface EventItem {
   color?: string
 }
 
+interface StudentMember {
+  name: string
+  role: string
+  image: string
+}
+
+interface DomainTeam {
+  domain: string
+  head: StudentMember
+  team?: StudentMember[]
+}
+
 const ICON_MAP: Record<string, any> = {
   Code2,
   Lightbulb,
   Mic2,
 } as const
+
+const normalizeStudentImage = (image?: string) => {
+  const fallback = "/studentteam/falll.png"
+
+  if (!image || typeof image !== "string") return fallback
+
+  let src = image.trim()
+
+  // Ensure local assets are rooted at /studentteam
+  if (!/^https?:\/\//i.test(src)) {
+    src = src.startsWith("/") ? src : `/${src}`
+    src = src
+      .replace(/^\/students\//i, "/studentteam/")
+      .replace(/^\/student-team\//i, "/studentteam/")
+  }
+
+  return src
+}
+
+const INITIAL_STUDENTS = [
+  {
+    "name": "Keshav Gupta",
+    "role": "ChairPerson",
+    "image": "/studentteam/chair.png"
+  },
+  {
+    "name": "Ushnish Ghosal",
+    "role": "Vice ChairPerson",
+    "image": "/studentteam/secretary.jpg"
+  },
+  {
+    "name": "Iraa jayakumar",
+    "role": "Secretary",
+    "image": "/studentteam/secretary.jpg"
+  },
+  {
+    "name": "Harsh Agarwal",
+    "role": "Treasurer",
+    "image": "/studentteam/treasurer.jpg"
+  }
+].map(student => ({
+  ...student,
+  image: normalizeStudentImage(student.image)
+}))
 
 export default function Home() {
   const [loadingComplete, setLoadingComplete] = useState(false)
@@ -68,16 +124,19 @@ export default function Home() {
   const [speakers, setSpeakers] = useState<Speaker[]>([])
   const [eventsData, setEventsData] = useState<EventItem[] | null>(null) // null = loading, [] = loaded empty
   const [selectedSpeaker, setSelectedSpeaker] = useState<Speaker | null>(null)
-  const [students, setStudents] = useState<any[]>([]);
+  const [students, setStudents] = useState<any[]>(INITIAL_STUDENTS);
+  const [domains, setDomains] = useState<DomainTeam[]>([])
+  const [selectedDomain, setSelectedDomain] = useState<DomainTeam | null>(null)
+  const [infoTab, setInfoTab] = useState<"map" | "previous">("map")
 
   useEffect(() => {
     let mounted = true
     let abortController = new AbortController()
-    
-    // Use static cache with revalidation for better performance
-    fetch("/data/speakers.json", { 
-      cache: "force-cache",
-      next: { revalidate: 3600 }, // Revalidate every hour
+
+    // Always pull latest speakers after JSON edits
+    fetch("/data/speakers.json", {
+      cache: "no-store",
+      next: { revalidate: 0 },
       signal: abortController.signal
     })
       .then((res) => {
@@ -92,7 +151,7 @@ export default function Home() {
           console.warn('Failed to load speakers:', error)
         }
       })
-    
+
     return () => {
       mounted = false
       abortController.abort()
@@ -102,9 +161,9 @@ export default function Home() {
   useEffect(() => {
     let mounted = true
     let abortController = new AbortController()
-    
+
     // Use static cache with revalidation for better performance
-    fetch("/data/events.json", { 
+    fetch("/data/events.json", {
       cache: "force-cache",
       next: { revalidate: 3600 }, // Revalidate every hour
       signal: abortController.signal
@@ -126,7 +185,7 @@ export default function Home() {
           setEventsData([])
         }
       })
-    
+
     return () => {
       mounted = false
       abortController.abort()
@@ -136,10 +195,11 @@ export default function Home() {
   useEffect(() => {
     let mounted = true
     let abortController = new AbortController()
-    
-    fetch("/data/student-team.json", { 
-      cache: "force-cache",
-      next: { revalidate: 3600 },
+
+    fetch("/data/student-team.json", {
+      // Always pull the latest student data; avoids stale cache after edits
+      cache: "no-store",
+      next: { revalidate: 0 },
       signal: abortController.signal
     })
       .then(res => {
@@ -147,28 +207,60 @@ export default function Home() {
         return res.json()
       })
       .then(data => {
-        if (mounted) setStudents(Array.isArray(data) ? data : [])
+        if (!mounted) return
+
+        // New shape: array of domain teams
+        if (Array.isArray(data) && data.every(item => typeof item === "object" && "domain" in item && "head" in item)) {
+          const normalizedDomains: DomainTeam[] = data.map((domain: any) => ({
+            domain: domain.domain,
+            head: {
+              ...(domain.head || {}),
+              image: normalizeStudentImage(domain.head?.image)
+            },
+            team: (domain.team || []).filter(Boolean).map((member: any) => ({
+              ...member,
+              image: normalizeStudentImage(member.image)
+            }))
+          }))
+
+          setDomains(normalizedDomains)
+          return
+        }
+
+        // Backward compatibility: flat list
+        if (Array.isArray(data)) {
+          const normalizedStudents = data
+            .filter(Boolean)
+            .map(student => ({
+              ...student,
+              image: normalizeStudentImage(student.image)
+            }))
+
+          if (normalizedStudents.length > 0) {
+            setStudents(normalizedStudents)
+          }
+        }
       })
       .catch((error) => {
         if (mounted && error.name !== 'AbortError') {
           console.warn('Failed to load student team:', error)
-          setStudents([])
+          // Keep the default data instead of setting empty array
         }
       })
-    
+
     return () => {
       mounted = false
       abortController.abort()
     }
   }, []);
 
-  const sections = ["Hero", "Events", "Guests", "Partners", "Previous Events", "Student Team", "Contact"]
+  const sections = ["Hero", "Venue Map", "Events", "Guests", "Partners", "Previous Events", "Student Team", "Contact"]
 
   // Detect iOS device
   useEffect(() => {
     const checkIOS = () => {
       return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-             (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
     }
     setIsIOS(checkIOS())
   }, [])
@@ -182,7 +274,7 @@ export default function Home() {
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY
-      
+
       // Only process if scroll position changed significantly
       if (Math.abs(currentScrollY - lastScrollY) < 10) return
       lastScrollY = currentScrollY
@@ -228,7 +320,7 @@ export default function Home() {
   }
 
   return (
-    <div ref={containerRef} className="relative bg-black text-white overflow-x-hidden">
+    <div ref={containerRef} className="relative bg-black text-white overflow-x-hidden pt-6">
       <Navigation
         sections={sections}
         onSectionClick={scrollToSection}
@@ -244,7 +336,7 @@ export default function Home() {
 
       <section
         ref={(el) => { sectionsRef.current[0] = el }}
-        className="relative min-h-screen flex flex-col items-center justify-center px-6 py-20"
+        className="relative min-h-screen flex flex-col items-center justify-center px-6 py-16"
       >
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[15%] left-0 right-0 opacity-30 hidden md:block">
@@ -325,16 +417,16 @@ export default function Home() {
                 <p className="text-sm sm:text-base md:text-lg lg:text-xl">
                   At the IEEE High Impact Zonal Events (HIZE), we don't just showcase the future — we create it. The stage is now set for our high-impact Zonal Events 2.0, led by <span className="text-orange-400 font-semibold">Abhinav Gambhir, Associate Director at Oracle</span>. This marks the culmination of an inspiring journey that has brought together some of the most creative and driven tech minds from across the country.
                 </p>
-                
+
                 <p className="text-sm sm:text-base md:text-lg lg:text-xl">
                   Every edition of HIZE is built on a foundation of <span className="text-orange-500 font-semibold">excellence</span>, <span className="text-orange-400 font-semibold">inclusivity</span>, and <span className="text-orange-300 font-semibold">innovation</span>. From expert-led workshops and panel discussions to dynamic hackathons and startup showcases, the series cultivates a rich environment for skill development and networking. Participants not only gain technical mastery but also experience the collaborative energy that defines the IEEE ecosystem.
                 </p>
-                
+
                 <p className="text-sm sm:text-base md:text-lg lg:text-xl">
                   Backed by the global legacy of IEEE and the forward-thinking vision of the IEEE Computer Society, HIZE has become one of India's most anticipated student-driven technology movements. It's more than just a set of events — it's a <span className="text-orange-500 font-semibold">transformative journey</span> that shapes today's learners into tomorrow's leaders.
                 </p>
               </div>
-              
+
               <motion.div
                 className="absolute -inset-[1px] bg-gradient-to-r from-orange-600/20 via-orange-500/20 to-orange-600/20 rounded-3xl blur-xl -z-10"
                 animate={{
@@ -386,7 +478,7 @@ export default function Home() {
 
       <section
         ref={(el) => { sectionsRef.current[1] = el }}
-        className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-16 md:py-20"
+        className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
           <motion.div
@@ -394,9 +486,93 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-12 sm:mb-16 md:mb-20"
+            className="text-center mb-8 sm:mb-10 md:mb-12"
           >
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-4 sm:mb-6 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-3 sm:mb-4 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
+              VENUE MAP
+            </h2>
+            <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
+              Find us on campus. View and open the full Google Map for directions.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="relative p-6 sm:p-8 md:p-10 lg:p-12 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20"
+          >
+            <div className="flex flex-col gap-6 sm:gap-7 md:gap-8">
+              <div className="flex items-center gap-3">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-orange-500/40 text-sm font-semibold text-orange-200 shadow-lg">
+                  <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
+                  Map
+                </div>
+                <p className="text-sm text-slate-400">
+                  Google Maps embed with campus location
+                </p>
+              </div>
+
+              <div className="relative w-full rounded-xl md:rounded-2xl overflow-hidden bg-black/40 border border-orange-500/30 shadow-2xl">
+                <div className="relative aspect-[4/3] w-full">
+                  <iframe
+                    src="https://www.google.com/maps/d/embed?mid=1UfC_a8sotHQhQRM1hjjGmziJiRXu-7c&ehbc=2E312F"
+                    className="w-full h-full absolute inset-0"
+                    title="HIZE Venue Map"
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                  <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                </div>
+                <div className="absolute top-4 right-4">
+                  <div className="px-3 py-2 rounded-full bg-black/50 border border-white/10 text-xs text-orange-100">
+                    Drag, zoom, or open in Maps
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="text-slate-300 text-sm sm:text-base font-mono">
+                  SRM Institute of Science & Technology, Kattankulathur, Tamil Nadu
+                </div>
+                <motion.a
+                  href="https://www.google.com/maps/d/u/0/viewer?mid=18kGFk2ClDWeZPYT0rkdUHRDRw98Mj5U&ehbc=2E312F"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-orange-600 to-orange-400 font-semibold text-black shadow-lg shadow-orange-500/40 hover:shadow-orange-500/70 transition-all duration-300"
+                >
+                  Open Full Map
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </motion.a>
+              </div>
+            </div>
+
+            <motion.div
+              className="absolute -inset-[1px] bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 rounded-3xl opacity-20 blur-2xl -z-10"
+            />
+          </motion.div>
+        </div>
+      </section>
+
+      <section
+        ref={(el) => { sectionsRef.current[2] = el }}
+        className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
+      >
+        <div className="max-w-7xl mx-auto w-full relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-8 sm:mb-10 md:mb-12"
+          >
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-3 sm:mb-4 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
               EVENTS
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
@@ -464,16 +640,16 @@ export default function Home() {
       </section>
 
       {/* Timeline Section */}
-      <section className="relative py-12 sm:py-16 md:py-20">
+      <section className="relative py-10 sm:py-12 md:py-14">
         <div className="max-w-7xl mx-auto w-full relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-12 sm:mb-16 md:mb-20"
+            className="text-center mb-8 sm:mb-10 md:mb-12"
           >
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-4 sm:mb-6 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-3 sm:mb-4 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
               EVENT TIMELINE
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
@@ -485,8 +661,8 @@ export default function Home() {
       </section>
 
       <section
-        ref={(el) => { sectionsRef.current[2] = el }}
-        className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-16 md:py-24"
+        ref={(el) => { sectionsRef.current[3] = el }}
+        className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
           <motion.div
@@ -496,7 +672,7 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             className="text-center mb-10 sm:mb-12 md:mb-14"
           >
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-4 sm:mb-6 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-3 sm:mb-4 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
               Meet the Visionaries
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-gray-200 font-serif max-w-2xl mx-auto mb-0 px-4">
@@ -504,7 +680,7 @@ export default function Home() {
             </p>
           </motion.div>
           <div className="grid gap-4 sm:gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {speakers.map((speaker, idx) => (
+            {speakers.map((speaker, idx) => (
               <SpeakerCard
                 key={speaker.name || idx}
                 speaker={speaker}
@@ -571,10 +747,10 @@ export default function Home() {
         </AnimatePresence>
       </section>
 
-      
+
       <section
-        ref={(el) => { sectionsRef.current[3] = el }}
-        className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-16 md:py-20"
+        ref={(el) => { sectionsRef.current[4] = el }}
+        className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
           <motion.div
@@ -582,9 +758,9 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-12 sm:mb-16 md:mb-20"
+            className="text-center mb-8 sm:mb-10 md:mb-12"
           >
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-4 sm:mb-6 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-3 sm:mb-4 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
               PARTNERS
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
@@ -630,96 +806,108 @@ export default function Home() {
       </section>
 
       <section
-        ref={(el) => { sectionsRef.current[4] = el }}
-        className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-16 md:py-20"
-      >
-        <div className="max-w-7xl mx-auto w-full relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-12 sm:mb-16 md:mb-20"
-          >
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-4 sm:mb-6 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
-              PREVIOUS EVENTS
-            </h2>
-            <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
-              Discover details about our past HIZE events and achievements
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="relative p-6 sm:p-8 md:p-10 lg:p-12 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20"
-          >
-            <div className="text-center space-y-6 sm:space-y-7 md:space-y-8">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-2xl md:rounded-3xl bg-gradient-to-br from-orange-600 to-orange-400 flex items-center justify-center shadow-lg mx-auto">
-                <FileText className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />
-              </div>
-
-              <div className="px-4">
-                <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
-                  Previous HIZE Event Details
-                </h3>
-                <p className="text-sm sm:text-base md:text-lg text-slate-400 font-serif max-w-3xl mx-auto leading-relaxed">
-                  Get comprehensive insights into our previous HIZE event, including event highlights, 
-                  participant achievements, keynote sessions, and memorable moments that made it a success.
-                </p>
-              </div>
-
-              {/* Live Website Preview */}
-              <div className="relative w-full mt-8">
-                <div className="relative aspect-video w-full rounded-xl md:rounded-2xl overflow-hidden bg-black/40 border border-orange-500/30 shadow-2xl">
-                  <iframe
-                    src="https://www.ieeecshize.com/events"
-                    className="w-full h-full absolute inset-0"
-                    title="Previous HIZE Events Website Preview"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    loading="lazy"
-                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                  <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-transparent via-transparent to-black/20" />
-                </div>
-                <div className="mt-4 flex items-center justify-center gap-3">
-                  <motion.a
-                    href="https://www.ieeecshize.com/events"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-xl md:rounded-2xl bg-gradient-to-r from-orange-600 to-orange-400 font-bold text-base sm:text-lg text-black shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 transition-all duration-300"
-                  >
-                    Open in New Tab
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </motion.a>
-                </div>
-              </div>
-
-              <div className="pt-4">
-                <p className="text-sm text-slate-500 font-mono">
-                  Previous Event Information
-                </p>
-              </div>
-            </div>
-
-            <motion.div
-              className="absolute -inset-[1px] bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 rounded-3xl opacity-20 blur-2xl -z-10"
-            />
-          </motion.div>
-        </div>
-      </section>
-      
-      <section
         ref={(el) => { sectionsRef.current[5] = el }}
-        className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-16 md:py-24"
+  className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
+>
+  <div className="max-w-7xl mx-auto w-full relative z-10">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+      className="text-center mb-8 sm:mb-10 md:mb-12"
+    >
+      <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-3 sm:mb-4 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
+        PREVIOUS EVENTS
+      </h2>
+      <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
+        Revisit highlights from previous HIZE events.
+      </p>
+    </motion.div>
+
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+      className="relative p-6 sm:p-8 md:p-10 lg:p-12 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20"
+    >
+      <div className="text-center space-y-6 sm:space-y-7 md:space-y-8">
+        
+        <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-2xl md:rounded-3xl bg-gradient-to-br from-orange-600 to-orange-400 flex items-center justify-center shadow-lg mx-auto">
+          <FileText className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />
+        </div>
+
+        <div className="px-4">
+          <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
+            Previous HIZE Event Details
+          </h3>
+          <p className="text-sm sm:text-base md:text-lg text-slate-400 font-serif max-w-3xl mx-auto leading-relaxed">
+            Get comprehensive insights into our previous HIZE event, including event highlights,
+            participant achievements, keynote sessions, and memorable moments that made it a success.
+          </p>
+        </div>
+
+        <div className="relative w-full">
+          <div className="relative aspect-video w-full rounded-xl md:rounded-2xl overflow-hidden bg-black/40 border border-orange-500/30 shadow-2xl">
+            <iframe
+              src="https://www.ieeecshize.com/events"
+              className="w-full h-full absolute inset-0"
+              title="Previous HIZE Events Website Preview"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              loading="lazy"
+              sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-transparent via-transparent to-black/20" />
+          </div>
+
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <motion.a
+              href="https://www.ieeecshize.com/events"
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-xl md:rounded-2xl bg-gradient-to-r from-orange-600 to-orange-400 font-bold text-base sm:text-lg text-black shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 transition-all duration-300"
+            >
+              Open in New Tab
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+            </motion.a>
+          </div>
+        </div>
+
+        <div className="pt-2">
+          <p className="text-sm text-slate-500 font-mono">
+            Previous Event Information
+          </p>
+        </div>
+      </div>
+
+      <motion.div
+        className="absolute -inset-[1px] bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 rounded-3xl opacity-20 blur-2xl -z-10"
+      />
+    </motion.div>
+  </div>
+</section>
+
+
+      <section
+        ref={(el) => { sectionsRef.current[6] = el }}
+        className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
           <motion.div
@@ -727,39 +915,154 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-10 sm:mb-12 md:mb-14"
+            className="text-center mb-8 sm:mb-10 md:mb-12"
           >
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-4 sm:mb-6 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
-              MEET THE STUDENT TEAM
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-3 sm:mb-4 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
+              STUDENT TEAM
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-gray-200 font-serif max-w-2xl mx-auto mb-0 px-4">
               Our core student organizing team driving HIZE.
             </p>
           </motion.div>
-          <div className="grid gap-4 sm:gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-            {students.map((student) => (
-              <div key={student.name + student.role} className="relative p-6 sm:p-7 md:p-8 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20 flex flex-col items-center text-center shadow-lg">
-                <div className="relative w-20 h-20 sm:w-22 sm:h-22 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-orange-500/30 mb-4 sm:mb-5 md:mb-6">
-                  <Image
-                    src={student.image}
-                    alt={student.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 80px, (max-width: 1024px) 88px, 96px"
-                  />
-                </div>
-                <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2">{student.name}</h3>
-                <p className="text-orange-400 font-extrabold text-base sm:text-lg">{student.role}</p>
-              </div>
-            ))}
-          </div>
+          {domains.length === 0 && (!students || students.length === 0) ? (
+            <div className="text-center py-12">
+              <p className="text-slate-400">Loading student team...</p>
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+              {(domains.length > 0 ? domains : students).map((item: any, index: number) => {
+                const isDomain = domains.length > 0
+                const display = isDomain ? item.head : item
+
+                return (
+                  <motion.button
+                    type="button"
+                    key={(display?.name || "") + (display?.role || "") + (item?.domain || "")}
+                    onClick={() => isDomain ? setSelectedDomain(item as DomainTeam) : null}
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 0.6, delay: index * 0.15, ease: "easeOut" }}
+                    whileHover={{ y: -8, scale: 1.02 }}
+                    className="relative p-6 sm:p-7 md:p-8 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/70 to-zinc-900/70 backdrop-blur-xl border border-orange-500/30 flex flex-col items-center text-center shadow-2xl group w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+                  >
+                    {/* Glow effect on hover */}
+                    <div className="absolute -inset-1 bg-gradient-to-r from-orange-600/20 via-orange-500/20 to-orange-600/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-4 border-orange-500/40 mb-4 sm:mb-5 md:mb-6 group-hover:border-orange-400/60 transition-colors duration-300">
+                      <Image
+                        src={display.image}
+                        alt={display.name}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-300"
+                        sizes="(max-width: 640px) 80px, (max-width: 1024px) 96px, 112px"
+                      />
+                    </div>
+                    {isDomain && (
+                      <p className="text-xs uppercase tracking-[0.2em] text-orange-400/70 mb-2">
+                        {item.domain}
+                      </p>
+                    )}
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2 text-white group-hover:text-orange-100 transition-colors duration-300">{display.name}</h3>
+                    <p className="text-orange-400 font-bold text-sm sm:text-base md:text-lg group-hover:text-orange-300 transition-colors duration-300">{display.role}</p>
+                  </motion.button>
+                )
+              })}
+            </div>
+          )}
         </div>
       </section>
 
 
+      <AnimatePresence>
+        {selectedDomain && (
+          <motion.div
+            key="domain-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center px-4 sm:px-6 py-10 bg-black/70 backdrop-blur"
+            onClick={() => setSelectedDomain(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              transition={{ duration: 0.2 }}
+              className="relative max-w-4xl w-full bg-gradient-to-br from-zinc-950/90 via-zinc-900/90 to-black/90 border border-orange-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedDomain(null)}
+                className="absolute top-4 right-4 text-slate-200 hover:text-white transition-colors"
+                aria-label="Close team modal"
+              >
+                <X className="w-6 h-6" />
+              </button>
+
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.3em] text-orange-400/70">Domain</p>
+                    <h3 className="text-2xl sm:text-3xl font-bold text-white">{selectedDomain.domain}</h3>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-xl border border-orange-500/30 bg-white/5">
+                    <div className="relative w-14 h-14 rounded-full overflow-hidden border-2 border-orange-500/50">
+                      <Image
+                        src={selectedDomain.head.image}
+                        alt={selectedDomain.head.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-300">Head</p>
+                      <p className="font-semibold text-white">{selectedDomain.head.name}</p>
+                      <p className="text-orange-400 text-sm">{selectedDomain.head.role}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm text-slate-400 mb-3">Team Members</p>
+                  {selectedDomain.team && selectedDomain.team.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      {selectedDomain.team.map((member) => (
+                        <div
+                          key={member.name + member.role}
+                          className="p-4 rounded-2xl border border-white/10 bg-white/5 flex items-center gap-3"
+                        >
+                          <div className="relative w-14 h-14 rounded-2xl overflow-hidden border-2 border-orange-500/30 flex-shrink-0">
+                            <Image
+                              src={member.image}
+                              alt={member.name}
+                              fill
+                              className="object-cover"
+                              sizes="64px"
+                            />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-white">{member.name}</p>
+                            <p className="text-sm text-orange-300">{member.role}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-4 rounded-2xl border border-dashed border-white/15 bg-white/5 text-slate-400">
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+
       <section
-        ref={(el) => { sectionsRef.current[6] = el }}
-        className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-16 md:py-20"
+        ref={(el) => { sectionsRef.current[7] = el }}
+        className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
           <motion.div
@@ -832,7 +1135,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="relative border-t border-white/10 py-12 px-6 overflow-hidden">
+      <footer className="relative border-t border-white/10 py-10 px-6 overflow-hidden">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left">
@@ -891,7 +1194,7 @@ export default function Home() {
                 />
                 <div className="absolute inset-0 ring-1 ring-inset ring-orange-500/30 rounded-3xl pointer-events-none" />
               </div>
-              
+
               <motion.div
                 className="absolute -inset-4 bg-gradient-to-r from-orange-600/30 via-orange-500/30 to-orange-600/30 rounded-3xl blur-3xl -z-10"
                 animate={{

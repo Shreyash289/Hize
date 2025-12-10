@@ -1,23 +1,200 @@
 [
   {
-    "name": "Keshav Gupta",
-    "role": "ChairPerson",
-    "image": "/students/chairperson.jpg"
+    "domain": "CORE TEAM",
+    "head": {
+      "name": "Keshav Gupta",
+      "role": "Chairperson",
+      "image": "/studentteam/chair.png"
+    }
   },
   {
-    "name": "Ushnish Ghosal",
-    "role": "Vice ChairPerson",
-    "image": "/students/vicechair.jpg"
+    "domain": "CORE TEAM",
+    "head": {
+      "name": "Ushnish Ghosal",
+      "role": "Vice - Chairperson",
+      "image": "/studentteam/image.png"
+    }
   },
   {
-    "name": "Iraa jayakumar",
-    "role": "Secretary",
-    "image": "/students/secretary.jpg"
+    "domain": "CORE TEAM",
+    "head": {
+      "name": "Iraa Jayakumar",
+      "role": "Secretary",
+      "image": "/studentteam/secretary.jpg"
+    }
   },
   {
-    "name": "Harsh Agarwal",
-    "role": "Treasurer",
-    "image": "/students/treasurer.jpg"
+    "domain": "CORE TEAM",
+    "head": {
+      "name": "Harsh Agarwal",
+      "role": "Treasurer",
+      "image": "/studentteam/treasurer.jpg"
+    }
+  },
+  {
+    "domain": "Technical",
+    "head": {
+      "name": "Krishna Aggarwal",
+      "role": "Technical Head",
+      "image": "/studentteam/tech.png"
+    },
+    "team": [
+      { "name": "Adhya Saxena" },
+      { "name": "Bhoomika Khoiya" },
+      { "name": "Dipesh kumar pirojiwala" },
+      { "name": "HARISH U" },
+      { "name": "Ishant Singh" },
+      { "name": "Pragya Apoorva" },
+      { "name": "Premkumar Adesh Mali" },
+      { "name": "Purav Agarwal" },
+      { "name": "Shreya" },
+      { "name": "Sneh Prasad" },
+      { "name": "Spandan Choubey" },
+      { "name": "Vedasree Ruttala" },
+      { "name": "Devangana Rameshan" },
+      { "name": "Prachi Gautam" },
+      { "name": "Boda om" },
+      { "name": "Aanya Agrawal" },
+      { "name": "Altamash Tariq" }
+    ]
+  },
+
+  {
+    "domain": "Web Development",
+    "head": {
+      "name": "Akshit Ohri",
+      "role": "Web Development Head",
+      "image": "/studentteam/web.png"
+    },
+    "team": [
+      { "name": "Ayush Rudra"},
+      { "name": "MD NAYAJ MONDAL" },
+      { "name": "NIKITA DEB" },
+      { "name": "Prithish Misra" },
+      { "name": "Rachana R" },
+      { "name": "Roudra Ghosal" },
+      { "name": "Shambhavi Mishra" },
+      { "name": "Shine kaninwal" },
+      { "name": "Tanishi Agrawal" },
+      { "name": "Yatharth Gupta" },
+      { "name": "Astha Singh" }
+    ]
+  },
+
+  {
+    "domain": "Web Development Coordinators",
+    "head": {
+      "name": "Shreyash Mishra",
+      "role": "Web Developer",
+      "image": "/studentteam/shreyash.jpg"
+    },
+    "team": []
+  },
+
+  {
+    "domain": "Web Development Coordinators",
+    "head": {
+      "name": "Ekamjot Singh",
+      "role": "Web Developer",
+      "image": "/studentteam/falll.png"
+    },
+    "team": []
+  },
+
+  {
+    "domain": "Web Development Coordinators",
+    "head": {
+      "name": "Puneet Khandelwal",
+      "role": "Web Developer",
+      "image": "/studentteam/puneet.jpg"
+    },
+    "team": []
+  },
+
+  {
+    "domain": "Web Development Coordinators",
+    "head": {
+      "name": "Rajat Pandey",
+      "role": "Web Developer",
+      "image": "/studentteam/falll.png"
+    },
+    "team": []
+  },
+
+  {
+    "domain": "Operations & Resources",
+    "head": {
+      "name": "Shubham Bhandari",
+      "role": "Operations & Resources Head",
+      "image": "/studentteam/operations.jpg"
+    },
+    "team": [
+      { "name": "Aditya Kumar" },
+      { "name": "Arjun R" },
+      { "name": "Arya Sachin phanase" },
+      { "name": "Chiraag Mutupuri" },
+      { "name": "Devika Santosh" },
+      { "name": "Dhruv Madhra" },
+      { "name": "Rojashree B" },
+      { "name": "Sarthak Mangalwedhekar" }
+    ]
+  },
+
+  {
+    "domain": "Social Media",
+    "head": {
+      "name": "Vani Jaiswal",
+      "role": "Social-Media Head",
+      "image": "/studentteam/socialmedia.jpg"
+    },
+    "team": []
+  },
+
+  {
+    "domain": "Event Management",
+    "head": {
+      "name": "Aayushman Kathayat",
+      "role": "Event Management Head",
+      "image": "/studentteam/events.jpg"
+    },
+    "team": []
+  },
+
+  {
+    "domain": "Design",
+    "head": {
+      "name": "Manaswi Singh",
+      "role": "Design Head",
+      "image": "/studentteam/design.png"
+    },
+    "team": [
+      { "name": "DANYAA ASOKKUMAR" },
+      { "name": "Narlapati Manoj Naga Venkata Siva" },
+      { "name": "Shivangi" }
+    ]
+  },
+
+  {
+    "domain": "Public Relations",
+    "head": {
+      "name": "Saumya Singh",
+      "role": "Public Relations Head",
+      "image": "/studentteam/pr.png"
+    },
+    "team": [
+      { "name": "Anwesha sinha" },
+      { "name": "Priyanshisingh" },
+      { "name": "Samarth Periwal" }
+    ]
+  },
+
+  {
+    "domain": "Media & Outreach",
+    "head": {
+      "name": "Vanshika Sharma",
+      "role": "Media & Outreach Head",
+      "image": "/studentteam/photo.png"
+    },
+    "team": []
   }
 ]
-
