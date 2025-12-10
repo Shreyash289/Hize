@@ -88,11 +88,6 @@ export default function EventsPage() {
         )}
       </main>
 
-      <section className="py-24">
-  <Timeline />
-</section>
-
-
       <footer className="border-t border-border mt-20 py-8">
         <div className="max-w-7xl mx-auto px-6 text-center text-sm text-muted-foreground">
           <p>© 2026 IEEE CS SRM | In collaboration with SRM Institute of Science & Technology</p>

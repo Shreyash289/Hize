@@ -1,8 +1,8 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import { memo, useRef } from "react";
-import { Calendar, Users, Trophy, Coffee, Mic, Code, Lightbulb } from "lucide-react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { memo, useRef, useState } from "react";
+import { Calendar, Users, Trophy, Coffee, Mic, Code, Lightbulb, ChevronDown, ChevronUp } from "lucide-react";
 
 // Enhanced timeline data with yellow-orange-black-deep blue theme
 const timelineData = [
@@ -72,39 +72,55 @@ const timelineData = [
   },
 ] as const;
 
-// Animation variants for smooth card-to-card flow
+// Animation variants for interactive timeline
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.6, delayChildren: 0.3 }
+    transition: { staggerChildren: 0.2, delayChildren: 0.1 }
   }
 };
 
 const dayVariants = {
-  hidden: { opacity: 0, scale: 0.7, y: 100, x: -50 },
+  hidden: { opacity: 0, scale: 0.9, y: 30 },
   visible: {
     opacity: 1,
     scale: 1,
-    y: 0,
-    x: 0
+    y: 0
   }
 };
 
 const eventVariants = {
-  hidden: { opacity: 0, x: -30, scale: 0.9 },
+  hidden: { opacity: 0, y: -10 },
   visible: {
     opacity: 1,
-    x: 0,
-    scale: 1
+    y: 0
+  },
+  exit: {
+    opacity: 0,
+    y: -10
+  }
+};
+
+const eventsContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05, delayChildren: 0.1 }
+  },
+  exit: {
+    opacity: 0,
+    transition: { staggerChildren: 0.02, staggerDirection: -1 }
   }
 };
 
 
 
-// Highly animated Timeline component inspired by flowing design
+// Interactive Timeline component with expandable days
 const Timeline = memo(function Timeline() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [expandedDays, setExpandedDays] = useState<Set<number>>(new Set());
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start 0.8", "end 0.2"]
@@ -113,8 +129,20 @@ const Timeline = memo(function Timeline() {
   const pathLength = useTransform(scrollYProgress, [0, 1], [0, 1]);
   const pathOpacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.3, 0.8, 0.8, 0.5]);
 
+  const toggleDay = (dayIndex: number) => {
+    setExpandedDays(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(dayIndex)) {
+        newSet.delete(dayIndex);
+      } else {
+        newSet.add(dayIndex);
+      }
+      return newSet;
+    });
+  };
+
   return (
-    <div ref={containerRef} className="relative w-full min-h-screen py-16 overflow-hidden">
+    <div ref={containerRef} className="relative w-full py-8 overflow-hidden">
       {/* Animated background elements with new theme */}
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
@@ -203,7 +231,7 @@ const Timeline = memo(function Timeline() {
             opacity: useTransform(scrollYProgress, [0, 0.3, 0.5], [0, 0.6, 0.3])
           }}
         />
-        
+
         {/* Second swish - Day 1 to Day 2 */}
         <motion.path
           d="M 750 220 Q 900 160 850 320 Q 800 480 650 420 Q 500 360 400 480"
@@ -229,7 +257,7 @@ const Timeline = memo(function Timeline() {
             opacity: useTransform(scrollYProgress, [0, 0.3, 0.5], [0, 1, 0.7])
           }}
         />
-        
+
         {/* Main animated path - Second segment */}
         <motion.path
           d="M 750 220 Q 900 160 850 320 Q 800 480 650 420 Q 500 360 400 480"
@@ -246,11 +274,11 @@ const Timeline = memo(function Timeline() {
 
       {/* Timeline Content */}
       <motion.div
-        className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6"
+        className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
+        viewport={{ once: true, margin: "-50px" }}
       >
         {timelineData.map((day, index) => {
           const IconComponent = day.icon;
@@ -260,124 +288,186 @@ const Timeline = memo(function Timeline() {
               key={day.day}
               variants={dayVariants}
               transition={{
-                duration: 1.2,
+                duration: 0.8,
                 ease: [0.25, 0.46, 0.45, 0.94],
-                delay: index * 0.4
+                delay: index * 0.2
               }}
-              className="relative mb-24 flex justify-center"
+              className="relative mb-4 flex justify-center"
             >
-              {/* Floating Day Card */}
+              {/* Interactive Day Card Button */}
               <motion.div
-                className="relative p-8 rounded-3xl backdrop-blur-xl border shadow-2xl max-w-md mx-auto"
-                style={{
-                  background: day.bgColor,
-                  borderColor: day.borderColor
-                }}
-
-                animate={{
-                  y: [-10, 10, -10],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: [0.4, 0, 0.6, 1]
-                }}
-                whileHover={{
-                  scale: 1.05,
-                  y: -10,
-                  boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
-                  transition: { duration: 0.3 }
-                }}
+                className="relative w-full max-w-2xl mx-auto cursor-pointer"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => toggleDay(index)}
               >
-                {/* Glowing background */}
-                <div
-                  className="absolute -inset-1 rounded-3xl blur-xl opacity-40 -z-10"
+                {/* Day Header Button */}
+                <motion.div
+                  className="relative p-4 rounded-2xl backdrop-blur-xl border shadow-xl"
                   style={{
-                    background: `linear-gradient(135deg, ${day.glowColor}, ${day.glowColor}80)`
+                    background: day.bgColor,
+                    borderColor: day.borderColor
                   }}
-                />
+                  animate={{
+                    y: expandedDays.has(index) ? 0 : [-5, 5, -5],
+                  }}
+                  transition={{
+                    duration: expandedDays.has(index) ? 0 : 4,
+                    repeat: expandedDays.has(index) ? 0 : Infinity,
+                    ease: [0.4, 0, 0.6, 1]
+                  }}
+                >
+                  {/* Glowing background */}
+                  <div
+                    className="absolute -inset-1 rounded-2xl blur-lg opacity-30 -z-10"
+                    style={{
+                      background: `linear-gradient(135deg, ${day.glowColor}, ${day.glowColor}60)`
+                    }}
+                  />
 
-                {/* Day Header */}
-                <div className="flex items-center gap-4 mb-6">
-                  <motion.div
-                    className="p-3 rounded-2xl bg-white/10 backdrop-blur-sm"
-                    whileHover={{ rotate: 360 }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    <IconComponent className="w-8 h-8 text-white" />
-                  </motion.div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-white">{day.day}</h3>
-                    <p className="text-yellow-300 text-sm font-medium">{day.date}</p>
-                  </div>
-                </div>
-
-                <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-2">
-                  {day.title}
-                </h2>
-                <p className="text-amber-200 text-lg mb-8 font-medium">
-                  {day.subtitle}
-                </p>
-
-                {/* Events List */}
-                <div className="space-y-3">
-                  {day.events.map((event, i) => {
-                    const EventIcon = event.icon;
-                    return (
+                  {/* Day Header */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
                       <motion.div
-                        key={i}
-                        variants={eventVariants}
-                        transition={{
-                          duration: 0.6,
-                          ease: [0.25, 0.46, 0.45, 0.94],
-                          delay: i * 0.1
-                        }}
-                        className="group flex items-start gap-3 p-3 rounded-xl bg-black/20 backdrop-blur-sm border border-white/10 hover:border-yellow-400/50 hover:bg-black/30 transition-all duration-300"
-                        whileHover={{ x: 5, scale: 1.02 }}
+                        className="p-3 rounded-xl bg-white/10 backdrop-blur-sm"
+                        whileHover={{ rotate: 180 }}
+                        transition={{ duration: 0.4 }}
                       >
-                        <motion.div
-                          className="p-2 rounded-lg flex-shrink-0 mt-1"
-                          style={{ backgroundColor: `${day.glowColor}30` }}
-                          whileHover={{ scale: 1.1, rotate: 5 }}
-                        >
-                          <EventIcon className="w-4 h-4" style={{ color: day.glowColor }} />
-                        </motion.div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-yellow-300 text-xs font-bold uppercase tracking-wide mb-1">
-                            {event.time}
-                          </p>
-                          <p className="text-white text-sm font-medium leading-relaxed">
-                            {event.label}
-                          </p>
+                        <IconComponent className="w-6 h-6 text-white" />
+                      </motion.div>
+                      <div>
+                        <h3 className="text-xl font-bold text-white">{day.day}</h3>
+                        <p className="text-yellow-300 text-sm font-medium">{day.date}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <h2 className="text-2xl md:text-3xl font-extrabold text-white">
+                          {day.title}
+                        </h2>
+                        <p className="text-amber-200 text-sm font-medium">
+                          {day.subtitle}
+                        </p>
+                      </div>
+
+                      <motion.div
+                        className="p-2 rounded-full bg-white/10"
+                        animate={{ rotate: expandedDays.has(index) ? 180 : 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <ChevronDown className="w-5 h-5 text-white" />
+                      </motion.div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Expandable Events List */}
+                <AnimatePresence>
+                  {expandedDays.has(index) && (
+                    <motion.div
+                      variants={eventsContainerVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      className="mt-6 overflow-hidden"
+                    >
+                      <motion.div
+                        className="p-6 rounded-xl"
+                        style={{
+                          background: `${day.bgColor}80`,
+                          borderColor: day.borderColor
+                        }}
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <h4 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                          <Calendar className="w-5 h-5" style={{ color: day.glowColor }} />
+                          Event Schedule
+                        </h4>
+
+                        <div className="space-y-3">
+                          {day.events.map((event, i) => {
+                            const EventIcon = event.icon;
+                            return (
+                              <motion.div
+                                key={i}
+                                variants={eventVariants}
+                                className="group flex items-start gap-3 p-4 rounded-lg bg-black/30 backdrop-blur-sm border border-white/10 hover:border-yellow-400/50 hover:bg-black/40 transition-all duration-300"
+                                whileHover={{ x: 5, scale: 1.01 }}
+                              >
+                                <motion.div
+                                  className="p-2 rounded-lg flex-shrink-0 mt-1"
+                                  style={{ backgroundColor: `${day.glowColor}40` }}
+                                  whileHover={{ scale: 1.1, rotate: 10 }}
+                                >
+                                  <EventIcon className="w-4 h-4" style={{ color: day.glowColor }} />
+                                </motion.div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-yellow-300 text-xs font-bold uppercase tracking-wide mb-1">
+                                    {event.time}
+                                  </p>
+                                  <p className="text-white text-sm font-medium leading-relaxed">
+                                    {event.label}
+                                  </p>
+                                </div>
+                              </motion.div>
+                            );
+                          })}
                         </div>
                       </motion.div>
-                    );
-                  })}
-                </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 {/* Decorative elements */}
                 <motion.div
-                  className="absolute -top-2 -right-2 w-6 h-6 rounded-full"
+                  className="absolute -top-1 -right-1 w-4 h-4 rounded-full"
                   style={{ background: `linear-gradient(135deg, ${day.glowColor}, ${day.glowColor}80)` }}
-                  animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
-                  transition={{ duration: 2, repeat: Infinity, delay: index * 0.5 }}
+                  animate={{
+                    scale: expandedDays.has(index) ? [1, 1.5, 1] : [1, 1.2, 1],
+                    opacity: [0.7, 1, 0.7]
+                  }}
+                  transition={{
+                    duration: expandedDays.has(index) ? 1 : 2,
+                    repeat: Infinity,
+                    delay: index * 0.3
+                  }}
                 />
                 <motion.div
-                  className="absolute -bottom-3 -left-3 w-4 h-4 rounded-full bg-gradient-to-r from-black to-gray-800"
-                  animate={{ scale: [1, 1.3, 1], opacity: [0.6, 1, 0.6] }}
-                  transition={{ duration: 3, repeat: Infinity, delay: 1 + index * 0.3 }}
+                  className="absolute -bottom-1 -left-1 w-3 h-3 rounded-full bg-gradient-to-r from-black to-gray-700"
+                  animate={{
+                    scale: expandedDays.has(index) ? [1, 1.4, 1] : [1, 1.2, 1],
+                    opacity: [0.6, 1, 0.6]
+                  }}
+                  transition={{
+                    duration: expandedDays.has(index) ? 1.5 : 2.5,
+                    repeat: Infinity,
+                    delay: 0.5 + index * 0.2
+                  }}
                 />
               </motion.div>
 
               {/* Connection line to path */}
               <motion.div
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 w-20 h-1 rounded-full"
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 w-16 h-1 rounded-full"
                 style={{
-                  background: `linear-gradient(90deg, transparent, ${day.glowColor}80, transparent)`
+                  background: `linear-gradient(90deg, transparent, ${day.glowColor}60, transparent)`
                 }}
                 initial={{ scaleX: 0, opacity: 0 }}
                 whileInView={{ scaleX: 1, opacity: 1 }}
-                transition={{ duration: 1, delay: index * 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                animate={{
+                  scaleX: expandedDays.has(index) ? [1, 1.2, 1] : 1,
+                  opacity: expandedDays.has(index) ? [0.6, 1, 0.6] : 0.6
+                }}
+                transition={{
+                  duration: expandedDays.has(index) ? 2 : 1,
+                  delay: index * 0.2,
+                  ease: [0.25, 0.46, 0.45, 0.94],
+                  repeat: expandedDays.has(index) ? Infinity : 0
+                }}
               />
             </motion.div>
           );
@@ -411,7 +501,7 @@ const Timeline = memo(function Timeline() {
           />
         );
       })}
-      
+
       {/* Additional orange particles for Day 2 area */}
       {[...Array(4)].map((_, i) => (
         <motion.div
