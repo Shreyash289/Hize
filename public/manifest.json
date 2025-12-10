@@ -1,7 +1,7 @@
 {
-  "name": "HIZE 2026 - High Impact Zonal Events",
+  "name": "IEEE CS SYP HIZE 2026",
   "short_name": "HIZE 2026",
-  "description": "A flagship IEEE Computer Society initiative bringing together innovation, technology, and academic excellence",
+  "description": "IEEE Computer Society High Impact Zonal Events 2026",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
@@ -12,13 +12,13 @@
       "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     }
   ],
   "categories": ["education", "technology", "events"],

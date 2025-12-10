@@ -1,15 +1,19 @@
 "use client"
 
+import { memo } from "react"
 import { motion } from "framer-motion"
+import { FaLinkedin } from 'react-icons/fa'
 
 export interface Speaker {
   name: string
   title?: string
   image?: string
   bio?: string
+  featured?: boolean // NEW
+  social?: { linkedin?: string; x?: string }
 }
 
-export default function SpeakerCard({
+function SpeakerCard({
   speaker,
   index,
   onClick,
@@ -20,35 +24,62 @@ export default function SpeakerCard({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
-      transition={{ delay: (index ?? 0) * 0.2, duration: 0.8 }}
-      whileHover={{ y: -10 }}
-      className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20 cursor-pointer"
+      className="group relative rounded-2xl overflow-hidden flex flex-col h-full cursor-pointer"
       onClick={onClick}
+      tabIndex={onClick ? 0 : undefined}
+      role={onClick ? 'button' : undefined}
+      aria-label={`View details for ${speaker.name}${speaker.title ? ", " + speaker.title : ''}`}
+      style={{ willChange: "transform" }}
+      whileHover={{ y: -8 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
     >
-      <div className="relative aspect-square overflow-hidden">
-        <div className="w-full h-full overflow-hidden">
-          <div
-            className="w-full h-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-125"
-            style={{
-              backgroundImage: `url(${speaker.image})`,
-              filter: "grayscale(100%)",
-            }}
-          />
+      {/* Orange halo effect behind the card on hover */}
+      <div className="absolute -inset-6 -z-10 pointer-events-none">
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-orange-500/0 via-orange-500/40 to-orange-500/0 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-2 rounded-3xl bg-orange-500/30 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      </div>
+      
+      {/* Card base with glassmorphism */}
+      <div className="relative flex-1 flex flex-col backdrop-blur-xl bg-white/10 border border-neutral-800 rounded-xl sm:rounded-2xl shadow-lg h-full transition-all duration-300 z-10">
+        {/* Speaker Image */}
+        <div className="relative aspect-[3/4] w-full overflow-hidden bg-neutral-800 rounded-t-xl sm:rounded-t-2xl">
+          {speaker.image ? (
+            <img
+              src={speaker.image}
+              alt={`${speaker.name}${speaker.title ? ' - ' + speaker.title : ''}`}
+              className="w-full h-full object-cover object-center"
+              loading="lazy"
+              onError={e => { e.currentTarget.style.display = 'none' }}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-neutral-900">
+              <div className="text-4xl sm:text-5xl font-bold text-gray-700">
+                {speaker.name.charAt(0)}
+              </div>
+            </div>
+          )}
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent group-hover:from-orange-900/70 group-hover:via-orange-950/30 group-hover:to-transparent transition-all duration-700" />
+        {/* Speaker Info */}
+        <div className="flex-1 p-4 sm:p-5 md:p-6 flex flex-col justify-end">
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-white">
+              {speaker.name}
+            </h3>
+            {speaker.social?.linkedin && (
+              <a href={speaker.social.linkedin} target="_blank" rel="noopener noreferrer" className="ml-2 text-blue-600 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full flex-shrink-0" aria-label={`LinkedIn profile of ${speaker.name}`} onClick={e => e.stopPropagation()}>
+                <FaLinkedin className="w-5 h-5 sm:w-6 sm:h-6" />
+              </a>
+            )}
+          </div>
+          {speaker.title && (
+            <p className="text-sm sm:text-base text-gray-300 mb-1 font-medium">
+              {speaker.title}
+            </p>
+          )}
+        </div>
       </div>
-
-      <div className="p-6 space-y-2">
-        <h3 className="text-2xl font-bold">{speaker.name}</h3>
-        <p className="text-slate-400 font-serif">{speaker.title}</p>
-      </div>
-
-      <motion.div
-        className="absolute -inset-[1px] bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10"
-      />
     </motion.div>
   )
 }
+
+export default memo(SpeakerCard)

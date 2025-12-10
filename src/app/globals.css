@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lora:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lora:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap') layer(fonts);
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -219,6 +219,15 @@
     background-color: rgba(0, 0, 0, 0.8);
   }
   
+  @keyframes swish {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+  
+  .animate-swish {
+    animation: swish 3s linear infinite;
+  }
+  
   @supports (backdrop-filter: blur(24px)) {
     .backdrop-blur-xl {
       backdrop-filter: blur(24px);
@@ -267,6 +276,39 @@
     will-change: transform;
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
+  }
+
+  /* Performance optimizations */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* GPU acceleration for animations */
+  [class*="motion-"],
+  [class*="animate-"],
+  .group {
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000px;
+    perspective: 1000px;
+  }
+
+  /* Optimize scroll performance */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 
   /* iOS Safari text rendering */

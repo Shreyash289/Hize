@@ -5,6 +5,8 @@ import { motion } from "framer-motion"
 import Navigation from "@/components/Navigation"
 import { Code2, Lightbulb, Mic2 } from "lucide-react"
 import EventCard, { EventItem } from "@/components/EventCard"
+import Timeline from "@/components/Timeline";
+
 
 const ICON_MAP: Record<string, any> = {
   Code2,
@@ -85,6 +87,11 @@ export default function EventsPage() {
           </div>
         )}
       </main>
+
+      <section className="py-24">
+  <Timeline />
+</section>
+
 
       <footer className="border-t border-border mt-20 py-8">
         <div className="max-w-7xl mx-auto px-6 text-center text-sm text-muted-foreground">
