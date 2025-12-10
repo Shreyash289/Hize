@@ -51,62 +51,38 @@ export default function DynamicBackground() {
       // iOS Safari performance: reduce animation speed on mobile
       time += isIOS ? 0.001 : 0.002
 
-      const gradient1 = ctx.createRadialGradient(
-        width * (0.3 + Math.sin(time) * 0.15),
-        height * (0.3 + Math.cos(time * 0.7) * 0.15),
-        0,
-        width * (0.3 + Math.sin(time) * 0.15),
-        height * (0.3 + Math.cos(time * 0.7) * 0.15),
-        width * 0.65
-      )
+      // Optimize: Reuse gradient calculations
+      const g1x = width * (0.3 + Math.sin(time) * 0.15)
+      const g1y = height * (0.3 + Math.cos(time * 0.7) * 0.15)
+      const gradient1 = ctx.createRadialGradient(g1x, g1y, 0, g1x, g1y, width * 0.65)
       gradient1.addColorStop(0, "rgba(255, 107, 26, 0.7)")
       gradient1.addColorStop(0.5, "rgba(255, 85, 0, 0.4)")
       gradient1.addColorStop(1, "rgba(0, 0, 0, 0)")
 
-      const gradient2 = ctx.createRadialGradient(
-        width * (0.7 + Math.cos(time * 1.1) * 0.12),
-        height * (0.6 + Math.sin(time * 0.95) * 0.12),
-        0,
-        width * (0.7 + Math.cos(time * 1.1) * 0.12),
-        height * (0.6 + Math.sin(time * 0.95) * 0.12),
-        width * 0.6
-      )
+      const g2x = width * (0.7 + Math.cos(time * 1.1) * 0.12)
+      const g2y = height * (0.6 + Math.sin(time * 0.95) * 0.12)
+      const gradient2 = ctx.createRadialGradient(g2x, g2y, 0, g2x, g2y, width * 0.6)
       gradient2.addColorStop(0, "rgba(255, 140, 66, 0.6)")
       gradient2.addColorStop(0.5, "rgba(255, 107, 26, 0.3)")
       gradient2.addColorStop(1, "rgba(0, 0, 0, 0)")
 
-      const gradient3 = ctx.createRadialGradient(
-        width * (0.5 + Math.sin(time * 1.3) * 0.18),
-        height * (0.8 + Math.cos(time * 1.05) * 0.12),
-        0,
-        width * (0.5 + Math.sin(time * 1.3) * 0.18),
-        height * (0.8 + Math.cos(time * 1.05) * 0.12),
-        width * 0.58
-      )
+      const g3x = width * (0.5 + Math.sin(time * 1.3) * 0.18)
+      const g3y = height * (0.8 + Math.cos(time * 1.05) * 0.12)
+      const gradient3 = ctx.createRadialGradient(g3x, g3y, 0, g3x, g3y, width * 0.58)
       gradient3.addColorStop(0, "rgba(255, 85, 0, 0.5)")
       gradient3.addColorStop(0.5, "rgba(204, 68, 0, 0.3)")
       gradient3.addColorStop(1, "rgba(0, 0, 0, 0)")
 
-      const gradient4 = ctx.createRadialGradient(
-        width * (0.2 + Math.cos(time * 0.85) * 0.1),
-        height * (0.4 + Math.sin(time * 1.25) * 0.1),
-        0,
-        width * (0.2 + Math.cos(time * 0.85) * 0.1),
-        height * (0.4 + Math.sin(time * 1.25) * 0.1),
-        width * 0.5
-      )
+      const g4x = width * (0.2 + Math.cos(time * 0.85) * 0.1)
+      const g4y = height * (0.4 + Math.sin(time * 1.25) * 0.1)
+      const gradient4 = ctx.createRadialGradient(g4x, g4y, 0, g4x, g4y, width * 0.5)
       gradient4.addColorStop(0, "rgba(255, 107, 26, 0.45)")
       gradient4.addColorStop(0.5, "rgba(153, 51, 0, 0.3)")
       gradient4.addColorStop(1, "rgba(0, 0, 0, 0)")
 
-      const gradient5 = ctx.createRadialGradient(
-        width * (0.85 + Math.sin(time * 0.75) * 0.08),
-        height * (0.3 + Math.cos(time * 1.15) * 0.08),
-        0,
-        width * (0.85 + Math.sin(time * 0.75) * 0.08),
-        height * (0.3 + Math.cos(time * 1.15) * 0.08),
-        width * 0.45
-      )
+      const g5x = width * (0.85 + Math.sin(time * 0.75) * 0.08)
+      const g5y = height * (0.3 + Math.cos(time * 1.15) * 0.08)
+      const gradient5 = ctx.createRadialGradient(g5x, g5y, 0, g5x, g5y, width * 0.45)
       gradient5.addColorStop(0, "rgba(255, 140, 66, 0.4)")
       gradient5.addColorStop(0.5, "rgba(204, 68, 0, 0.2)")
       gradient5.addColorStop(1, "rgba(0, 0, 0, 0)")

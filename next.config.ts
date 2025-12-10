@@ -35,6 +35,8 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
+  // Optimize production builds
+  productionBrowserSourceMaps: false,
   turbopack: {
     rules: {
       "*.{jsx,tsx}": {

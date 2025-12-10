@@ -68,7 +68,7 @@ export default function ImageUpload({
       {preview ? (
         <div className="relative group">
           <div className="relative w-full h-48 bg-gray-800/50 rounded-lg overflow-hidden border-2 border-gray-700">
-            <img src={preview} alt="ID Card Preview" className="w-full h-full object-cover" />
+            <img src={preview || undefined} alt="ID Card Preview" className="w-full h-full object-cover" />
 
             {uploading && (
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
@@ -138,7 +138,7 @@ export default function ImageUpload({
               <X className="w-6 h-6 text-white" />
             </button>
             <img
-              src={preview}
+              src={preview || undefined}
               alt="ID Card Full Preview"
               className="max-w-full max-h-[90vh] rounded-lg"
             />

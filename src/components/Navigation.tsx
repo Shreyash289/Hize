@@ -1,85 +1,224 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { Moon, Sun } from "lucide-react"
 import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
+import { Menu, X } from "lucide-react"
 
-export default function Navigation() {
+interface NavigationProps {
+  sections?: string[]
+  onSectionClick?: (index: number) => void
+  activeSection?: number
+}
+
+export default function Navigation({ sections, onSectionClick, activeSection }: NavigationProps = {}) {
   const pathname = usePathname()
-  const [isDark, setIsDark] = useState(false)
+  const isHomepage = pathname === "/"
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
-    const theme = localStorage.getItem("theme")
-    if (theme === "dark") {
-      setIsDark(true)
-      document.documentElement.classList.add("dark")
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20)
     }
+    // Use passive listener for better scroll performance
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const toggleTheme = () => {
-    if (isDark) {
-      document.documentElement.classList.remove("dark")
-      localStorage.setItem("theme", "light")
-      setIsDark(false)
-    } else {
-      document.documentElement.classList.add("dark")
-      localStorage.setItem("theme", "dark")
-      setIsDark(true)
-    }
-  }
+  const homepageLinks = [
+    { label: "Events", section: 1 },
+    { label: "Guests", section: 2 },
+    { label: "Partners", section: 3 },
+    { label: "Previous Events", section: 4 },
+    { label: "Student Team", section: 5 },
+    { label: "Contact", section: 6 },
+  ]
 
-  const links = [
-    { href: "/", label: "Home" },
+  const regularLinks = [
     { href: "/events", label: "Events" },
     { href: "/guests", label: "Guests" },
+    { href: "/register", label: "Register" },
     { href: "/contact", label: "Contact" },
   ]
 
+  const handleNavClick = (index?: number) => {
+    if (isHomepage && index !== undefined && onSectionClick) {
+      onSectionClick(index)
+    }
+    setMobileMenuOpen(false)
+  }
+
   return (
-    <motion.nav
-      initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg"
-    >
-      <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="flex items-center justify-center gap-8">
-          <div className="flex items-center gap-6">
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`text-sm font-medium transition-colors hover:text-primary relative ${
-                  pathname === link.href ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
-                {link.label}
-                {pathname === link.href && (
-                  <motion.div
-                    layoutId="activeNav"
-                    className="absolute -bottom-[21px] left-0 right-0 h-0.5 bg-primary"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
-              </Link>
-            ))}
+    <>
+      <motion.nav
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className={`fixed top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-4 z-50 transition-all duration-300 ${
+          isScrolled
+            ? "bg-black/60 backdrop-blur-xl border border-orange-500/20 shadow-2xl shadow-orange-500/10"
+            : "bg-black/40 backdrop-blur-lg border border-orange-500/10"
+        } rounded-xl sm:rounded-2xl mx-auto max-w-7xl`}
+      >
+        <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between">
+          {/* Logo/Brand */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="relative h-8 sm:h-10 md:h-12 w-auto flex items-center gap-3"
+            >
+              <Image
+                src="/logo_white.png"
+                alt="IEEE Computer Society HIZE 2026"
+                width={160}
+                height={48}
+                className="h-full w-auto object-contain"
+                priority
+              />
+              <Image
+                src="/srmlogo.png"
+                alt="SRM Institute of Science & Technology"
+                width={120}
+                height={48}
+                className="h-full w-auto object-contain"
+                priority
+              />
+            </motion.div>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-1">
+            {isHomepage && sections ? (
+              homepageLinks.map((link, idx) => (
+                <button
+                  key={link.label}
+                  onClick={() => handleNavClick(link.section)}
+                  className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    activeSection === link.section
+                      ? "text-orange-400 bg-orange-500/10"
+                      : "text-gray-300 hover:text-orange-400 hover:bg-white/5"
+                  }`}
+                >
+                  {link.label}
+                  {activeSection === link.section && (
+                    <motion.div
+                      layoutId="activeNavIndicator"
+                      className="absolute inset-0 rounded-lg bg-orange-500/20 border border-orange-500/30 -z-10"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </button>
+              ))
+            ) : (
+              regularLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    pathname === link.href
+                      ? "text-orange-400 bg-orange-500/10"
+                      : "text-gray-300 hover:text-orange-400 hover:bg-white/5"
+                  }`}
+                >
+                  {link.label}
+                  {pathname === link.href && (
+                    <motion.div
+                      layoutId="activeNavIndicator"
+                      className="absolute inset-0 rounded-lg bg-orange-500/20 border border-orange-500/30 -z-10"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </Link>
+              ))
+            )}
+            <Link
+              href="/register"
+              className="ml-2 px-6 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-orange-600 to-orange-400 text-black hover:from-orange-500 hover:to-orange-300 transition-all shadow-lg shadow-orange-500/30"
+            >
+              Register
+            </Link>
           </div>
 
+          {/* Mobile Menu Button */}
           <button
-            onClick={toggleTheme}
-            className="w-10 h-10 rounded-xl clay-button bg-secondary hover:bg-accent flex items-center justify-center"
-            aria-label="Toggle theme"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-lg text-gray-300 hover:text-orange-400 hover:bg-white/5 transition-colors"
+            aria-label="Toggle menu"
           >
-            {isDark ? (
-              <Sun className="w-5 h-5" />
-            ) : (
-              <Moon className="w-5 h-5" />
-            )}
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
-      </div>
-    </motion.nav>
+      </motion.nav>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 md:hidden"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              className="fixed top-0 right-0 bottom-0 w-80 bg-black/95 backdrop-blur-xl border-l border-orange-500/20 z-50 md:hidden shadow-2xl"
+            >
+              <div className="flex flex-col h-full pt-24 px-6">
+                {isHomepage && sections ? (
+                  <div className="flex flex-col gap-2">
+                    {homepageLinks.map((link) => (
+                      <button
+                        key={link.label}
+                        onClick={() => handleNavClick(link.section)}
+                        className={`text-left px-4 py-3 rounded-lg text-base font-medium transition-all ${
+                          activeSection === link.section
+                            ? "text-orange-400 bg-orange-500/10 border border-orange-500/30"
+                            : "text-gray-300 hover:text-orange-400 hover:bg-white/5"
+                        }`}
+                      >
+                        {link.label}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {regularLinks.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`px-4 py-3 rounded-lg text-base font-medium transition-all ${
+                          pathname === link.href
+                            ? "text-orange-400 bg-orange-500/10 border border-orange-500/30"
+                            : "text-gray-300 hover:text-orange-400 hover:bg-white/5"
+                        }`}
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+                <Link
+                  href="/register"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="mt-6 px-6 py-3 rounded-lg text-base font-bold text-center bg-gradient-to-r from-orange-600 to-orange-400 text-black hover:from-orange-500 hover:to-orange-300 transition-all shadow-lg shadow-orange-500/30"
+                >
+                  Register Now
+                </Link>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   )
 }

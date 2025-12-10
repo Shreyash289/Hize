@@ -1,65 +1,108 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import VisualEditsMessenger from "../visual-edits/VisualEditsMessenger";
-import ErrorReporter from "@/components/ErrorReporter";
-import Script from "next/script";
-import { Toaster } from "sonner"
 
 export const metadata: Metadata = {
-  title: "HIZE 2026 | High Impact Zonal Events",
-  description: "A flagship IEEE Computer Society initiative bringing together innovation, technology, and academic excellence. Join us for hackathons, workshops, and keynote sessions at SRM Institute of Science & Technology.",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-    viewportFit: "cover",
+  title: {
+    default: "IEEE CS SYP HIZE 2026 | High Impact Zonal Events",
+    template: "%s | IEEE CS SYP HIZE 2026"
   },
-  themeColor: "#ff8c42",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "HIZE 2026",
-  },
+  description: "Join IEEE Computer Society's flagship High Impact Zonal Events (HIZE) 2026 at SRM Institute. Experience innovation, technology, and academic excellence through hackathons, conferences, workshops, and networking opportunities.",
+  keywords: [
+    "IEEE Computer Society",
+    "HIZE 2026",
+    "High Impact Zonal Events",
+    "SRM Institute",
+    "Technology Conference",
+    "Hackathon",
+    "Tech Workshops",
+    "Student Events",
+    "Innovation",
+    "Programming Contest",
+    "Tech Talks",
+    "Networking"
+  ],
+  authors: [{ name: "IEEE Computer Society SRM" }],
+  creator: "IEEE Computer Society SRM",
+  publisher: "IEEE Computer Society",
   formatDetection: {
+    email: false,
+    address: false,
     telephone: false,
   },
+  metadataBase: new URL("https://ieeecshize.com"),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://ieeecshize.com",
+    title: "IEEE CS SYP HIZE 2026 | High Impact Zonal Events",
+    description: "Join IEEE Computer Society's flagship High Impact Zonal Events (HIZE) 2026. Experience innovation, technology, and academic excellence.",
+    siteName: "IEEE CS SYP HIZE 2026",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "IEEE CS SYP HIZE 2026 - High Impact Zonal Events",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "IEEE CS SYP HIZE 2026 | High Impact Zonal Events",
+    description: "Join IEEE Computer Society's flagship High Impact Zonal Events (HIZE) 2026. Experience innovation, technology, and academic excellence.",
+    images: ["/og-image.jpg"],
+    creator: "@ieeecs_srm",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "your-google-verification-code",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ff8c42" },
+    { media: "(prefers-color-scheme: dark)", color: "#ff8c42" },
+  ],
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth">
       <head>
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="HIZE 2026" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="#ff8c42" />
-        <meta name="msapplication-navbutton-color" content="#ff8c42" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="format-detection" content="telephone=no" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        <link rel="preload" href="/fonts/plus-jakarta-sans.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="antialiased">
-        <ErrorReporter />
-        <Script
-          src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/scripts//route-messenger.js"
-          strategy="afterInteractive"
-          data-target-origin="*"
-          data-message-type="ROUTE_CHANGE"
-          data-include-search-params="true"
-          data-only-in-iframe="true"
-          data-debug="true"
-          data-custom-data='{"appName": "YourApp", "version": "1.0.0", "greeting": "hi"}'
-        />
-        <Toaster position="top-right" richColors />
         {children}
-        <VisualEditsMessenger />
       </body>
     </html>
   );

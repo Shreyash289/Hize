@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Keshav Gupta",
+    "role": "ChairPerson",
+    "image": "/students/chairperson.jpg"
+  },
+  {
+    "name": "Ushnish Ghosal",
+    "role": "Vice ChairPerson",
+    "image": "/students/vicechair.jpg"
+  },
+  {
+    "name": "Iraa jayakumar",
+    "role": "Secretary",
+    "image": "/students/secretary.jpg"
+  },
+  {
+    "name": "Harsh Agarwal",
+    "role": "Treasurer",
+    "image": "/students/treasurer.jpg"
+  }
+]
+

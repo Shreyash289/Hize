@@ -1,20 +1,23 @@
 [
   {
-    "name": "Abhinav Gambhir",
-    "title": "Associate Director, Oracle",
-    "image": "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=1200&fit=crop",
-    "bio": "Expert in cloud engineering and developer relations."
+    "name": "Shivam Shivam",
+    "title": "AI Architect, ZS Associates",
+    "image": "guest/shivam.jpg",
+    "bio": "An award-winning AI Architect 7+ years of experience building Generative AI and multi-agent systems to transform pharmaceutical operations.",
+    "social": { "linkedin": "https://www.linkedin.com/in/shivamshivam96/" }
   },
   {
-    "name": "Priya Sharma",
-    "title": "Senior ML Engineer, Acme AI",
-    "image": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=1200&fit=crop",
-    "bio": "Works on production ML systems and on-device AI."
+    "name": "Mohan H.R",
+    "title": "Chair - Events, IEEE Computer Society, India Council",
+    "image": "guest/hrmohan.jpg",
+    "bio": "Mr. H. R. Mohan is a veteran ICT consultant and former technology leader at The Hindu, renowned for pioneering India’s first online newspaper and contributing over four decades of service to global computing societies.",
+    "social": { "linkedin": "https://www.linkedin.com/in/hr-mohan/" }
   },
   {
     "name": "Rohit Menon",
     "title": "CTO, StartupX",
     "image": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=1200&fit=crop",
-    "bio": "Founder & technology leader focused on scalable infra."
+    "bio": "Founder & technology leader focused on scalable infra.",
+    "social": { "linkedin": "https://www.linkedin.com/in/rohitmenon-sample/" }
   }
 ]
