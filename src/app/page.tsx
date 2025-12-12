@@ -22,7 +22,7 @@ const DynamicBackground = dynamic(() => import("@/components/DynamicBackground")
   loading: () => <div className="fixed inset-0 bg-black"></div>
 })
 
-const ScrollProgress = dynamic(() => import("@/components/ScrollProgress"), { 
+const ScrollProgress = dynamic(() => import("@/components/ScrollProgress"), {
   ssr: false,
   loading: () => null
 })
@@ -33,10 +33,12 @@ const EnhancedCountdown = dynamic(() => import("@/components/EnhancedCountdown")
 })
 
 // Only load magnetic cursor on desktop
-const MagneticCursor = dynamic(() => import("@/components/MagneticCursor"), { 
+const MagneticCursor = dynamic(() => import("@/components/MagneticCursor"), {
   ssr: false,
   loading: () => null
 })
+
+
 
 // Simplified marquee loading
 const Marquee = dynamic(() => import("react-fast-marquee").then(mod => ({ default: mod.default })), {
@@ -44,12 +46,12 @@ const Marquee = dynamic(() => import("react-fast-marquee").then(mod => ({ defaul
   loading: () => <div className="h-16 bg-gradient-to-r from-orange-600/5 to-orange-400/5 rounded-lg"></div>
 })
 
-const SpeakerCard = dynamic(() => import('@/components/SpeakerCard'), { 
+const SpeakerCard = dynamic(() => import('@/components/SpeakerCard'), {
   ssr: false,
   loading: () => <div className="h-64 bg-gradient-to-br from-black/40 to-zinc-900/40 rounded-xl animate-pulse"></div>
 })
 
-const Navigation = dynamic(() => import('@/components/Navigation'), { 
+const Navigation = dynamic(() => import('@/components/Navigation'), {
   ssr: false,
   loading: () => <div className="fixed top-0 left-0 right-0 z-50 h-16 bg-black/80 backdrop-blur-sm"></div>
 })
@@ -533,18 +535,18 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-orange-500/40 text-sm font-semibold text-orange-200 shadow-lg">
                   <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
-                  Interactive Campus Map
+                  Map
                 </div>
                 <p className="text-sm text-slate-400">
-                  Click venues to explore event locations
+                  Google Maps embed with campus location
                 </p>
               </div>
 
-              {/* Interactive Map Component */}
-              <InteractiveMap />
-
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="text-slate-300 text-sm sm:text-base fon
+              <div className="relative w-full rounded-xl md:rounded-2xl overflow-hidden bg-black/40 border border-orange-500/30 shadow-2xl">
+                <div className="relative aspect-[4/3] w-full">
+                  <iframe
+                    src="https://www.google.com/maps/d/embed?mid=1UfC_a8sotHQhQRM1hjjGmziJiRXu-7c&ehbc=2E312F"
+                    className="w-full h-full absolute inset-0"
                     title="HIZE Venue Map"
                     allowFullScreen
                     loading="lazy"
@@ -557,6 +559,25 @@ export default function Home() {
                     Drag, zoom, or open in Maps
                   </div>
                 </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="text-slate-300 text-sm sm:text-base font-mono">
+                  SRM Institute of Science & Technology, Kattankulathur, Tamil Nadu
+                </div>
+                <motion.a
+                  href="https://www.google.com/maps/d/u/0/viewer?mid=18kGFk2ClDWeZPYT0rkdUHRDRw98Mj5U&ehbc=2E312F"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-orange-600 to-orange-400 font-semibold text-black shadow-lg shadow-orange-500/40 hover:shadow-orange-500/70 transition-all duration-300"
+                >
+                  Open Full Map
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </motion.a>
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
