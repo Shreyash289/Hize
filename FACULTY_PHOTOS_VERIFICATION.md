@@ -12,15 +12,14 @@ All faculty photos are present in `public/faculty/`:
 5. ✅ `selvinpj.jpg` - Dr. J. Selvin Paul Peter
 6. ✅ `kishorea1.jpg` - Dr. K. Kishore Anthuvan Sahayaraj
 7. ✅ `gnanaves1.jpg` - Dr. S. Gnanavel
-8. ✅ `sindhujm1.jpg` - Dr. M. Sindhuja
-9. ✅ `saranyas6.jpg` - Dr. S. S. Saranya
-10. ✅ `arulalav.jpg` - Dr. V. Arulalan
-11. ✅ `raguntht.jpg` - Dr. T. Ragunthar
-12. ✅ `muralidc.jpg` - Dr. C. Muralidharan
-13. ✅ `balamurg1.jpg` - Dr. G. Balamurugan
-14. ✅ `vijiyakk.jpg` - Dr. K. Vijiyakumar
-15. ✅ `gokulakd.jpg` - Dr. D. Gokulakrishnan
-16. ✅ `ramkumaj.jpg` - Dr. Ramkumar Jayaraman
+8. ✅ `saranyas6.jpg` - Dr. S. S. Saranya
+9. ✅ `arulalav.jpg` - Dr. V. Arulalan
+10. ✅ `raguntht.jpg` - Dr. T. Ragunthar
+11. ✅ `muralidc.jpg` - Dr. C. Muralidharan
+12. ✅ `balamurg1.jpg` - Dr. G. Balamurugan
+13. ✅ `vijiyakk.jpg` - Dr. K. Vijiyakumar
+14. ✅ `gokulakd.jpg` - Dr. D. Gokulakrishnan
+15. ✅ `ramkumaj.jpg` - Dr. Ramkumar Jayaraman
 
 ### Configuration Files ✅
 - ✅ `src/lib/data/faculty.json` - Contains all faculty data with image paths

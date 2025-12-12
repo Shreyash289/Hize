@@ -1,20 +1,60 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useMemo } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { X } from "lucide-react"
+import { X, Calendar, Clock } from "lucide-react"
+import { shouldReduceAnimations, isMobile } from "@/lib/mobileOptimization"
 
-// Posters carousel replacing the previous 4 circular countdown circles
+interface TimeLeft {
+  days: number
+  hours: number
+  minutes: number
+  seconds: number
+}
+
+// Enhanced countdown with modern timer to January 29th
 export default function EnhancedCountdown() {
   const posters = [1, 2, 3, 4, 5].map((i) => `/poster/poster${i}.png`)
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const [lightboxImage, setLightboxImage] = useState<string | null>(null)
+  const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 })
   const containerRef = useRef<HTMLDivElement>(null)
   const autoplayRef = useRef<NodeJS.Timeout | null>(null)
   const lastScrollRef = useRef(0)
+  
+  // Memoize performance settings
+  const mobile = useMemo(() => isMobile(), [])
+  const reducedMotion = useMemo(() => shouldReduceAnimations(), [])
+
+  // Target date: January 29th, 2026
+  const targetDate = new Date('2026-01-29T00:00:00').getTime()
+
+  // Countdown timer logic
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const now = new Date().getTime()
+      const difference = targetDate - now
+
+      if (difference > 0) {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24))
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000)
+
+        setTimeLeft({ days, hours, minutes, seconds })
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+      }
+    }
+
+    calculateTimeLeft()
+    const timer = setInterval(calculateTimeLeft, 1000)
+
+    return () => clearInterval(timer)
+  }, [targetDate])
 
   const goTo = (nextIndex: number) => {
     const total = posters.length
@@ -107,14 +147,145 @@ export default function EnhancedCountdown() {
 
   return (
     <>
+      {/* Modern Countdown Timer */}
+      <div className="relative w-full py-6 sm:py-8 md:py-10 lg:py-12">
+        <div className="mx-auto max-w-6xl px-3 sm:px-4 md:px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="relative"
+          >
+            {/* Countdown Header */}
+            <div className="text-center mb-4 sm:mb-6 md:mb-8 lg:mb-10">
+              <motion.div
+                className="inline-flex items-center gap-1.5 sm:gap-2 md:gap-3 px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-3 rounded-full bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-400/30 backdrop-blur-sm mb-3 sm:mb-4"
+                animate={reducedMotion || mobile ? {} : { 
+                  boxShadow: [
+                    "0 0 15px rgba(255, 140, 66, 0.3)",
+                    "0 0 20px rgba(255, 140, 66, 0.4)",
+                    "0 0 15px rgba(255, 140, 66, 0.3)"
+                  ]
+                }}
+                transition={reducedMotion || mobile ? {} : { duration: 3, repeat: Infinity, ease: "linear" }}
+              >
+                <Calendar className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 text-orange-400" />
+                <span className="text-xs sm:text-sm md:text-base font-semibold text-orange-200">
+                  Event Countdown
+                </span>
+                <Clock className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 text-orange-400" />
+              </motion.div>
+              
+              <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold bg-gradient-to-r from-orange-400 via-orange-300 to-orange-500 bg-clip-text text-transparent mb-2 px-2">
+                Time Until HIZE 2026
+              </h3>
+              <p className="text-xs sm:text-sm md:text-base lg:text-lg text-orange-200/80 font-serif px-2">
+                January 29th, 2026 • SRM Institute of Science & Technology
+              </p>
+            </div>
+
+            {/* Countdown Display */}
+            <div className="relative p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-black/80 via-zinc-900/90 to-black/80 backdrop-blur-2xl border border-orange-500/30 shadow-2xl">
+              {/* Animated background gradient - simplified for mobile */}
+              <motion.div
+                className="absolute -inset-[1px] rounded-2xl sm:rounded-3xl bg-gradient-to-r from-orange-500 via-pink-500 to-orange-400 opacity-30"
+                animate={reducedMotion || mobile ? {} : {
+                  opacity: [0.2, 0.3, 0.2],
+                }}
+                transition={reducedMotion || mobile ? {} : {
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+              />
+              
+              <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6 xl:gap-8">
+                {[
+                  { label: 'Days', value: timeLeft.days, color: 'from-orange-500 to-orange-400' },
+                  { label: 'Hours', value: timeLeft.hours, color: 'from-orange-400 to-pink-500' },
+                  { label: 'Minutes', value: timeLeft.minutes, color: 'from-pink-500 to-orange-500' },
+                  { label: 'Seconds', value: timeLeft.seconds, color: 'from-orange-600 to-orange-400' }
+                ].map((item, index) => (
+                  <motion.div
+                    key={item.label}
+                    className="text-center"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1, duration: 0.6 }}
+                  >
+                    <div className="relative mb-2 sm:mb-3 md:mb-4">
+                      <motion.div
+                        className={`relative p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 rounded-xl sm:rounded-2xl bg-gradient-to-br ${item.color} shadow-lg`}
+                        animate={reducedMotion || mobile ? {} : (item.label === 'Seconds' ? {
+                          scale: [1, 1.02, 1],
+                        } : {})}
+                        transition={reducedMotion || mobile ? {} : (item.label === 'Seconds' ? {
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "linear"
+                        } : {})}
+                      >
+                        <motion.span
+                          key={item.value}
+                          className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black text-white block leading-none"
+                          initial={reducedMotion ? { opacity: 1 } : { scale: 1.1, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: reducedMotion ? 0.1 : 0.2 }}
+                        >
+                          {String(item.value).padStart(2, '0')}
+                        </motion.span>
+                        
+                        {/* Shine effect */}
+                        <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] animate-pulse" />
+                      </motion.div>
+                      
+                      {/* Glow effect */}
+                      <div className={`absolute -inset-1 sm:-inset-2 rounded-xl sm:rounded-2xl bg-gradient-to-br ${item.color} blur-lg sm:blur-xl opacity-30 -z-10`} />
+                    </div>
+                    
+                    <p className="text-xs sm:text-sm md:text-base lg:text-lg font-bold text-orange-200 uppercase tracking-wider">
+                      {item.label}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Event details */}
+              <motion.div
+                className="mt-4 sm:mt-6 md:mt-8 pt-4 sm:pt-6 md:pt-8 border-t border-orange-500/20 text-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8, duration: 0.6 }}
+              >
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 md:gap-6 lg:gap-8 text-xs sm:text-sm md:text-base text-orange-200/90">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-orange-400 animate-pulse" />
+                    <span>3-Day Event</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-pink-400 animate-pulse" />
+                    <span>Multiple Competitions</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-orange-500 animate-pulse" />
+                    <span>Expert Speakers</span>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Posters Section */}
       <div
         ref={containerRef}
-        className="relative w-full py-10 select-none"
+        className="relative w-full py-4 sm:py-6 md:py-8 lg:py-10 select-none"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="relative mx-auto w-full max-w-[900px] aspect-square overflow-hidden rounded-3xl border border-orange-500/20 bg-black will-change-transform">
+        <div className="mx-auto max-w-6xl px-3 sm:px-4 md:px-6">
+          <div className="relative mx-auto w-full max-w-[280px] sm:max-w-[400px] md:max-w-[600px] lg:max-w-[800px] xl:max-w-[900px] aspect-square overflow-hidden rounded-2xl sm:rounded-3xl border border-orange-500/20 bg-black will-change-transform">
             {posters.map((src, i) => (
               <motion.div
                 key={src}
@@ -130,7 +301,7 @@ export default function EnhancedCountdown() {
                   fill
                   priority={i === 0}
                   loading={i === 0 ? "eager" : "lazy"}
-                  sizes="(max-width: 1024px) 100vw, 900px"
+                  sizes="(max-width: 640px) 280px, (max-width: 768px) 400px, (max-width: 1024px) 600px, (max-width: 1280px) 800px, 900px"
                   placeholder="blur"
                   blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbGw9JyMyMjIyMjInLz48L3N2Zz4="
                   style={{ objectFit: "contain" }}
@@ -154,17 +325,17 @@ export default function EnhancedCountdown() {
               ))}
             </div>
 
-            <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-3 md:px-4">
+            <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-2 sm:px-3 md:px-4">
               <button
                 aria-label="Previous poster"
-                className="h-10 w-10 md:h-12 md:w-12 grid place-items-center rounded-full bg-black/40 hover:bg-black/60 border border-white/20 text-white backdrop-blur-sm"
+                className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 grid place-items-center rounded-full bg-black/40 hover:bg-black/60 border border-white/20 text-white backdrop-blur-sm text-sm sm:text-base md:text-lg"
                 onClick={prev}
               >
                 ‹
               </button>
               <button
                 aria-label="Next poster"
-                className="h-10 w-10 md:h-12 md:w-12 grid place-items-center rounded-full bg-black/40 hover:bg-black/60 border border-white/20 text-white backdrop-blur-sm"
+                className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 grid place-items-center rounded-full bg-black/40 hover:bg-black/60 border border-white/20 text-white backdrop-blur-sm text-sm sm:text-base md:text-lg"
                 onClick={next}
               >
                 ›
