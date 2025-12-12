@@ -4,34 +4,59 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from 'next/link'
 import { Code2, Lightbulb, Mic2, Mail, Phone, ArrowDown, ChevronUp, X, FileText } from "lucide-react"
+import { FaLinkedin, FaTwitter } from 'react-icons/fa'
 import Image from "next/image"
 import dynamic from "next/dynamic"
 import facultyContacts from "@/lib/facultyContacts"
+import { isMobile, shouldReduceAnimations, getMobileOptimizedVariants } from "@/lib/mobileOptimization"
 
-// Lazy load heavy components for better initial load performance with loading states
+// Conditionally load heavy components based on device capabilities
 const LoadingScreen = dynamic(() => import("@/components/LoadingScreen"), {
   ssr: false,
-  loading: () => <div className="fixed inset-0 bg-black flex items-center justify-center"><div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div></div>
+  loading: () => <div className="fixed inset-0 bg-black flex items-center justify-center"><div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div></div>
 })
+
+// Only load background on desktop for performance
 const DynamicBackground = dynamic(() => import("@/components/DynamicBackground"), {
   ssr: false,
   loading: () => <div className="fixed inset-0 bg-black"></div>
 })
-const ScrollProgress = dynamic(() => import("@/components/ScrollProgress"), { ssr: false })
+
+const ScrollProgress = dynamic(() => import("@/components/ScrollProgress"), { 
+  ssr: false,
+  loading: () => null
+})
+
 const EnhancedCountdown = dynamic(() => import("@/components/EnhancedCountdown"), {
   ssr: false,
-  loading: () => <div className="h-32 bg-gradient-to-r from-orange-600/20 to-orange-400/20 rounded-2xl animate-pulse"></div>
+  loading: () => <div className="h-24 sm:h-32 bg-gradient-to-r from-orange-600/10 to-orange-400/10 rounded-xl"></div>
 })
-const MagneticCursor = dynamic(() => import("@/components/MagneticCursor"), { ssr: false })
+
+// Only load magnetic cursor on desktop
+const MagneticCursor = dynamic(() => import("@/components/MagneticCursor"), { 
+  ssr: false,
+  loading: () => null
+})
+
+// Simplified marquee loading
 const Marquee = dynamic(() => import("react-fast-marquee").then(mod => ({ default: mod.default })), {
   ssr: false,
-  loading: () => <div className="h-20 bg-gradient-to-r from-orange-600/10 to-orange-400/10 rounded-xl animate-pulse"></div>
+  loading: () => <div className="h-16 bg-gradient-to-r from-orange-600/5 to-orange-400/5 rounded-lg"></div>
 })
-const SpeakerCard = dynamic(() => import('@/components/SpeakerCard'), { ssr: false })
-const Navigation = dynamic(() => import('@/components/Navigation'), { ssr: false })
+
+const SpeakerCard = dynamic(() => import('@/components/SpeakerCard'), { 
+  ssr: false,
+  loading: () => <div className="h-64 bg-gradient-to-br from-black/40 to-zinc-900/40 rounded-xl animate-pulse"></div>
+})
+
+const Navigation = dynamic(() => import('@/components/Navigation'), { 
+  ssr: false,
+  loading: () => <div className="fixed top-0 left-0 right-0 z-50 h-16 bg-black/80 backdrop-blur-sm"></div>
+})
+
 const Timeline = dynamic(() => import('@/components/Timeline'), {
   ssr: false,
-  loading: () => <div className="max-w-7xl mx-auto px-4 py-16"><div className="space-y-8">{[1, 2, 3].map(i => <div key={i} className="h-64 bg-gradient-to-br from-black/60 to-zinc-900/60 rounded-2xl animate-pulse"></div>)}</div></div>
+  loading: () => <div className="max-w-7xl mx-auto px-4 py-8"><div className="space-y-4">{[1, 2, 3].map(i => <div key={i} className="h-32 bg-gradient-to-br from-black/40 to-zinc-900/40 rounded-xl"></div>)}</div></div>
 })
 
 interface Speaker {
@@ -41,6 +66,7 @@ interface Speaker {
   bio?: string
   social?: {
     linkedin?: string
+    x?: string
   }
 }
 
@@ -507,18 +533,18 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-orange-500/40 text-sm font-semibold text-orange-200 shadow-lg">
                   <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
-                  Map
+                  Interactive Campus Map
                 </div>
                 <p className="text-sm text-slate-400">
-                  Google Maps embed with campus location
+                  Click venues to explore event locations
                 </p>
               </div>
 
-              <div className="relative w-full rounded-xl md:rounded-2xl overflow-hidden bg-black/40 border border-orange-500/30 shadow-2xl">
-                <div className="relative aspect-[4/3] w-full">
-                  <iframe
-                    src="https://www.google.com/maps/d/embed?mid=1UfC_a8sotHQhQRM1hjjGmziJiRXu-7c&ehbc=2E312F"
-                    className="w-full h-full absolute inset-0"
+              {/* Interactive Map Component */}
+              <InteractiveMap />
+
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="text-slate-300 text-sm sm:text-base fon
                     title="HIZE Venue Map"
                     allowFullScreen
                     loading="lazy"
@@ -679,66 +705,154 @@ export default function Home() {
               Our distinguished guest speakers and tech thought leaders for HIZE.
             </p>
           </motion.div>
-          <div className="grid gap-4 sm:gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {speakers.map((speaker, idx) => (
-              <SpeakerCard
-                key={speaker.name || idx}
-                speaker={speaker}
-                index={idx}
-                onClick={() => setSelectedSpeaker(speaker)}
-              />
-            ))}
+          <div className="flex justify-center">
+            <div className="grid gap-6 sm:gap-8 md:gap-10 lg:gap-12 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl">
+              {speakers.map((speaker, idx) => (
+                <motion.div
+                  key={speaker.name || idx}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{
+                    duration: 0.6,
+                    delay: idx * 0.1,
+                    ease: "easeOut"
+                  }}
+                >
+                  <SpeakerCard
+                    speaker={speaker}
+                    onClick={() => setSelectedSpeaker(speaker)}
+                  />
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
-        {/* Speaker detail lightbox modal */}
+        {/* Enhanced Speaker detail lightbox modal */}
         <AnimatePresence>
           {selectedSpeaker && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-3xl px-6"
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-3xl px-4 sm:px-6"
               onClick={() => setSelectedSpeaker(null)}
             >
               <motion.div
-                initial={{ scale: 0.96, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.96, opacity: 0 }}
-                transition={{ duration: 0.23 }}
-                className="relative max-w-2xl w-full rounded-2xl md:rounded-3xl bg-white/10 backdrop-blur-xl shadow-2xl border border-orange-500/30 p-0 overflow-hidden"
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="relative max-w-4xl w-full rounded-3xl bg-gradient-to-br from-black/90 via-zinc-900/95 to-black/90 backdrop-blur-2xl shadow-2xl border border-orange-500/30 overflow-hidden"
                 onClick={e => e.stopPropagation()}
                 style={{ willChange: "transform" }}
               >
-                {/* Orange accent header bar */}
-                <div className="h-2 w-full bg-gradient-to-r from-orange-500 via-orange-400 to-orange-500 mb-0" />
-                {/* Close button */}
-                <button
-                  className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 rounded-full bg-zinc-900/60 text-white hover:bg-zinc-900/80 shadow transition-colors"
-                  onClick={() => setSelectedSpeaker(null)}
-                  aria-label="Close"
-                  type="button"
-                >
-                  <svg width="20" height="20" className="sm:w-[22px] sm:h-[22px]" fill="none" stroke="currentColor" strokeWidth="2.1" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-                <div className="flex flex-col md:flex-row items-center gap-4 sm:gap-6 p-6 sm:p-8 md:p-10">
-                  {selectedSpeaker.image && (
-                    <img
-                      src={selectedSpeaker.image}
-                      alt={selectedSpeaker.name}
-                      className="w-32 h-44 sm:w-40 sm:h-56 rounded-xl md:rounded-2xl object-cover object-center border border-orange-400/30 shadow-lg bg-neutral-900"
-                      loading="eager"
-                      decoding="async"
-                    />
-                  )}
-                  <div className="flex-1 text-left w-full">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">{selectedSpeaker.name}</h2>
-                    {selectedSpeaker.title && (
-                      <div className="text-base sm:text-lg font-semibold text-orange-200 mb-2">{selectedSpeaker.title}</div>
+                {/* Animated gradient border */}
+                <div className="absolute -inset-[1px] rounded-3xl bg-gradient-to-r from-orange-500 via-pink-500 to-orange-400 opacity-50" />
+                <div className="absolute -inset-[1px] rounded-3xl bg-gradient-to-r from-orange-400 via-orange-500 to-pink-500 blur-sm opacity-30" />
+
+                {/* Content container */}
+                <div className="relative bg-gradient-to-br from-black/95 via-zinc-900/98 to-black/95 rounded-3xl">
+                  {/* Header with gradient accent */}
+                  <div className="h-1 w-full bg-gradient-to-r from-orange-500 via-pink-500 to-orange-400" />
+
+                  {/* Close button */}
+                  <motion.button
+                    className="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 rounded-full bg-gradient-to-r from-zinc-800/80 to-zinc-900/80 backdrop-blur-sm border border-orange-500/20 text-white hover:border-orange-400/40 shadow-lg transition-all duration-300 group z-10"
+                    onClick={() => setSelectedSpeaker(null)}
+                    aria-label="Close"
+                    type="button"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <svg width="20" height="20" className="mx-auto group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </motion.button>
+
+                  <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 p-6 sm:p-8 lg:p-10">
+                    {/* Speaker Image */}
+                    {selectedSpeaker.image && (
+                      <motion.div
+                        className="flex-shrink-0 mx-auto lg:mx-0"
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.2, duration: 0.5 }}
+                      >
+                        <div className="relative">
+                          <div className="absolute -inset-2 bg-gradient-to-r from-orange-500 to-pink-500 rounded-2xl blur-lg opacity-30" />
+                          <img
+                            src={selectedSpeaker.image}
+                            alt={selectedSpeaker.name}
+                            className="relative w-48 h-64 sm:w-56 sm:h-72 lg:w-64 lg:h-80 rounded-2xl object-cover object-center border border-orange-400/30 shadow-2xl bg-neutral-900"
+                            loading="eager"
+                            decoding="async"
+                          />
+                        </div>
+                      </motion.div>
                     )}
-                    {selectedSpeaker.bio && (
-                      <p className="text-sm sm:text-base text-orange-100 mt-2 leading-relaxed whitespace-pre-line">{selectedSpeaker.bio}</p>
-                    )}
+
+                    {/* Speaker Details */}
+                    <motion.div
+                      className="flex-1 text-center lg:text-left space-y-4 sm:space-y-6"
+                      initial={{ x: 20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.3, duration: 0.5 }}
+                    >
+                      <div>
+                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-white via-orange-100 to-orange-200 bg-clip-text text-transparent mb-3 leading-tight">
+                          {selectedSpeaker.name}
+                        </h2>
+                        {selectedSpeaker.title && (
+                          <div className="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-400/30 backdrop-blur-sm">
+                            <p className="text-lg sm:text-xl font-semibold text-orange-200">
+                              {selectedSpeaker.title}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {selectedSpeaker.bio && (
+                        <div className="prose prose-invert max-w-none">
+                          <p className="text-base sm:text-lg text-orange-100/90 leading-relaxed whitespace-pre-line">
+                            {selectedSpeaker.bio}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Social Links */}
+                      {(selectedSpeaker.social?.linkedin || selectedSpeaker.social?.x) && (
+                        <div className="flex items-center justify-center lg:justify-start gap-4 pt-4">
+                          {selectedSpeaker.social?.linkedin && (
+                            <motion.a
+                              href={selectedSpeaker.social.linkedin}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              <FaLinkedin className="w-5 h-5" />
+                              <span>LinkedIn</span>
+                            </motion.a>
+                          )}
+                          {selectedSpeaker.social?.x && (
+                            <motion.a
+                              href={selectedSpeaker.social.x}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-gray-800 to-black text-white font-semibold shadow-lg hover:shadow-gray-500/25 transition-all duration-300"
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              <FaTwitter className="w-5 h-5" />
+                              <span>X (Twitter)</span>
+                            </motion.a>
+                          )}
+                        </div>
+                      )}
+                    </motion.div>
                   </div>
                 </div>
               </motion.div>
@@ -807,102 +921,102 @@ export default function Home() {
 
       <section
         ref={(el) => { sectionsRef.current[5] = el }}
-  className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
->
-  <div className="max-w-7xl mx-auto w-full relative z-10">
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8 }}
-      className="text-center mb-8 sm:mb-10 md:mb-12"
-    >
-      <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-3 sm:mb-4 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
-        PREVIOUS EVENTS
-      </h2>
-      <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
-        Revisit highlights from previous HIZE events.
-      </p>
-    </motion.div>
+        className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
+      >
+        <div className="max-w-7xl mx-auto w-full relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-8 sm:mb-10 md:mb-12"
+          >
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-3 sm:mb-4 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
+              PREVIOUS EVENTS
+            </h2>
+            <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
+              Revisit highlights from previous HIZE events.
+            </p>
+          </motion.div>
 
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8 }}
-      className="relative p-6 sm:p-8 md:p-10 lg:p-12 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20"
-    >
-      <div className="text-center space-y-6 sm:space-y-7 md:space-y-8">
-        
-        <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-2xl md:rounded-3xl bg-gradient-to-br from-orange-600 to-orange-400 flex items-center justify-center shadow-lg mx-auto">
-          <FileText className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />
-        </div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="relative p-6 sm:p-8 md:p-10 lg:p-12 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20"
+          >
+            <div className="text-center space-y-6 sm:space-y-7 md:space-y-8">
 
-        <div className="px-4">
-          <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
-            Previous HIZE Event Details
-          </h3>
-          <p className="text-sm sm:text-base md:text-lg text-slate-400 font-serif max-w-3xl mx-auto leading-relaxed">
-            Get comprehensive insights into our previous HIZE event, including event highlights,
-            participant achievements, keynote sessions, and memorable moments that made it a success.
-          </p>
-        </div>
+              <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-2xl md:rounded-3xl bg-gradient-to-br from-orange-600 to-orange-400 flex items-center justify-center shadow-lg mx-auto">
+                <FileText className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />
+              </div>
 
-        <div className="relative w-full">
-          <div className="relative aspect-video w-full rounded-xl md:rounded-2xl overflow-hidden bg-black/40 border border-orange-500/30 shadow-2xl">
-            <iframe
-              src="https://www.ieeecshize.com/events"
-              className="w-full h-full absolute inset-0"
-              title="Previous HIZE Events Website Preview"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              loading="lazy"
-              sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-              referrerPolicy="no-referrer-when-downgrade"
+              <div className="px-4">
+                <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
+                  Previous HIZE Event Details
+                </h3>
+                <p className="text-sm sm:text-base md:text-lg text-slate-400 font-serif max-w-3xl mx-auto leading-relaxed">
+                  Get comprehensive insights into our previous HIZE event, including event highlights,
+                  participant achievements, keynote sessions, and memorable moments that made it a success.
+                </p>
+              </div>
+
+              <div className="relative w-full">
+                <div className="relative aspect-video w-full rounded-xl md:rounded-2xl overflow-hidden bg-black/40 border border-orange-500/30 shadow-2xl">
+                  <iframe
+                    src="https://www.ieeecshize.com/events"
+                    className="w-full h-full absolute inset-0"
+                    title="Previous HIZE Events Website Preview"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    loading="lazy"
+                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                  <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-transparent via-transparent to-black/20" />
+                </div>
+
+                <div className="mt-4 flex items-center justify-center gap-3">
+                  <motion.a
+                    href="https://www.ieeecshize.com/events"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-xl md:rounded-2xl bg-gradient-to-r from-orange-600 to-orange-400 font-bold text-base sm:text-lg text-black shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 transition-all duration-300"
+                  >
+                    Open in New Tab
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
+                  </motion.a>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <p className="text-sm text-slate-500 font-mono">
+                  Previous Event Information
+                </p>
+              </div>
+            </div>
+
+            <motion.div
+              className="absolute -inset-[1px] bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 rounded-3xl opacity-20 blur-2xl -z-10"
             />
-            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-transparent via-transparent to-black/20" />
-          </div>
-
-          <div className="mt-4 flex items-center justify-center gap-3">
-            <motion.a
-              href="https://www.ieeecshize.com/events"
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-xl md:rounded-2xl bg-gradient-to-r from-orange-600 to-orange-400 font-bold text-base sm:text-lg text-black shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 transition-all duration-300"
-            >
-              Open in New Tab
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                />
-              </svg>
-            </motion.a>
-          </div>
+          </motion.div>
         </div>
-
-        <div className="pt-2">
-          <p className="text-sm text-slate-500 font-mono">
-            Previous Event Information
-          </p>
-        </div>
-      </div>
-
-      <motion.div
-        className="absolute -inset-[1px] bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 rounded-3xl opacity-20 blur-2xl -z-10"
-      />
-    </motion.div>
-  </div>
-</section>
+      </section>
 
 
       <section

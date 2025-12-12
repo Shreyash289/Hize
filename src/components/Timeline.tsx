@@ -1,8 +1,9 @@
 "use client";
 
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { memo, useRef, useState } from "react";
-import { Calendar, Users, Trophy, Coffee, Mic, Code, Lightbulb, ChevronDown, ChevronUp } from "lucide-react";
+import { memo, useRef, useState, useMemo } from "react";
+import { Calendar, Users, Trophy, Coffee, Mic, Code, Lightbulb, ChevronDown } from "lucide-react";
+import { getMobileOptimizedVariants, shouldReduceAnimations, isMobile } from "@/lib/mobileOptimization";
 
 // Enhanced timeline data with yellow-orange-black-deep blue theme
 const timelineData = [
@@ -72,46 +73,69 @@ const timelineData = [
   },
 ] as const;
 
-// Animation variants for interactive timeline
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.2, delayChildren: 0.1 }
-  }
-};
+// Mobile-optimized animation variants
+const getMobileVariants = () => {
+  const isReducedMotion = shouldReduceAnimations();
+  const mobile = isMobile();
 
-const dayVariants = {
-  hidden: { opacity: 0, scale: 0.9, y: 30 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    y: 0
-  }
-};
-
-const eventVariants = {
-  hidden: { opacity: 0, y: -10 },
-  visible: {
-    opacity: 1,
-    y: 0
-  },
-  exit: {
-    opacity: 0,
-    y: -10
-  }
-};
-
-const eventsContainerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.05, delayChildren: 0.1 }
-  },
-  exit: {
-    opacity: 0,
-    transition: { staggerChildren: 0.02, staggerDirection: -1 }
-  }
+  return {
+    containerVariants: {
+      hidden: { opacity: isReducedMotion ? 1 : 0 },
+      visible: {
+        opacity: 1,
+        transition: {
+          staggerChildren: isReducedMotion ? 0 : (mobile ? 0.1 : 0.2),
+          delayChildren: isReducedMotion ? 0 : 0.1
+        }
+      }
+    },
+    dayVariants: {
+      hidden: {
+        opacity: isReducedMotion ? 1 : 0,
+        scale: isReducedMotion ? 1 : 0.95,
+        y: isReducedMotion ? 0 : (mobile ? 15 : 30)
+      },
+      visible: {
+        opacity: 1,
+        scale: 1,
+        y: 0,
+        transition: { duration: isReducedMotion ? 0.1 : (mobile ? 0.4 : 0.6) }
+      }
+    },
+    eventVariants: {
+      hidden: {
+        opacity: isReducedMotion ? 1 : 0,
+        y: isReducedMotion ? 0 : -5
+      },
+      visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: isReducedMotion ? 0.1 : 0.3 }
+      },
+      exit: {
+        opacity: isReducedMotion ? 1 : 0,
+        y: isReducedMotion ? 0 : -5,
+        transition: { duration: isReducedMotion ? 0.1 : 0.2 }
+      }
+    },
+    eventsContainerVariants: {
+      hidden: { opacity: isReducedMotion ? 1 : 0 },
+      visible: {
+        opacity: 1,
+        transition: {
+          staggerChildren: isReducedMotion ? 0 : 0.03,
+          delayChildren: isReducedMotion ? 0 : 0.05
+        }
+      },
+      exit: {
+        opacity: isReducedMotion ? 1 : 0,
+        transition: {
+          staggerChildren: isReducedMotion ? 0 : 0.01,
+          staggerDirection: -1
+        }
+      }
+    }
+  };
 };
 
 
@@ -121,13 +145,15 @@ const Timeline = memo(function Timeline() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [expandedDays, setExpandedDays] = useState<Set<number>>(new Set());
 
+  // Memoize mobile detection and variants
+  const mobile = useMemo(() => isMobile(), []);
+  const reducedMotion = useMemo(() => shouldReduceAnimations(), []);
+  const variants = useMemo(() => getMobileVariants(), []);
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start 0.8", "end 0.2"]
   });
-
-  const pathLength = useTransform(scrollYProgress, [0, 1], [0, 1]);
-  const pathOpacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.3, 0.8, 0.8, 0.5]);
 
   const toggleDay = (dayIndex: number) => {
     setExpandedDays(prev => {
@@ -142,143 +168,109 @@ const Timeline = memo(function Timeline() {
   };
 
   return (
-    <div ref={containerRef} className="relative w-full py-8 overflow-hidden">
-      {/* Animated background elements with new theme */}
-      <div className="absolute inset-0 pointer-events-none">
-        <motion.div
-          className="absolute top-20 left-10 w-32 h-32 rounded-full bg-gradient-to-r from-yellow-400/15 to-amber-500/15 blur-3xl"
-          animate={{
-            y: [-15, 15, -15],
-            scale: [1, 1.1, 1],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            ease: [0.4, 0, 0.6, 1]
-          }}
-        />
-        <motion.div
-          className="absolute top-60 right-20 w-48 h-48 rounded-full bg-gradient-to-r from-orange-500/15 to-red-600/15 blur-3xl"
-          animate={{
-            y: [-12, 12, -12],
-            scale: [1, 1.05, 1],
-          }}
-          transition={{
-            duration: 6,
-            repeat: Infinity,
-            ease: [0.4, 0, 0.6, 1],
-            delay: 1.5
-          }}
-        />
-        <motion.div
-          className="absolute bottom-40 left-1/3 w-40 h-40 rounded-full bg-gradient-to-r from-black/20 to-orange-600/15 blur-3xl"
-          animate={{
-            y: [-18, 18, -18],
-            scale: [1, 1.15, 1],
-          }}
-          transition={{
-            duration: 7,
-            repeat: Infinity,
-            ease: [0.4, 0, 0.6, 1],
-            delay: 3
-          }}
-        />
-      </div>
+    <div ref={containerRef} className="relative w-full py-4 sm:py-6 md:py-8 overflow-hidden">
+      {/* Conditionally render animated background elements - disabled on mobile for performance */}
+      {!mobile && !reducedMotion && (
+        <div className="absolute inset-0 pointer-events-none">
+          <motion.div
+            className="absolute top-20 left-10 w-32 h-32 rounded-full bg-gradient-to-r from-yellow-400/10 to-amber-500/10 blur-3xl"
+            animate={{
+              y: [-10, 10, -10],
+              scale: [1, 1.05, 1],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          />
+          <motion.div
+            className="absolute top-60 right-20 w-48 h-48 rounded-full bg-gradient-to-r from-orange-500/10 to-red-600/10 blur-3xl"
+            animate={{
+              y: [-8, 8, -8],
+              scale: [1, 1.03, 1],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "linear",
+              delay: 2
+            }}
+          />
+        </div>
+      )}
 
-      {/* Flowing SVG Path */}
-      <svg
-        className="absolute inset-0 w-full h-full pointer-events-none"
-        viewBox="0 0 1000 600"
-        preserveAspectRatio="xMidYMid slice"
-      >
-        <defs>
-          <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#FCD34D" stopOpacity="0.8" />
-            <stop offset="33%" stopColor="#FB923C" stopOpacity="0.9" />
-            <stop offset="66%" stopColor="#EA580C" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#000000" stopOpacity="0.9" />
-          </linearGradient>
-          <linearGradient id="pathGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#000000" stopOpacity="0.9" />
-            <stop offset="50%" stopColor="#EA580C" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#FB923C" stopOpacity="0.7" />
-          </linearGradient>
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="5" result="coloredBlur" />
-            <feMerge>
-              <feMergeNode in="coloredBlur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-          <filter id="pulseGlow">
-            <feGaussianBlur stdDeviation="8" result="coloredBlur" />
-            <feMerge>
-              <feMergeNode in="coloredBlur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
+      {/* Static background for mobile */}
+      {mobile && (
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-20 left-10 w-24 h-24 rounded-full bg-gradient-to-r from-yellow-400/5 to-amber-500/5 blur-2xl" />
+          <div className="absolute top-60 right-20 w-32 h-32 rounded-full bg-gradient-to-r from-orange-500/5 to-red-600/5 blur-2xl" />
+        </div>
+      )}
 
-        {/* First swish - Day 0 to Day 1 */}
-        <motion.path
-          d="M 150 120 Q 300 80 450 180 Q 600 280 750 220"
-          stroke="url(#pathGradient)"
-          strokeWidth="12"
-          fill="none"
-          filter="url(#pulseGlow)"
-          style={{
-            pathLength: useTransform(scrollYProgress, [0, 0.5], [0, 1]),
-            opacity: useTransform(scrollYProgress, [0, 0.3, 0.5], [0, 0.6, 0.3])
-          }}
-        />
+      {/* Flowing SVG Path - simplified for mobile */}
+      {!mobile && (
+        <svg
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          viewBox="0 0 1000 600"
+          preserveAspectRatio="xMidYMid slice"
+        >
+          <defs>
+            <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#FCD34D" stopOpacity="0.6" />
+              <stop offset="50%" stopColor="#FB923C" stopOpacity="0.7" />
+              <stop offset="100%" stopColor="#EA580C" stopOpacity="0.6" />
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+              <feMerge>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
 
-        {/* Second swish - Day 1 to Day 2 */}
-        <motion.path
-          d="M 750 220 Q 900 160 850 320 Q 800 480 650 420 Q 500 360 400 480"
-          stroke="url(#pathGradient2)"
-          strokeWidth="12"
-          fill="none"
-          filter="url(#pulseGlow)"
-          style={{
-            pathLength: useTransform(scrollYProgress, [0.5, 1], [0, 1]),
-            opacity: useTransform(scrollYProgress, [0.5, 0.7, 1], [0, 0.8, 0.4])
-          }}
-        />
+          {/* Simplified path for desktop */}
+          <motion.path
+            d="M 150 120 Q 300 80 450 180 Q 600 280 750 220"
+            stroke="url(#pathGradient)"
+            strokeWidth="4"
+            fill="none"
+            filter={reducedMotion ? "none" : "url(#glow)"}
+            style={{
+              pathLength: reducedMotion ? 1 : useTransform(scrollYProgress, [0, 0.5], [0, 1]),
+              opacity: reducedMotion ? 0.4 : useTransform(scrollYProgress, [0, 0.3, 0.5], [0, 0.8, 0.5])
+            }}
+          />
 
-        {/* Main animated path - First segment */}
-        <motion.path
-          d="M 150 120 Q 300 80 450 180 Q 600 280 750 220"
-          stroke="url(#pathGradient)"
-          strokeWidth="6"
-          fill="none"
-          filter="url(#glow)"
-          style={{
-            pathLength: useTransform(scrollYProgress, [0, 0.5], [0, 1]),
-            opacity: useTransform(scrollYProgress, [0, 0.3, 0.5], [0, 1, 0.7])
-          }}
-        />
+          <motion.path
+            d="M 750 220 Q 900 160 850 320 Q 800 480 650 420 Q 500 360 400 480"
+            stroke="url(#pathGradient)"
+            strokeWidth="4"
+            fill="none"
+            filter={reducedMotion ? "none" : "url(#glow)"}
+            style={{
+              pathLength: reducedMotion ? 1 : useTransform(scrollYProgress, [0.5, 1], [0, 1]),
+              opacity: reducedMotion ? 0.4 : useTransform(scrollYProgress, [0.5, 0.7, 1], [0, 0.8, 0.6])
+            }}
+          />
+        </svg>
+      )}
 
-        {/* Main animated path - Second segment */}
-        <motion.path
-          d="M 750 220 Q 900 160 850 320 Q 800 480 650 420 Q 500 360 400 480"
-          stroke="url(#pathGradient2)"
-          strokeWidth="6"
-          fill="none"
-          filter="url(#glow)"
-          style={{
-            pathLength: useTransform(scrollYProgress, [0.5, 1], [0, 1]),
-            opacity: useTransform(scrollYProgress, [0.5, 0.7, 1], [0, 1, 0.8])
-          }}
-        />
-      </svg>
+      {/* Static decorative line for mobile */}
+      {mobile && (
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-transparent via-orange-400/30 to-transparent rounded-full" />
+        </div>
+      )}
 
       {/* Timeline Content */}
       <motion.div
-        className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6"
-        variants={containerVariants}
+        className="relative z-10 max-w-6xl mx-auto px-3 sm:px-4 md:px-6"
+        variants={variants.containerVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, margin: "-50px" }}
+        viewport={{ once: true, margin: mobile ? "-20px" : "-50px" }}
       >
         {timelineData.map((day, index) => {
           const IconComponent = day.icon;
@@ -286,35 +278,35 @@ const Timeline = memo(function Timeline() {
           return (
             <motion.div
               key={day.day}
-              variants={dayVariants}
+              variants={variants.dayVariants}
               transition={{
-                duration: 0.8,
-                ease: [0.25, 0.46, 0.45, 0.94],
-                delay: index * 0.2
+                duration: reducedMotion ? 0.1 : (mobile ? 0.4 : 0.8),
+                ease: reducedMotion ? "linear" : [0.25, 0.46, 0.45, 0.94],
+                delay: reducedMotion ? 0 : (index * (mobile ? 0.1 : 0.2))
               }}
               className="relative mb-4 flex justify-center"
             >
               {/* Interactive Day Card Button */}
               <motion.div
                 className="relative w-full max-w-2xl mx-auto cursor-pointer"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={reducedMotion ? {} : { scale: mobile ? 1.005 : 1.01 }}
+                whileTap={reducedMotion ? {} : { scale: mobile ? 0.995 : 0.99 }}
                 onClick={() => toggleDay(index)}
               >
                 {/* Day Header Button */}
                 <motion.div
-                  className="relative p-4 rounded-2xl backdrop-blur-xl border shadow-xl"
+                  className="relative p-3 sm:p-4 md:p-5 rounded-xl sm:rounded-2xl backdrop-blur-xl border shadow-xl"
                   style={{
                     background: day.bgColor,
                     borderColor: day.borderColor
                   }}
-                  animate={{
-                    y: expandedDays.has(index) ? 0 : [-5, 5, -5],
+                  animate={reducedMotion || mobile ? {} : {
+                    y: expandedDays.has(index) ? 0 : [-2, 2, -2],
                   }}
-                  transition={{
-                    duration: expandedDays.has(index) ? 0 : 4,
+                  transition={reducedMotion || mobile ? {} : {
+                    duration: expandedDays.has(index) ? 0 : 6,
                     repeat: expandedDays.has(index) ? 0 : Infinity,
-                    ease: [0.4, 0, 0.6, 1]
+                    ease: "linear"
                   }}
                 >
                   {/* Glowing background */}
@@ -326,37 +318,37 @@ const Timeline = memo(function Timeline() {
                   />
 
                   {/* Day Header */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4">
                       <motion.div
-                        className="p-3 rounded-xl bg-white/10 backdrop-blur-sm"
+                        className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white/10 backdrop-blur-sm flex-shrink-0"
                         whileHover={{ rotate: 180 }}
                         transition={{ duration: 0.4 }}
                       >
-                        <IconComponent className="w-6 h-6 text-white" />
+                        <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
                       </motion.div>
-                      <div>
-                        <h3 className="text-xl font-bold text-white">{day.day}</h3>
-                        <p className="text-yellow-300 text-sm font-medium">{day.date}</p>
+                      <div className="min-w-0">
+                        <h3 className="text-lg sm:text-xl font-bold text-white truncate">{day.day}</h3>
+                        <p className="text-yellow-300 text-xs sm:text-sm font-medium">{day.date}</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <h2 className="text-2xl md:text-3xl font-extrabold text-white">
+                    <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
+                      <div className="text-left sm:text-right flex-1 sm:flex-none min-w-0">
+                        <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white leading-tight">
                           {day.title}
                         </h2>
-                        <p className="text-amber-200 text-sm font-medium">
+                        <p className="text-amber-200 text-xs sm:text-sm font-medium">
                           {day.subtitle}
                         </p>
                       </div>
 
                       <motion.div
-                        className="p-2 rounded-full bg-white/10"
+                        className="p-2 rounded-full bg-white/10 flex-shrink-0"
                         animate={{ rotate: expandedDays.has(index) ? 180 : 0 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <ChevronDown className="w-5 h-5 text-white" />
+                        <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                       </motion.div>
                     </div>
                   </div>
@@ -366,14 +358,14 @@ const Timeline = memo(function Timeline() {
                 <AnimatePresence>
                   {expandedDays.has(index) && (
                     <motion.div
-                      variants={eventsContainerVariants}
+                      variants={variants.eventsContainerVariants}
                       initial="hidden"
                       animate="visible"
                       exit="exit"
-                      className="mt-6 overflow-hidden"
+                      className="mt-4 sm:mt-6 overflow-hidden"
                     >
                       <motion.div
-                        className="p-6 rounded-xl"
+                        className="p-4 sm:p-5 md:p-6 rounded-lg sm:rounded-xl"
                         style={{
                           background: `${day.bgColor}80`,
                           borderColor: day.borderColor
@@ -383,33 +375,33 @@ const Timeline = memo(function Timeline() {
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <h4 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                          <Calendar className="w-5 h-5" style={{ color: day.glowColor }} />
+                        <h4 className="text-base sm:text-lg font-bold text-white mb-3 sm:mb-4 flex items-center gap-2">
+                          <Calendar className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: day.glowColor }} />
                           Event Schedule
                         </h4>
 
-                        <div className="space-y-3">
+                        <div className="space-y-2 sm:space-y-3">
                           {day.events.map((event, i) => {
                             const EventIcon = event.icon;
                             return (
                               <motion.div
                                 key={i}
-                                variants={eventVariants}
-                                className="group flex items-start gap-3 p-4 rounded-lg bg-black/30 backdrop-blur-sm border border-white/10 hover:border-yellow-400/50 hover:bg-black/40 transition-all duration-300"
-                                whileHover={{ x: 5, scale: 1.01 }}
+                                variants={variants.eventVariants}
+                                className="group flex items-start gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg bg-black/30 backdrop-blur-sm border border-white/10 hover:border-yellow-400/50 hover:bg-black/40 transition-all duration-300"
+                                whileHover={reducedMotion ? {} : { x: mobile ? 1 : 2, scale: mobile ? 1.002 : 1.005 }}
                               >
                                 <motion.div
-                                  className="p-2 rounded-lg flex-shrink-0 mt-1"
+                                  className="p-1.5 sm:p-2 rounded-lg flex-shrink-0 mt-0.5 sm:mt-1"
                                   style={{ backgroundColor: `${day.glowColor}40` }}
                                   whileHover={{ scale: 1.1, rotate: 10 }}
                                 >
-                                  <EventIcon className="w-4 h-4" style={{ color: day.glowColor }} />
+                                  <EventIcon className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: day.glowColor }} />
                                 </motion.div>
                                 <div className="flex-1 min-w-0">
                                   <p className="text-yellow-300 text-xs font-bold uppercase tracking-wide mb-1">
                                     {event.time}
                                   </p>
-                                  <p className="text-white text-sm font-medium leading-relaxed">
+                                  <p className="text-white text-xs sm:text-sm font-medium leading-relaxed">
                                     {event.label}
                                   </p>
                                 </div>
@@ -474,54 +466,43 @@ const Timeline = memo(function Timeline() {
         })}
       </motion.div>
 
-      {/* Floating particles with theme colors */}
-      {[...Array(8)].map((_, i) => {
-        const colors = ['#FCD34D', '#FB923C', '#EA580C', '#000000'];
+      {/* Floating particles with theme colors - disabled on mobile for performance */}
+      {!mobile && !reducedMotion && [...Array(6)].map((_, i) => {
+        const colors = ['#FCD34D', '#FB923C', '#EA580C'];
         const color = colors[i % colors.length];
         return (
           <motion.div
             key={i}
             className="absolute w-2 h-2 rounded-full"
             style={{
-              backgroundColor: `${color}40`,
-              left: `${15 + i * 12}%`,
-              top: `${25 + (i % 4) * 20}%`,
+              backgroundColor: `${color}30`,
+              left: `${20 + i * 15}%`,
+              top: `${30 + (i % 3) * 20}%`,
             }}
             animate={{
-              y: [-25, 25, -25],
-              opacity: [0.2, 0.8, 0.2],
-              scale: [0.6, 1.4, 0.6],
+              y: [-15, 15, -15],
+              opacity: [0.3, 0.6, 0.3],
+              scale: [0.8, 1.2, 0.8],
             }}
             transition={{
-              duration: 5 + i * 0.5,
+              duration: 8 + i * 0.5,
               repeat: Infinity,
-              delay: i * 0.7,
-              ease: [0.4, 0, 0.6, 1],
+              delay: i * 1,
+              ease: "linear",
             }}
           />
         );
       })}
 
-      {/* Additional orange particles for Day 2 area */}
-      {[...Array(4)].map((_, i) => (
-        <motion.div
-          key={`orange-${i}`}
-          className="absolute w-3 h-3 rounded-full"
+      {/* Static particles for mobile */}
+      {mobile && [...Array(3)].map((_, i) => (
+        <div
+          key={`static-${i}`}
+          className="absolute w-1.5 h-1.5 rounded-full opacity-30"
           style={{
-            backgroundColor: '#EA580C30',
-            left: `${60 + i * 8}%`,
-            top: `${60 + (i % 2) * 15}%`,
-          }}
-          animate={{
-            y: [-15, 15, -15],
-            opacity: [0.3, 0.9, 0.3],
-            scale: [0.8, 1.2, 0.8],
-          }}
-          transition={{
-            duration: 4 + i * 0.3,
-            repeat: Infinity,
-            delay: 2 + i * 0.5,
-            ease: [0.4, 0, 0.6, 1],
+            backgroundColor: '#FB923C',
+            left: `${25 + i * 25}%`,
+            top: `${35 + (i % 2) * 30}%`,
           }}
         />
       ))}
@@ -532,4 +513,3 @@ const Timeline = memo(function Timeline() {
 Timeline.displayName = 'Timeline';
 
 export default Timeline;
-

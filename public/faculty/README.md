@@ -24,15 +24,14 @@ Please provide photos with the following exact filenames:
 5. **selvinpj.jpg** - Dr. J. Selvin Paul Peter (selvinpj@srmist.edu.in)
 6. **kishorea1.jpg** - Dr. K. Kishore Anthuvan Sahayaraj (kishorea1@srmist.edu.in)
 7. **gnanaves1.jpg** - Dr. S. Gnanavel (gnanaves1@srmist.edu.in)
-8. **sindhujm1.jpg** - Dr. M. Sindhuja (sindhujm1@srmist.edu.in)
-9. **saranyas6.jpg** - Dr. S. S. Saranya (saranyas6@srmist.edu.in)
-10. **arulalav.jpg** - Dr. V. Arulalan (arulalav@srmist.edu.in)
-11. **raguntht.jpg** - Dr. T. Ragunthar (raguntht@srmist.edu.in)
-12. **muralidc.jpg** - Dr. C. Muralidharan (muralidc@srmist.edu.in)
-13. **balamurg1.jpg** - Dr. G. Balamurugan (balamurg1@srmist.edu.in)
-14. **vijiyakk.jpg** - Dr. K. Vijiyakumar (vijiyakk@srmist.edu.in)
-15. **gokulakd.jpg** - Dr. D. Gokulakrishnan (gokulakd@srmist.edu.in)
-16. **ramkumaj.jpg** - Dr. Ramkumar Jayaraman (ramkumaj@srmist.edu.in)
+8. **saranyas6.jpg** - Dr. S. S. Saranya (saranyas6@srmist.edu.in)
+9. **arulalav.jpg** - Dr. V. Arulalan (arulalav@srmist.edu.in)
+10. **raguntht.jpg** - Dr. T. Ragunthar (raguntht@srmist.edu.in)
+11. **muralidc.jpg** - Dr. C. Muralidharan (muralidc@srmist.edu.in)
+12. **balamurg1.jpg** - Dr. G. Balamurugan (balamurg1@srmist.edu.in)
+13. **vijiyakk.jpg** - Dr. K. Vijiyakumar (vijiyakk@srmist.edu.in)
+14. **gokulakd.jpg** - Dr. D. Gokulakrishnan (gokulakd@srmist.edu.in)
+15. **ramkumaj.jpg** - Dr. Ramkumar Jayaraman (ramkumaj@srmist.edu.in)
 
 ---
 
@@ -61,7 +60,6 @@ Place all photos in the `public/faculty/` directory.
 | selvinpj.jpg | Dr. J. Selvin Paul Peter |
 | kishorea1.jpg | Dr. K. Kishore Anthuvan Sahayaraj |
 | gnanaves1.jpg | Dr. S. Gnanavel |
-| sindhujm1.jpg | Dr. M. Sindhuja |
 | saranyas6.jpg | Dr. S. S. Saranya |
 | arulalav.jpg | Dr. V. Arulalan |
 | raguntht.jpg | Dr. T. Ragunthar |

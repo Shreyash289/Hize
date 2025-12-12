@@ -77,6 +77,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
+  viewportFit: "cover", // For iPhone X+ safe areas
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ff8c42" },
     { media: "(prefers-color-scheme: dark)", color: "#ff8c42" },
@@ -101,8 +102,10 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className="antialiased">
-        {children}
+      <body className="antialiased safe-area-inset">
+        <div className="min-h-screen min-h-[100dvh] bg-black">
+          {children}
+        </div>
       </body>
     </html>
   );
