@@ -568,7 +568,7 @@ export default function Home() {
                   SRM Institute of Science & Technology, Kattankulathur, Tamil Nadu
                 </div>
                 <motion.a
-                  href="https://maps.app.goo.gl/TvLt1XHk1SLhTqEP8"
+                  href="https://www.google.com/maps/d/u/0/viewer?mid=18kGFk2ClDWeZPYT0rkdUHRDRw98Mj5U&ehbc=2E312F"
                   target="_blank"
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.04 }}
