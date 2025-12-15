@@ -9,6 +9,7 @@ import Image from "next/image"
 import dynamic from "next/dynamic"
 import facultyContacts from "@/lib/facultyContacts"
 import { isMobile, shouldReduceAnimations, getMobileOptimizedVariants } from "@/lib/mobileOptimization"
+import RegistrationPopup from "@/components/RegistrationPopup"
 
 // Conditionally load heavy components based on device capabilities
 const LoadingScreen = dynamic(() => import("@/components/LoadingScreen"), {
@@ -156,6 +157,7 @@ export default function Home() {
   const [domains, setDomains] = useState<DomainTeam[]>([])
   const [selectedDomain, setSelectedDomain] = useState<DomainTeam | null>(null)
   const [infoTab, setInfoTab] = useState<"map" | "previous">("map")
+  const [showRegistrationPopup, setShowRegistrationPopup] = useState(false)
 
   useEffect(() => {
     let mounted = true
@@ -353,6 +355,7 @@ export default function Home() {
         sections={sections}
         onSectionClick={scrollToSection}
         activeSection={activeSection}
+        onRegisterClick={() => setShowRegistrationPopup(true)}
       />
       <DynamicBackground />
       <MagneticCursor />
@@ -483,15 +486,14 @@ export default function Home() {
             transition={{ delay: 0.7, duration: 0.6 }}
             className="pt-12 flex flex-col items-center gap-4"
           >
-            <Link href="/register">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-6 sm:px-8 md:px-12 py-3 sm:py-4 md:py-5 rounded-xl md:rounded-2xl bg-gradient-to-r from-orange-600 to-orange-400 font-black text-base sm:text-lg md:text-xl text-black shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 transition-all w-full sm:w-auto"
-              >
-                REGISTER NOW
-              </motion.button>
-            </Link>
+            <motion.button
+              onClick={() => setShowRegistrationPopup(true)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-6 sm:px-8 md:px-12 py-3 sm:py-4 md:py-5 rounded-xl md:rounded-2xl bg-gradient-to-r from-orange-600 to-orange-400 font-black text-base sm:text-lg md:text-xl text-black shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 transition-all w-full sm:w-auto"
+            >
+              REGISTER NOW
+            </motion.button>
 
             <motion.div
               animate={{ y: [0, 12, 0] }}
@@ -560,25 +562,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="text-slate-300 text-sm sm:text-base font-mono">
-                  SRM Institute of Science & Technology, Kattankulathur, Tamil Nadu
-                </div>
-                <motion.a
-                  href="https://www.google.com/maps/d/u/0/viewer?mid=18kGFk2ClDWeZPYT0rkdUHRDRw98Mj5U&ehbc=2E312F"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-orange-600 to-orange-400 font-semibold text-black shadow-lg shadow-orange-500/40 hover:shadow-orange-500/70 transition-all duration-300"
-                >
-                  Open Full Map
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </motion.a>
-              </div>
+              
 
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="text-slate-300 text-sm sm:text-base font-mono">
@@ -1346,6 +1330,12 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Registration Popup */}
+      <RegistrationPopup 
+        isOpen={showRegistrationPopup} 
+        onClose={() => setShowRegistrationPopup(false)} 
+      />
     </div>
   )
 }

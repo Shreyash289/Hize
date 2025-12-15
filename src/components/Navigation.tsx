@@ -11,9 +11,10 @@ interface NavigationProps {
   sections?: string[]
   onSectionClick?: (index: number) => void
   activeSection?: number
+  onRegisterClick?: () => void
 }
 
-export default function Navigation({ sections, onSectionClick, activeSection }: NavigationProps = {}) {
+export default function Navigation({ sections, onSectionClick, activeSection, onRegisterClick }: NavigationProps = {}) {
   const pathname = usePathname()
   const isHomepage = pathname === "/"
   const [isScrolled, setIsScrolled] = useState(false)
@@ -41,7 +42,6 @@ export default function Navigation({ sections, onSectionClick, activeSection }: 
   const regularLinks = [
     { href: "/events", label: "Events" },
     { href: "/guests", label: "Guests" },
-    { href: "/register", label: "Register" },
     { href: "/contact", label: "Contact" },
   ]
 
@@ -135,12 +135,12 @@ export default function Navigation({ sections, onSectionClick, activeSection }: 
                 </Link>
               ))
             )}
-            <Link
-              href="/register"
+            <button
+              onClick={() => onRegisterClick?.()}
               className="ml-2 px-6 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-orange-600 to-orange-400 text-black hover:from-orange-500 hover:to-orange-300 transition-all shadow-lg shadow-orange-500/30"
             >
               Register
-            </Link>
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -208,13 +208,15 @@ export default function Navigation({ sections, onSectionClick, activeSection }: 
                     ))}
                   </div>
                 )}
-                <Link
-                  href="/register"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="mt-6 px-6 py-3 rounded-lg text-base font-bold text-center bg-gradient-to-r from-orange-600 to-orange-400 text-black hover:from-orange-500 hover:to-orange-300 transition-all shadow-lg shadow-orange-500/30"
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    onRegisterClick?.()
+                  }}
+                  className="mt-6 px-6 py-3 rounded-lg text-base font-bold text-center bg-gradient-to-r from-orange-600 to-orange-400 text-black hover:from-orange-500 hover:to-orange-300 transition-all shadow-lg shadow-orange-500/30 w-full"
                 >
                   Register Now
-                </Link>
+                </button>
               </div>
             </motion.div>
           </>
