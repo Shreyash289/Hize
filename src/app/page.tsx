@@ -566,26 +566,7 @@ export default function Home() {
                   SRM Institute of Science & Technology, Kattankulathur, Tamil Nadu
                 </div>
                 <motion.a
-                  href="https://www.google.com/maps/d/u/0/viewer?mid=18kGFk2ClDWeZPYT0rkdUHRDRw98Mj5U&ehbc=2E312F"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-orange-600 to-orange-400 font-semibold text-black shadow-lg shadow-orange-500/40 hover:shadow-orange-500/70 transition-all duration-300"
-                >
-                  Open Full Map
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </motion.a>
-              </div>
-
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="text-slate-300 text-sm sm:text-base font-mono">
-                  SRM Institute of Science & Technology, Kattankulathur, Tamil Nadu
-                </div>
-                <motion.a
-                  href="https://www.google.com/maps/d/u/0/viewer?mid=18kGFk2ClDWeZPYT0rkdUHRDRw98Mj5U&ehbc=2E312F"
+                  href="https://maps.app.goo.gl/TvLt1XHk1SLhTqEP8"
                   target="_blank"
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.04 }}
@@ -1068,18 +1049,20 @@ export default function Home() {
               {(domains.length > 0 ? domains : students).map((item: any, index: number) => {
                 const isDomain = domains.length > 0
                 const display = isDomain ? item.head : item
+                const isCoreTeam = isDomain && item.domain === "CORE TEAM"
 
                 return (
                   <motion.button
                     type="button"
                     key={(display?.name || "") + (display?.role || "") + (item?.domain || "")}
-                    onClick={() => isDomain ? setSelectedDomain(item as DomainTeam) : null}
+                    onClick={() => (isDomain && !isCoreTeam) ? setSelectedDomain(item as DomainTeam) : null}
                     initial={{ opacity: 0, y: 50 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-100px" }}
                     transition={{ duration: 0.6, delay: index * 0.15, ease: "easeOut" }}
-                    whileHover={{ y: -8, scale: 1.02 }}
-                    className="relative p-6 sm:p-7 md:p-8 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/70 to-zinc-900/70 backdrop-blur-xl border border-orange-500/30 flex flex-col items-center text-center shadow-2xl group w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+                    whileHover={isCoreTeam ? undefined : { y: -8, scale: 1.02 }}
+                    className={`relative p-6 sm:p-7 md:p-8 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/70 to-zinc-900/70 backdrop-blur-xl border border-orange-500/30 flex flex-col items-center text-center shadow-2xl group w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 ${isCoreTeam ? "cursor-default" : "cursor-pointer"}`}
+                    disabled={isCoreTeam}
                   >
                     {/* Glow effect on hover */}
                     <div className="absolute -inset-1 bg-gradient-to-r from-orange-600/20 via-orange-500/20 to-orange-600/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
