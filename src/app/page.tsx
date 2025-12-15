@@ -9,6 +9,7 @@ import Image from "next/image"
 import dynamic from "next/dynamic"
 import facultyContacts from "@/lib/facultyContacts"
 import { isMobile, shouldReduceAnimations, getMobileOptimizedVariants } from "@/lib/mobileOptimization"
+import RegistrationPopup from "@/components/RegistrationPopup"
 
 // Conditionally load heavy components based on device capabilities
 const LoadingScreen = dynamic(() => import("@/components/LoadingScreen"), {
@@ -156,6 +157,7 @@ export default function Home() {
   const [domains, setDomains] = useState<DomainTeam[]>([])
   const [selectedDomain, setSelectedDomain] = useState<DomainTeam | null>(null)
   const [infoTab, setInfoTab] = useState<"map" | "previous">("map")
+  const [showRegistrationPopup, setShowRegistrationPopup] = useState(false)
 
   useEffect(() => {
     let mounted = true
@@ -353,6 +355,7 @@ export default function Home() {
         sections={sections}
         onSectionClick={scrollToSection}
         activeSection={activeSection}
+        onRegisterClick={() => setShowRegistrationPopup(true)}
       />
       <DynamicBackground />
       <MagneticCursor />
@@ -483,15 +486,14 @@ export default function Home() {
             transition={{ delay: 0.7, duration: 0.6 }}
             className="pt-12 flex flex-col items-center gap-4"
           >
-            <Link href="/register">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-6 sm:px-8 md:px-12 py-3 sm:py-4 md:py-5 rounded-xl md:rounded-2xl bg-gradient-to-r from-orange-600 to-orange-400 font-black text-base sm:text-lg md:text-xl text-black shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 transition-all w-full sm:w-auto"
-              >
-                REGISTER NOW
-              </motion.button>
-            </Link>
+            <motion.button
+              onClick={() => setShowRegistrationPopup(true)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-6 sm:px-8 md:px-12 py-3 sm:py-4 md:py-5 rounded-xl md:rounded-2xl bg-gradient-to-r from-orange-600 to-orange-400 font-black text-base sm:text-lg md:text-xl text-black shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 transition-all w-full sm:w-auto"
+            >
+              REGISTER NOW
+            </motion.button>
 
             <motion.div
               animate={{ y: [0, 12, 0] }}
@@ -1329,6 +1331,12 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Registration Popup */}
+      <RegistrationPopup 
+        isOpen={showRegistrationPopup} 
+        onClose={() => setShowRegistrationPopup(false)} 
+      />
     </div>
   )
 }
