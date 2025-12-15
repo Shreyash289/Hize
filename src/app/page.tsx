@@ -1057,7 +1057,16 @@ export default function Home() {
                   <motion.button
                     type="button"
                     key={(display?.name || "") + (display?.role || "") + (item?.domain || "")}
-                    onClick={() => (isDomain && !isCoreTeam) ? setSelectedDomain(item as DomainTeam) : null}
+                    onClick={(e) => {
+                      if (isCoreTeam) {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        return
+                      }
+                      if (isDomain) {
+                        setSelectedDomain(item as DomainTeam)
+                      }
+                    }}
                     initial={{ opacity: 0, y: 50 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-100px" }}
