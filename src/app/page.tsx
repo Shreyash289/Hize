@@ -318,24 +318,29 @@ export default function Home() {
       if (!ticking) {
         rafId = requestAnimationFrame(() => {
           const now = Date.now()
-          if (now - lastSectionUpdate < 100) {
+          // Increased throttling to 200ms for iOS Safari stability
+          if (now - lastSectionUpdate < 200) {
             ticking = false
             return
           }
 
           const scrollPosition = currentScrollY + window.innerHeight / 2
+          let newActiveSection = activeSectionRef.current
 
           sectionsRef.current.forEach((section, index) => {
             if (section) {
               const { offsetTop, offsetHeight } = section
               if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-                if (activeSectionRef.current !== index) {
-                  setActiveSection(index)
-                  lastSectionUpdate = now
-                }
+                newActiveSection = index
               }
             }
           })
+
+          // Only update if section actually changed - double check to prevent unnecessary updates
+          if (newActiveSection !== activeSectionRef.current) {
+            setActiveSection(newActiveSection)
+            lastSectionUpdate = now
+          }
           ticking = false
         })
         ticking = true
@@ -344,7 +349,6 @@ export default function Home() {
 
     // Use passive listener for better scroll performance with throttling
     window.addEventListener("scroll", handleScroll, { passive: true })
-    handleScroll()
 
     return () => {
       window.removeEventListener("scroll", handleScroll)
