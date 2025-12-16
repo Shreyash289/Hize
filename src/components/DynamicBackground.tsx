@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { LazyMotion, domAnimation, m } from "framer-motion"
+import { useEffect, useRef } from "react"
+import { motion } from "framer-motion"
 
 export default function DynamicBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -132,7 +132,6 @@ export default function DynamicBackground() {
   }, [])
 
   return (
-    <LazyMotion features={domAnimation} strict>
     <div className="fixed inset-0 pointer-events-none z-0">
       <canvas
         ref={canvasRef}
@@ -145,7 +144,7 @@ export default function DynamicBackground() {
       <div className="absolute inset-0 bg-gradient-to-b from-black via-black/60 to-black opacity-80" />
 
       {Array.from({ length: 15 }).map((_, i) => (
-        <m.div
+        <motion.div
           key={i}
           className="absolute w-px h-20 bg-gradient-to-b from-transparent via-orange-500/40 to-transparent"
           style={{
@@ -165,6 +164,5 @@ export default function DynamicBackground() {
         />
       ))}
     </div>
-    </LazyMotion>
   )
 }

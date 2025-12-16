@@ -88,12 +88,9 @@ export default function FacultyCard({
             fill
             className="object-cover transition-transform duration-400 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            unoptimized
             priority={index < 3}
-            quality={85}
-            placeholder="blur"
-            blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbGw9JyMxNzE3MTcnLz48L3N2Zz4="
             onError={() => setImgError(true)}
-            loading={index < 3 ? 'eager' : 'lazy'}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-secondary text-white text-3xl">
