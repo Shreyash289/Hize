@@ -36,7 +36,7 @@ export default function ScrollProgress({ sections, activeSection, onSectionClick
               <motion.div
                 initial={false}
                 animate={{
-                  width: activeSection === index ? 80 : 0,
+                  width: activeSection === index ? 160 : 0,
                   opacity: activeSection === index ? 1 : 0,
                 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
