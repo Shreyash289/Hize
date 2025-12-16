@@ -150,6 +150,7 @@ export default function Home() {
   const [isIOS, setIsIOS] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const sectionsRef = useRef<(HTMLElement | null)[]>([])
+  const activeSectionRef = useRef(0)
   const [speakers, setSpeakers] = useState<Speaker[]>([])
   const [eventsData, setEventsData] = useState<EventItem[] | null>(null) // null = loading, [] = loaded empty
   const [selectedSpeaker, setSelectedSpeaker] = useState<Speaker | null>(null)
@@ -296,11 +297,16 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
+    activeSectionRef.current = activeSection
+  }, [activeSection])
+
+  useEffect(() => {
     if (!loadingComplete) return
 
     let ticking = false
     let rafId: number | null = null
     let lastScrollY = 0
+    let lastSectionUpdate = 0
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY
@@ -311,13 +317,22 @@ export default function Home() {
 
       if (!ticking) {
         rafId = requestAnimationFrame(() => {
+          const now = Date.now()
+          if (now - lastSectionUpdate < 100) {
+            ticking = false
+            return
+          }
+
           const scrollPosition = currentScrollY + window.innerHeight / 2
 
           sectionsRef.current.forEach((section, index) => {
             if (section) {
               const { offsetTop, offsetHeight } = section
               if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-                setActiveSection(prev => prev !== index ? index : prev)
+                if (activeSectionRef.current !== index) {
+                  setActiveSection(index)
+                  lastSectionUpdate = now
+                }
               }
             }
           })
@@ -1052,18 +1067,29 @@ export default function Home() {
               {(domains.length > 0 ? domains : students).map((item: any, index: number) => {
                 const isDomain = domains.length > 0
                 const display = isDomain ? item.head : item
+                const isCoreTeam = isDomain && item.domain === "CORE TEAM"
 
                 return (
                   <motion.button
                     type="button"
                     key={(display?.name || "") + (display?.role || "") + (item?.domain || "")}
-                    onClick={() => isDomain ? setSelectedDomain(item as DomainTeam) : null}
+                    onClick={(e) => {
+                      if (isCoreTeam) {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        return
+                      }
+                      if (isDomain) {
+                        setSelectedDomain(item as DomainTeam)
+                      }
+                    }}
                     initial={{ opacity: 0, y: 50 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-100px" }}
                     transition={{ duration: 0.6, delay: index * 0.15, ease: "easeOut" }}
                     whileHover={{ y: -8, scale: 1.02 }}
-                    className="relative p-6 sm:p-7 md:p-8 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/70 to-zinc-900/70 backdrop-blur-xl border border-orange-500/30 flex flex-col items-center text-center shadow-2xl group w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+                    className={`relative p-6 sm:p-7 md:p-8 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/70 to-zinc-900/70 backdrop-blur-xl border border-orange-500/30 flex flex-col items-center text-center shadow-2xl group w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 ${isCoreTeam ? "cursor-default" : "cursor-pointer"}`}
+                    disabled={isCoreTeam}
                   >
                     {/* Glow effect on hover */}
                     <div className="absolute -inset-1 bg-gradient-to-r from-orange-600/20 via-orange-500/20 to-orange-600/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
