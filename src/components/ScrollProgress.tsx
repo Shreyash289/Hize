@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { AnimatePresence, LazyMotion, domAnimation, m } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 
 interface ScrollProgressProps {
   sections: string[]
@@ -18,10 +18,9 @@ export default function ScrollProgress({ sections, activeSection, onSectionClick
   }, [])
 
   return (
-    <LazyMotion features={domAnimation} strict>
     <AnimatePresence>
       {isVisible && (
-        <m.div
+        <motion.div
           initial={{ x: 50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: 50, opacity: 0 }}
@@ -34,24 +33,24 @@ export default function ScrollProgress({ sections, activeSection, onSectionClick
               onClick={() => onSectionClick(index)}
               className="group relative flex items-center justify-end"
             >
-              <m.div
+              <motion.div
                 initial={false}
                 animate={{
-                  width: activeSection === index ? 80 : 0,
+                  width: activeSection === index ? 160 : 0,
                   opacity: activeSection === index ? 1 : 0,
                 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
                 className="absolute right-10 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap overflow-hidden"
               >
                 {section}
-              </m.div>
+              </motion.div>
 
-              <m.div
+              <motion.div
                 className="relative flex items-center justify-center"
                 whileHover={{ scale: 1.2 }}
                 whileTap={{ scale: 0.9 }}
               >
-                <m.div
+                <motion.div
                   initial={false}
                   animate={{
                     scale: activeSection === index ? 1 : 0.6,
@@ -66,20 +65,19 @@ export default function ScrollProgress({ sections, activeSection, onSectionClick
                 />
 
                 {activeSection === index && (
-                  <m.div
+                  <motion.div
                     layoutId="activeIndicator"
                     className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 opacity-30 blur-md"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
-              </m.div>
+              </motion.div>
             </button>
           ))}
 
           <div className="absolute -left-0.5 top-0 bottom-0 w-0.5 bg-gradient-to-b from-orange-500/20 via-orange-400/20 to-orange-500/20" />
-        </m.div>
+        </motion.div>
       )}
     </AnimatePresence>
-    </LazyMotion>
   )
 }
