@@ -1,135 +1,216 @@
-// Responsive utility functions and constants for consistent breakpoints
+/* =========================================================
+   Universal Responsive Utilities (FINAL)
+   SSR-safe, Mobile-first, Resize-aware
+   ========================================================= */
 
+/* -------------------------------
+   Breakpoints (Tailwind aligned)
+-------------------------------- */
 export const breakpoints = {
-  xs: '320px',
-  sm: '640px',
-  md: '768px',
-  lg: '1024px',
-  xl: '1280px',
-  '2xl': '1536px',
-} as const;
+  xs: 320,
+  sm: 640,
+  md: 768,
+  lg: 1024,
+  xl: 1280,
+  "2xl": 1536,
+} as const
 
+export type BreakpointKey = keyof typeof breakpoints
+
+/* -------------------------------
+   Containers
+-------------------------------- */
 export const containerSizes = {
-  xs: 'max-w-none',
-  sm: 'max-w-screen-sm',
-  md: 'max-w-screen-md',
-  lg: 'max-w-screen-lg',
-  xl: 'max-w-screen-xl',
-  '2xl': 'max-w-screen-2xl',
-} as const;
+  xs: "max-w-none",
+  sm: "max-w-screen-sm",
+  md: "max-w-screen-md",
+  lg: "max-w-screen-lg",
+  xl: "max-w-screen-xl",
+  "2xl": "max-w-screen-2xl",
+} as const
 
-// Responsive spacing scale
+/* -------------------------------
+   Spacing (mobile-first)
+-------------------------------- */
 export const spacing = {
-  xs: 'px-3 sm:px-4',
-  sm: 'px-4 sm:px-6',
-  md: 'px-4 sm:px-6 md:px-8',
-  lg: 'px-4 sm:px-6 md:px-8 lg:px-12',
-  xl: 'px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16',
-} as const;
+  xs: "px-3 sm:px-4",
+  sm: "px-4 sm:px-6",
+  md: "px-4 sm:px-6 md:px-8",
+  lg: "px-4 sm:px-6 md:px-8 lg:px-12",
+  xl: "px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16",
+} as const
 
-// Responsive text sizes
+/* -------------------------------
+   Typography
+-------------------------------- */
 export const textSizes = {
-  xs: 'text-xs sm:text-sm',
-  sm: 'text-sm sm:text-base',
-  base: 'text-base sm:text-lg',
-  lg: 'text-lg sm:text-xl',
-  xl: 'text-xl sm:text-2xl',
-  '2xl': 'text-2xl sm:text-3xl',
-  '3xl': 'text-3xl sm:text-4xl md:text-5xl',
-  '4xl': 'text-4xl sm:text-5xl md:text-6xl lg:text-7xl',
-  '5xl': 'text-5xl sm:text-6xl md:text-7xl lg:text-8xl',
-} as const;
+  xs: "text-xs sm:text-sm",
+  sm: "text-sm sm:text-base",
+  base: "text-base sm:text-lg",
+  lg: "text-lg sm:text-xl",
+  xl: "text-xl sm:text-2xl",
+  "2xl": "text-2xl sm:text-3xl",
+  "3xl": "text-3xl sm:text-4xl md:text-5xl",
+  "4xl": "text-4xl sm:text-5xl md:text-6xl lg:text-7xl",
+  "5xl": "text-5xl sm:text-6xl md:text-7xl lg:text-8xl",
+} as const
 
-// Responsive gap sizes
+/* -------------------------------
+   Layout helpers
+-------------------------------- */
 export const gaps = {
-  xs: 'gap-2 sm:gap-3',
-  sm: 'gap-3 sm:gap-4',
-  md: 'gap-4 sm:gap-6',
-  lg: 'gap-6 sm:gap-8',
-  xl: 'gap-8 sm:gap-12',
-} as const;
+  xs: "gap-2 sm:gap-3",
+  sm: "gap-3 sm:gap-4",
+  md: "gap-4 sm:gap-6",
+  lg: "gap-6 sm:gap-8",
+  xl: "gap-8 sm:gap-12",
+} as const
 
-// Responsive padding
 export const padding = {
-  xs: 'p-2 sm:p-3',
-  sm: 'p-3 sm:p-4',
-  md: 'p-4 sm:p-6',
-  lg: 'p-6 sm:p-8',
-  xl: 'p-8 sm:p-12',
-} as const;
+  xs: "p-2 sm:p-3",
+  sm: "p-3 sm:p-4",
+  md: "p-4 sm:p-6",
+  lg: "p-6 sm:p-8",
+  xl: "p-8 sm:p-12",
+} as const
 
-// Responsive margin
 export const margin = {
-  xs: 'm-2 sm:m-3',
-  sm: 'm-3 sm:m-4',
-  md: 'm-4 sm:m-6',
-  lg: 'm-6 sm:m-8',
-  xl: 'm-8 sm:m-12',
-} as const;
+  xs: "m-2 sm:m-3",
+  sm: "m-3 sm:m-4",
+  md: "m-4 sm:m-6",
+  lg: "m-6 sm:m-8",
+  xl: "m-8 sm:m-12",
+} as const
 
-// Grid responsive classes
+/* -------------------------------
+   Grid presets
+-------------------------------- */
 export const gridCols = {
-  1: 'grid-cols-1',
-  2: 'grid-cols-1 sm:grid-cols-2',
-  3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
-  4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
-  auto: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5',
-} as const;
+  1: "grid-cols-1",
+  2: "grid-cols-1 sm:grid-cols-2",
+  3: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
+  4: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+  auto: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5",
+} as const
 
-// Utility function to get responsive classes
+/* -------------------------------
+   Class composer
+-------------------------------- */
 export function getResponsiveClasses(config: {
-  container?: keyof typeof containerSizes;
-  spacing?: keyof typeof spacing;
-  textSize?: keyof typeof textSizes;
-  gap?: keyof typeof gaps;
-  padding?: keyof typeof padding;
-  margin?: keyof typeof margin;
-  gridCols?: keyof typeof gridCols;
+  container?: keyof typeof containerSizes
+  spacing?: keyof typeof spacing
+  textSize?: keyof typeof textSizes
+  gap?: keyof typeof gaps
+  padding?: keyof typeof padding
+  margin?: keyof typeof margin
+  gridCols?: keyof typeof gridCols
 }) {
-  const classes: string[] = [];
-  
-  if (config.container) classes.push(containerSizes[config.container]);
-  if (config.spacing) classes.push(spacing[config.spacing]);
-  if (config.textSize) classes.push(textSizes[config.textSize]);
-  if (config.gap) classes.push(gaps[config.gap]);
-  if (config.padding) classes.push(padding[config.padding]);
-  if (config.margin) classes.push(margin[config.margin]);
-  if (config.gridCols) classes.push(gridCols[config.gridCols]);
-  
-  return classes.join(' ');
+  return [
+    config.container && containerSizes[config.container],
+    config.spacing && spacing[config.spacing],
+    config.textSize && textSizes[config.textSize],
+    config.gap && gaps[config.gap],
+    config.padding && padding[config.padding],
+    config.margin && margin[config.margin],
+    config.gridCols && gridCols[config.gridCols],
+  ]
+    .filter(Boolean)
+    .join(" ")
 }
 
-// Hook for responsive behavior
-export function useResponsive() {
-  if (typeof window === 'undefined') return { isMobile: false, isTablet: false, isDesktop: true };
-  
-  const width = window.innerWidth;
-  
-  return {
-    isMobile: width < 768,
-    isTablet: width >= 768 && width < 1024,
-    isDesktop: width >= 1024,
-    width,
-  };
+/* =========================================================
+   Responsive Runtime Hook (SAFE)
+   ========================================================= */
+
+import { useEffect, useState } from "react"
+
+type ResponsiveState = {
+  width: number
+  height: number
+  breakpoint: BreakpointKey
+  isMobile: boolean
+  isTablet: boolean
+  isDesktop: boolean
+  isTouch: boolean
 }
 
-// Media query helpers
+const getBreakpoint = (width: number): BreakpointKey => {
+  if (width < breakpoints.sm) return "xs"
+  if (width < breakpoints.md) return "sm"
+  if (width < breakpoints.lg) return "md"
+  if (width < breakpoints.xl) return "lg"
+  if (width < breakpoints["2xl"]) return "xl"
+  return "2xl"
+}
+
+export function useResponsive(): ResponsiveState {
+  const [state, setState] = useState<ResponsiveState>(() => ({
+    width: 0,
+    height: 0,
+    breakpoint: "xl",
+    isMobile: false,
+    isTablet: false,
+    isDesktop: true,
+    isTouch: false,
+  }))
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    const update = () => {
+      const width = window.innerWidth
+      const height = window.innerHeight
+      const bp = getBreakpoint(width)
+
+      setState({
+        width,
+        height,
+        breakpoint: bp,
+        isMobile: width < breakpoints.md,
+        isTablet: width >= breakpoints.md && width < breakpoints.lg,
+        isDesktop: width >= breakpoints.lg,
+        isTouch: window.matchMedia("(pointer: coarse)").matches,
+      })
+    }
+
+    update()
+
+    window.addEventListener("resize", update, { passive: true })
+    window.addEventListener("orientationchange", update)
+
+    return () => {
+      window.removeEventListener("resize", update)
+      window.removeEventListener("orientationchange", update)
+    }
+  }, [])
+
+  return state
+}
+
+/* -------------------------------
+   Media Queries
+-------------------------------- */
 export const mediaQueries = {
-  mobile: `(max-width: ${breakpoints.md})`,
-  tablet: `(min-width: ${breakpoints.md}) and (max-width: ${breakpoints.lg})`,
-  desktop: `(min-width: ${breakpoints.lg})`,
-  touch: '(hover: none) and (pointer: coarse)',
-  mouse: '(hover: hover) and (pointer: fine)',
-} as const;
+  mobile: `(max-width: ${breakpoints.md - 1}px)`,
+  tablet: `(min-width: ${breakpoints.md}px) and (max-width: ${breakpoints.lg - 1}px)`,
+  desktop: `(min-width: ${breakpoints.lg}px)`,
+  touch: "(hover: none) and (pointer: coarse)",
+  mouse: "(hover: hover) and (pointer: fine)",
+} as const
 
-// Responsive image sizes
+/* -------------------------------
+   Responsive image sizes
+-------------------------------- */
 export const imageSizes = {
-  avatar: '(max-width: 640px) 64px, (max-width: 1024px) 80px, 96px',
-  card: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
-  hero: '(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 70vw',
-  full: '100vw',
-} as const;
+  avatar: "(max-width: 640px) 56px, (max-width: 1024px) 72px, 96px",
+  card: "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw",
+  hero: "(max-width: 640px) 100vw, (max-width: 1024px) 85vw, 70vw",
+  full: "100vw",
+} as const
 
+/* -------------------------------
+   Default export
+-------------------------------- */
 export default {
   breakpoints,
   containerSizes,
@@ -143,4 +224,4 @@ export default {
   useResponsive,
   mediaQueries,
   imageSizes,
-};
+}
