@@ -1,8 +1,9 @@
 "use client"
 
 import { memo } from "react"
-import { motion } from "framer-motion"
+import { m } from "framer-motion"
 import { FaLinkedin } from 'react-icons/fa'
+import Image from 'next/image'
 
 export interface Speaker {
   name: string
@@ -13,6 +14,11 @@ export interface Speaker {
   social?: { linkedin?: string; x?: string }
 }
 
+const cardVariants = {
+  initial: { y: 0, scale: 1 },
+  hover: { y: -8, scale: 1.02, transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1] } }
+}
+
 function SpeakerCard({
   speaker,
   onClick,
@@ -21,15 +27,16 @@ function SpeakerCard({
   onClick?: () => void
 }) {
   return (
-    <motion.div
+    <m.div
       className="group relative rounded-2xl overflow-hidden flex flex-col h-full cursor-pointer"
       onClick={onClick}
       tabIndex={onClick ? 0 : undefined}
       role={onClick ? 'button' : undefined}
       aria-label={`View details for ${speaker.name}${speaker.title ? ", " + speaker.title : ''}`}
-      style={{ willChange: "transform" }}
-      whileHover={{ y: -8, scale: 1.02 }}
-      transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+      style={{ willChange: "transform", transform: "translateZ(0)" }}
+      initial="initial"
+      whileHover="hover"
+      variants={cardVariants}
     >
       {/* Enhanced glow effect with multiple layers */}
       <div className="absolute -inset-4 -z-10 pointer-events-none">
@@ -46,13 +53,17 @@ function SpeakerCard({
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           
           {speaker.image ? (
-            <img
+            <Image
               src={speaker.image}
               alt={`${speaker.name}${speaker.title ? ' - ' + speaker.title : ''}`}
-              className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700 ease-out"
+              fill
+              className="object-cover object-center transform group-hover:scale-105 transition-transform duration-700 ease-out"
               loading="lazy"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              onError={e => { e.currentTarget.style.display = 'none' }}
+              quality={85}
+              placeholder="blur"
+              blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbGw9JyMxNzE3MTcnLz48L3N2Zz4="
+              onError={e => { const target = e.currentTarget; target.style.display = 'none' }}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900">
@@ -93,7 +104,7 @@ function SpeakerCard({
           )}
         </div>
       </div>
-    </motion.div>
+    </m.div>
   )
 }
 
