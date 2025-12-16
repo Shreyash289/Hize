@@ -2,21 +2,21 @@
   {
     "name": "Shivam Shivam",
     "title": "AI Architect, ZS Associates",
-    "image": "guest/shivam.jpg",
+    "image": "/guest/shivam.jpg",
     "bio": "An award-winning AI Architect 7+ years of experience building Generative AI and multi-agent systems to transform pharmaceutical operations.",
     "social": { "linkedin": "https://www.linkedin.com/in/shivamshivam96/" }
   },
   {
     "name": "Mohan H.R",
     "title": "Chair - Events, IEEE Computer Society, India Council",
-    "image": "guest/hrmohan.jpg",
+    "image": "/guest/hrmohan.jpg",
     "bio": "Mr. H. R. Mohan is a veteran ICT consultant and former technology leader at The Hindu, renowned for pioneering India’s first online newspaper and contributing over four decades of service to global computing societies.",
     "social": { "linkedin": "https://www.linkedin.com/in/hr-mohan/" }
   },
   {
     "name": "Abhinav Gambhir",
     "title": "Associate Director, Oracle",
-    "image": "guest/gambhir.jpg",
+    "image": "/guest/gambhir.jpg",
     "bio": "Founder & technology leader focused on scalable infra.",
     "social": { "linkedin": "https://www.linkedin.com/in/abhinavgambhir/" }
   }

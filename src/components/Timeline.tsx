@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { useScroll, useTransform, AnimatePresence, LazyMotion, domAnimation, m } from "framer-motion";
 import { memo, useRef, useState, useMemo } from "react";
 import { Calendar, Users, Trophy, Coffee, Mic, Code, Lightbulb, ChevronDown } from "lucide-react";
 import { getMobileOptimizedVariants, shouldReduceAnimations, isMobile } from "@/lib/mobileOptimization";
@@ -168,11 +168,12 @@ const Timeline = memo(function Timeline() {
   };
 
   return (
+    <LazyMotion features={domAnimation} strict>
     <div ref={containerRef} className="relative w-full py-4 sm:py-6 md:py-8 overflow-hidden">
       {/* Conditionally render animated background elements - disabled on mobile for performance */}
       {!mobile && !reducedMotion && (
         <div className="absolute inset-0 pointer-events-none">
-          <motion.div
+          <m.div
             className="absolute top-20 left-10 w-32 h-32 rounded-full bg-gradient-to-r from-yellow-400/10 to-amber-500/10 blur-3xl"
             animate={{
               y: [-10, 10, -10],
@@ -184,7 +185,7 @@ const Timeline = memo(function Timeline() {
               ease: "linear"
             }}
           />
-          <motion.div
+          <m.div
             className="absolute top-60 right-20 w-48 h-48 rounded-full bg-gradient-to-r from-orange-500/10 to-red-600/10 blur-3xl"
             animate={{
               y: [-8, 8, -8],
@@ -231,7 +232,7 @@ const Timeline = memo(function Timeline() {
           </defs>
 
           {/* Simplified path for desktop */}
-          <motion.path
+          <m.path
             d="M 150 120 Q 300 80 450 180 Q 600 280 750 220"
             stroke="url(#pathGradient)"
             strokeWidth="4"
@@ -243,7 +244,7 @@ const Timeline = memo(function Timeline() {
             }}
           />
 
-          <motion.path
+          <m.path
             d="M 750 220 Q 900 160 850 320 Q 800 480 650 420 Q 500 360 400 480"
             stroke="url(#pathGradient)"
             strokeWidth="4"
@@ -265,7 +266,7 @@ const Timeline = memo(function Timeline() {
       )}
 
       {/* Timeline Content */}
-      <motion.div
+      <m.div
         className="relative z-10 max-w-6xl mx-auto px-3 sm:px-4 md:px-6"
         variants={variants.containerVariants}
         initial="hidden"
@@ -276,7 +277,7 @@ const Timeline = memo(function Timeline() {
           const IconComponent = day.icon;
 
           return (
-            <motion.div
+            <m.div
               key={day.day}
               variants={variants.dayVariants}
               transition={{
@@ -287,14 +288,14 @@ const Timeline = memo(function Timeline() {
               className="relative mb-4 flex justify-center"
             >
               {/* Interactive Day Card Button */}
-              <motion.div
+              <m.div
                 className="relative w-full max-w-2xl mx-auto cursor-pointer"
                 whileHover={reducedMotion ? {} : { scale: mobile ? 1.005 : 1.01 }}
                 whileTap={reducedMotion ? {} : { scale: mobile ? 0.995 : 0.99 }}
                 onClick={() => toggleDay(index)}
               >
                 {/* Day Header Button */}
-                <motion.div
+                <m.div
                   className="relative p-3 sm:p-4 md:p-5 rounded-xl sm:rounded-2xl backdrop-blur-xl border shadow-xl"
                   style={{
                     background: day.bgColor,
@@ -320,13 +321,13 @@ const Timeline = memo(function Timeline() {
                   {/* Day Header */}
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                     <div className="flex items-center gap-3 sm:gap-4">
-                      <motion.div
+                      <m.div
                         className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white/10 backdrop-blur-sm flex-shrink-0"
                         whileHover={{ rotate: 180 }}
                         transition={{ duration: 0.4 }}
                       >
                         <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
-                      </motion.div>
+                      </m.div>
                       <div className="min-w-0">
                         <h3 className="text-lg sm:text-xl font-bold text-white truncate">{day.day}</h3>
                         <p className="text-yellow-300 text-xs sm:text-sm font-medium">{day.date}</p>
@@ -343,28 +344,28 @@ const Timeline = memo(function Timeline() {
                         </p>
                       </div>
 
-                      <motion.div
+                      <m.div
                         className="p-2 rounded-full bg-white/10 flex-shrink-0"
                         animate={{ rotate: expandedDays.has(index) ? 180 : 0 }}
                         transition={{ duration: 0.3 }}
                       >
                         <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                      </motion.div>
+                      </m.div>
                     </div>
                   </div>
-                </motion.div>
+                </m.div>
 
                 {/* Expandable Events List */}
                 <AnimatePresence>
                   {expandedDays.has(index) && (
-                    <motion.div
+                    <m.div
                       variants={variants.eventsContainerVariants}
                       initial="hidden"
                       animate="visible"
                       exit="exit"
                       className="mt-4 sm:mt-6 overflow-hidden"
                     >
-                      <motion.div
+                      <m.div
                         className="p-4 sm:p-5 md:p-6 rounded-lg sm:rounded-xl"
                         style={{
                           background: `${day.bgColor}80`,
@@ -384,19 +385,19 @@ const Timeline = memo(function Timeline() {
                           {day.events.map((event, i) => {
                             const EventIcon = event.icon;
                             return (
-                              <motion.div
+                              <m.div
                                 key={i}
                                 variants={variants.eventVariants}
                                 className="group flex items-start gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg bg-black/30 backdrop-blur-sm border border-white/10 hover:border-yellow-400/50 hover:bg-black/40 transition-all duration-300"
                                 whileHover={reducedMotion ? {} : { x: mobile ? 1 : 2, scale: mobile ? 1.002 : 1.005 }}
                               >
-                                <motion.div
+                                <m.div
                                   className="p-1.5 sm:p-2 rounded-lg flex-shrink-0 mt-0.5 sm:mt-1"
                                   style={{ backgroundColor: `${day.glowColor}40` }}
                                   whileHover={{ scale: 1.1, rotate: 10 }}
                                 >
                                   <EventIcon className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: day.glowColor }} />
-                                </motion.div>
+                                </m.div>
                                 <div className="flex-1 min-w-0">
                                   <p className="text-yellow-300 text-xs font-bold uppercase tracking-wide mb-1">
                                     {event.time}
@@ -405,17 +406,17 @@ const Timeline = memo(function Timeline() {
                                     {event.label}
                                   </p>
                                 </div>
-                              </motion.div>
+                              </m.div>
                             );
                           })}
                         </div>
-                      </motion.div>
-                    </motion.div>
+                      </m.div>
+                    </m.div>
                   )}
                 </AnimatePresence>
 
                 {/* Decorative elements */}
-                <motion.div
+                <m.div
                   className="absolute -top-1 -right-1 w-4 h-4 rounded-full"
                   style={{ background: `linear-gradient(135deg, ${day.glowColor}, ${day.glowColor}80)` }}
                   animate={{
@@ -428,7 +429,7 @@ const Timeline = memo(function Timeline() {
                     delay: index * 0.3
                   }}
                 />
-                <motion.div
+                <m.div
                   className="absolute -bottom-1 -left-1 w-3 h-3 rounded-full bg-gradient-to-r from-black to-gray-700"
                   animate={{
                     scale: expandedDays.has(index) ? [1, 1.4, 1] : [1, 1.2, 1],
@@ -440,10 +441,10 @@ const Timeline = memo(function Timeline() {
                     delay: 0.5 + index * 0.2
                   }}
                 />
-              </motion.div>
+              </m.div>
 
               {/* Connection line to path */}
-              <motion.div
+              <m.div
                 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 w-16 h-1 rounded-full"
                 style={{
                   background: `linear-gradient(90deg, transparent, ${day.glowColor}60, transparent)`
@@ -461,17 +462,17 @@ const Timeline = memo(function Timeline() {
                   repeat: expandedDays.has(index) ? Infinity : 0
                 }}
               />
-            </motion.div>
+            </m.div>
           );
         })}
-      </motion.div>
+      </m.div>
 
       {/* Floating particles with theme colors - disabled on mobile for performance */}
       {!mobile && !reducedMotion && [...Array(6)].map((_, i) => {
         const colors = ['#FCD34D', '#FB923C', '#EA580C'];
         const color = colors[i % colors.length];
         return (
-          <motion.div
+          <m.div
             key={i}
             className="absolute w-2 h-2 rounded-full"
             style={{
@@ -507,6 +508,7 @@ const Timeline = memo(function Timeline() {
         />
       ))}
     </div>
+    </LazyMotion>
   );
 });
 
