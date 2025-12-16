@@ -97,13 +97,16 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
         <link rel="preload" href="/fonts/plus-jakarta-sans.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/data/speakers.json" as="fetch" crossOrigin="anonymous" />
+        <link rel="preload" href="/data/events.json" as="fetch" crossOrigin="anonymous" />
+        <link rel="preload" href="/data/student-team.json" as="fetch" crossOrigin="anonymous" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className="antialiased safe-area-inset">
-        <div className="min-h-screen min-h-[100dvh] bg-black">
+      <body className="antialiased safe-area-inset" suppressHydrationWarning>
+        <div className="min-h-screen min-h-[100dvh] bg-black" style={{ contentVisibility: 'auto' }}>
           {children}
         </div>
       </body>

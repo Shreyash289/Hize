@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { motion } from "framer-motion"
+import { useEffect, useRef, useState } from "react"
+import { LazyMotion, domAnimation, m } from "framer-motion"
 
 export default function MagneticCursor() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -71,8 +71,9 @@ export default function MagneticCursor() {
   if (!isVisible || isTouchDevice) return null
 
   return (
+    <LazyMotion features={domAnimation} strict>
     <>
-      <motion.div
+      <m.div
         className="fixed top-0 left-0 w-8 h-8 rounded-full border-2 border-orange-500 pointer-events-none z-[9998] mix-blend-difference hidden lg:block"
         variants={variants}
         animate={cursorVariant}
@@ -83,7 +84,7 @@ export default function MagneticCursor() {
           mass: 0.5,
         }}
       />
-      <motion.div
+      <m.div
         className="fixed top-0 left-0 w-2 h-2 rounded-full bg-gradient-to-r from-orange-600 to-orange-400 pointer-events-none z-[9999] hidden lg:block"
         animate={{
           x: mousePosition.x - 4,
@@ -96,6 +97,6 @@ export default function MagneticCursor() {
           mass: 0.1,
         }}
       />
-    </>
+    </>\n    </LazyMotion>
   )
 }

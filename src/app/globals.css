@@ -123,31 +123,60 @@
   }
   
   html {
-    /* iOS Safari viewport fixes */
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
-    /* Prevent zoom on input focus */
-    -webkit-text-size-adjust: none;
-    /* Fix iOS Safari bounce scrolling */
     overscroll-behavior: none;
+    scroll-behavior: smooth;
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
   
   body {
     @apply bg-background text-foreground;
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    /* iOS Safari specific fixes */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Prevent iOS Safari bounce */
+    text-rendering: optimizeLegibility;
     overscroll-behavior: none;
-    /* Fix iOS Safari 100vh issue */
     min-height: 100vh;
     min-height: -webkit-fill-available;
+    transform: translateZ(0);
+  }
+
+  img, picture, video, canvas, svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  img {
+    content-visibility: auto;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  * {
+    will-change: auto;
+  }
+
+  [style*="will-change"] {
+    will-change: transform;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-weight: 700;
+    text-rendering: optimizeLegibility;
   }
 
   .font-serif {
@@ -159,10 +188,12 @@
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   .clay-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-4px) translateZ(0);
     box-shadow: 0px 8px 30px rgba(255, 140, 66, 0.35);
   }
 

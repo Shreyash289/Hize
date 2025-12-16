@@ -29,7 +29,7 @@ export default function ResponsiveImage({
   priority = false,
   quality = 85,
   placeholder = 'blur',
-  blurDataURL = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbGw9JyMyMjIyMjInLz48L3N2Zz4=",
+  blurDataURL = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbGw9JyMxNzE3MTcnLz48L3N2Zz4=",
   sizes = 'card',
   fill = false,
   objectFit = 'cover',
@@ -71,7 +71,7 @@ export default function ResponsiveImage({
   return (
     <div className={`relative ${className}`}>
       {isLoading && (
-        <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 to-neutral-900 animate-pulse rounded-lg" />
+        <div className="absolute inset-0 bg-gradient-to-br from-neutral-900 to-black animate-pulse" />
       )}
       <Image
         src={src}
@@ -84,7 +84,7 @@ export default function ResponsiveImage({
         placeholder={placeholder}
         blurDataURL={blurDataURL}
         sizes={getSizes()}
-        className={`transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'} ${
+        className={`transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'} ${
           fill ? `object-${objectFit}` : ''
         }`}
         style={fill ? { objectFit } : undefined}
@@ -92,6 +92,7 @@ export default function ResponsiveImage({
         onLoad={handleLoad}
         loading={priority ? 'eager' : 'lazy'}
         decoding="async"
+        unoptimized={false}
       />
     </div>
   );

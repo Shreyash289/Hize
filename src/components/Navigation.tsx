@@ -4,7 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { AnimatePresence, LazyMotion, domAnimation, m } from "framer-motion"
 import { Menu, X } from "lucide-react"
 
 interface NavigationProps {
@@ -53,8 +53,9 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
   }
 
   return (
+    <LazyMotion features={domAnimation} strict>
     <>
-      <motion.nav
+      <m.nav
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
@@ -67,7 +68,7 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
         <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between">
           {/* Logo/Brand */}
           <Link href="/" className="flex items-center gap-3 group">
-            <motion.div
+            <m.div
               whileHover={{ scale: 1.05 }}
               className="relative h-8 sm:h-10 md:h-12 w-auto flex items-center gap-3"
             >
@@ -87,7 +88,7 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
                 className="h-full w-auto object-contain"
                 priority
               />
-            </motion.div>
+            </m.div>
           </Link>
 
           {/* Desktop Navigation */}
@@ -105,7 +106,7 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
                 >
                   {link.label}
                   {activeSection === link.section && (
-                    <motion.div
+                    <m.div
                       layoutId="activeNavIndicator"
                       className="absolute inset-0 rounded-lg bg-orange-500/20 border border-orange-500/30 -z-10"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
@@ -126,7 +127,7 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
                 >
                   {link.label}
                   {pathname === link.href && (
-                    <motion.div
+                    <m.div
                       layoutId="activeNavIndicator"
                       className="absolute inset-0 rounded-lg bg-orange-500/20 border border-orange-500/30 -z-10"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
@@ -152,13 +153,13 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
-      </motion.nav>
+      </m.nav>
 
       {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -166,7 +167,7 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
               className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 md:hidden"
               onClick={() => setMobileMenuOpen(false)}
             />
-            <motion.div
+            <m.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
@@ -218,10 +219,11 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
                   Register Now
                 </button>
               </div>
-            </motion.div>
+            </m.div>
           </>
         )}
       </AnimatePresence>
     </>
+    </LazyMotion>
   )
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useMemo, useCallback } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { AnimatePresence, LazyMotion, domAnimation, m } from "framer-motion"
 import Link from 'next/link'
 import { Code2, Lightbulb, Mic2, Mail, Phone, ArrowDown, ChevronUp, X, FileText } from "lucide-react"
 import { FaLinkedin, FaTwitter } from 'react-icons/fa'
@@ -17,7 +17,6 @@ const LoadingScreen = dynamic(() => import("@/components/LoadingScreen"), {
   loading: () => <div className="fixed inset-0 bg-black flex items-center justify-center"><div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div></div>
 })
 
-// Only load background on desktop for performance
 const DynamicBackground = dynamic(() => import("@/components/DynamicBackground"), {
   ssr: false,
   loading: () => <div className="fixed inset-0 bg-black"></div>
@@ -33,16 +32,12 @@ const EnhancedCountdown = dynamic(() => import("@/components/EnhancedCountdown")
   loading: () => <div className="h-24 sm:h-32 bg-gradient-to-r from-orange-600/10 to-orange-400/10 rounded-xl"></div>
 })
 
-// Only load magnetic cursor on desktop
 const MagneticCursor = dynamic(() => import("@/components/MagneticCursor"), {
   ssr: false,
   loading: () => null
 })
 
-
-
-// Simplified marquee loading
-const Marquee = dynamic(() => import("react-fast-marquee").then(mod => ({ default: mod.default })), {
+const Marquee = dynamic(() => import("react-fast-marquee"), {
   ssr: false,
   loading: () => <div className="h-16 bg-gradient-to-r from-orange-600/5 to-orange-400/5 rounded-lg"></div>
 })
@@ -53,7 +48,7 @@ const SpeakerCard = dynamic(() => import('@/components/SpeakerCard'), {
 })
 
 const Navigation = dynamic(() => import('@/components/Navigation'), {
-  ssr: false,
+  ssr: true,
   loading: () => <div className="fixed top-0 left-0 right-0 z-50 h-16 bg-black/80 backdrop-blur-sm"></div>
 })
 
@@ -98,6 +93,18 @@ const ICON_MAP: Record<string, any> = {
   Lightbulb,
   Mic2,
 } as const
+
+const transition = {
+  type: "spring",
+  stiffness: 100,
+  damping: 15,
+  mass: 0.5
+}
+
+const smoothTransition = {
+  duration: 0.3,
+  ease: [0.25, 0.1, 0.25, 1]
+}
 
 const normalizeStudentImage = (image?: string) => {
   const fallback = "/studentteam/falll.png"
@@ -160,13 +167,29 @@ export default function Home() {
   const [showRegistrationPopup, setShowRegistrationPopup] = useState(false)
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const criticalImages = [
+        '/studentteam/chair.png',
+        '/studentteam/secretary.jpg',
+        '/studentteam/treasurer.jpg'
+      ]
+      
+      criticalImages.forEach(src => {
+        const link = document.createElement('link')
+        link.rel = 'preload'
+        link.as = 'image'
+        link.href = src
+        document.head.appendChild(link)
+      })
+    }
+  }, [])
+
+  useEffect(() => {
     let mounted = true
     let abortController = new AbortController()
 
-    // Always pull latest speakers after JSON edits
     fetch("/data/speakers.json", {
       cache: "no-store",
-      next: { revalidate: 0 },
       signal: abortController.signal
     })
       .then((res) => {
@@ -301,23 +324,32 @@ export default function Home() {
     let ticking = false
     let rafId: number | null = null
     let lastScrollY = 0
+    let lastSectionUpdate = 0
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY
 
-      // Only process if scroll position changed significantly
       if (Math.abs(currentScrollY - lastScrollY) < 10) return
       lastScrollY = currentScrollY
 
       if (!ticking) {
         rafId = requestAnimationFrame(() => {
+          const now = Date.now()
+          if (now - lastSectionUpdate < 100) {
+            ticking = false
+            return
+          }
+          
           const scrollPosition = currentScrollY + window.innerHeight / 2
 
           sectionsRef.current.forEach((section, index) => {
             if (section) {
               const { offsetTop, offsetHeight } = section
               if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-                setActiveSection(prev => prev !== index ? index : prev)
+                if (activeSection !== index) {
+                  setActiveSection(index)
+                  lastSectionUpdate = now
+                }
               }
             }
           })
@@ -327,7 +359,6 @@ export default function Home() {
       }
     }
 
-    // Use passive listener for better scroll performance with throttling
     window.addEventListener("scroll", handleScroll, { passive: true })
     handleScroll()
 
@@ -350,20 +381,21 @@ export default function Home() {
   }
 
   return (
-    <div ref={containerRef} className="relative bg-black text-white overflow-x-hidden pt-6">
-      <Navigation
-        sections={sections}
-        onSectionClick={scrollToSection}
-        activeSection={activeSection}
-        onRegisterClick={() => setShowRegistrationPopup(true)}
-      />
-      <DynamicBackground />
-      <MagneticCursor />
-      <ScrollProgress
-        sections={sections}
-        activeSection={activeSection}
-        onSectionClick={scrollToSection}
-      />
+    <LazyMotion features={domAnimation} strict>
+      <div ref={containerRef} className="relative bg-black text-white overflow-x-hidden pt-6">
+        <Navigation
+          sections={sections}
+          onSectionClick={scrollToSection}
+          activeSection={activeSection}
+          onRegisterClick={() => setShowRegistrationPopup(true)}
+        />
+        <DynamicBackground />
+        <MagneticCursor />
+        <ScrollProgress
+          sections={sections}
+          activeSection={activeSection}
+          onSectionClick={scrollToSection}
+        />
 
       <section
         ref={(el) => { sectionsRef.current[0] = el }}
@@ -388,13 +420,13 @@ export default function Home() {
           </div>
         </div>
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={smoothTransition}
           className="text-center space-y-12 max-w-6xl mx-auto relative z-10"
         >
-          <motion.div className="relative">
+          <m.div className="relative">
             <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-[10rem] xl:text-[14rem] font-black tracking-tighter relative">
               <span className="absolute inset-0 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent blur-2xl opacity-60">
                 IEEE CS SYP HIZE
@@ -404,17 +436,17 @@ export default function Home() {
               </span>
             </h1>
 
-            <motion.p
+            <m.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
               className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black bg-gradient-to-r from-orange-600 via-orange-400 to-orange-500 bg-clip-text text-transparent tracking-wider mt-2 md:mt-4"
             >
               2026
-            </motion.p>
-          </motion.div>
+            </m.p>
+          </m.div>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, duration: 0.6 }}
@@ -426,18 +458,18 @@ export default function Home() {
               </h2>
             </div>
             <div className="absolute -inset-2 md:-inset-3 bg-gradient-to-r from-orange-600/30 via-orange-500/30 to-orange-600/30 rounded-2xl md:rounded-3xl blur-xl -z-10" />
-          </motion.div>
+          </m.div>
 
-          <motion.p
+          <m.p
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
             className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl text-orange-100/90 font-serif max-w-5xl mx-auto leading-relaxed px-4"
           >
             A flagship IEEE Computer Society initiative bringing together <span className="text-orange-500 font-bold">innovation</span>, <span className="text-orange-400 font-bold">technology</span>, and <span className="text-orange-300 font-bold">academic excellence</span>
-          </motion.p>
+          </m.p>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
@@ -458,7 +490,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <motion.div
+              <m.div
                 className="absolute -inset-[1px] bg-gradient-to-r from-orange-600/20 via-orange-500/20 to-orange-600/20 rounded-3xl blur-xl -z-10"
                 animate={{
                   opacity: [0.3, 0.6, 0.3],
@@ -470,40 +502,40 @@ export default function Home() {
                 }}
               />
             </div>
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.6 }}
           >
             <EnhancedCountdown />
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7, duration: 0.6 }}
             className="pt-12 flex flex-col items-center gap-4"
           >
-            <motion.button
+            <m.button
               onClick={() => setShowRegistrationPopup(true)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="px-6 sm:px-8 md:px-12 py-3 sm:py-4 md:py-5 rounded-xl md:rounded-2xl bg-gradient-to-r from-orange-600 to-orange-400 font-black text-base sm:text-lg md:text-xl text-black shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 transition-all w-full sm:w-auto"
             >
               REGISTER NOW
-            </motion.button>
+            </m.button>
 
-            <motion.div
+            <m.div
               animate={{ y: [0, 12, 0] }}
               transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
               className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-r from-orange-500/20 to-orange-400/20 backdrop-blur-sm border-2 border-orange-500/30"
             >
               <ArrowDown className="w-7 h-7 text-orange-400" strokeWidth={3} />
-            </motion.div>
-          </motion.div>
-        </motion.div>
+            </m.div>
+          </m.div>
+        </m.div>
       </section>
 
       <section
@@ -511,7 +543,7 @@ export default function Home() {
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -524,9 +556,9 @@ export default function Home() {
             <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
               Find us on campus. View and open the full Google Map for directions.
             </p>
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.92 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -568,7 +600,7 @@ export default function Home() {
                 <div className="text-slate-300 text-sm sm:text-base font-mono">
                   SRM Institute of Science & Technology, Kattankulathur, Tamil Nadu
                 </div>
-                <motion.a
+                <m.a
                   href="https://www.google.com/maps/d/u/0/viewer?mid=18kGFk2ClDWeZPYT0rkdUHRDRw98Mj5U&ehbc=2E312F"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -580,14 +612,14 @@ export default function Home() {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                   </svg>
-                </motion.a>
+                </m.a>
               </div>
             </div>
 
-            <motion.div
+            <m.div
               className="absolute -inset-[1px] bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 rounded-3xl opacity-20 blur-2xl -z-10"
             />
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
@@ -596,7 +628,7 @@ export default function Home() {
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -609,7 +641,7 @@ export default function Home() {
             <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
               Explore our lineup of competitions, workshops and keynotes
             </p>
-          </motion.div>
+          </m.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             {eventsData === null ? (
@@ -624,7 +656,7 @@ export default function Home() {
               eventsData.map((event, index) => {
                 const Icon = event.icon ? ICON_MAP[event.icon] ?? Code2 : Code2
                 return (
-                  <motion.div
+                  <m.div
                     key={event.title ?? index}
                     initial={{ opacity: 0, y: 50 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -662,7 +694,7 @@ export default function Home() {
                         </button>
                       </div>
                     </div>
-                  </motion.div>
+                  </m.div>
                 )
               })
             )}
@@ -673,7 +705,7 @@ export default function Home() {
       {/* Timeline Section */}
       <section className="relative py-10 sm:py-12 md:py-14">
         <div className="max-w-7xl mx-auto w-full relative z-10">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -686,7 +718,7 @@ export default function Home() {
             <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
               Detailed schedule of all activities across the three days
             </p>
-          </motion.div>
+          </m.div>
           <Timeline />
         </div>
       </section>
@@ -696,7 +728,7 @@ export default function Home() {
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -709,11 +741,11 @@ export default function Home() {
             <p className="text-base sm:text-lg md:text-xl text-gray-200 font-serif max-w-2xl mx-auto mb-0 px-4">
               Our distinguished guest speakers and tech thought leaders for HIZE.
             </p>
-          </motion.div>
+          </m.div>
           <div className="flex justify-center">
             <div className="grid gap-6 sm:gap-8 md:gap-10 lg:gap-12 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl">
               {speakers.map((speaker, idx) => (
-                <motion.div
+                <m.div
                   key={speaker.name || idx}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -728,7 +760,7 @@ export default function Home() {
                     speaker={speaker}
                     onClick={() => setSelectedSpeaker(speaker)}
                   />
-                </motion.div>
+                </m.div>
               ))}
             </div>
           </div>
@@ -736,7 +768,7 @@ export default function Home() {
         {/* Enhanced Speaker detail lightbox modal */}
         <AnimatePresence>
           {selectedSpeaker && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -744,7 +776,7 @@ export default function Home() {
               className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-3xl px-4 sm:px-6"
               onClick={() => setSelectedSpeaker(null)}
             >
-              <motion.div
+              <m.div
                 initial={{ scale: 0.9, opacity: 0, y: 20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 exit={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -763,7 +795,7 @@ export default function Home() {
                   <div className="h-1 w-full bg-gradient-to-r from-orange-500 via-pink-500 to-orange-400" />
 
                   {/* Close button */}
-                  <motion.button
+                  <m.button
                     className="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 rounded-full bg-gradient-to-r from-zinc-800/80 to-zinc-900/80 backdrop-blur-sm border border-orange-500/20 text-white hover:border-orange-400/40 shadow-lg transition-all duration-300 group z-10"
                     onClick={() => setSelectedSpeaker(null)}
                     aria-label="Close"
@@ -774,12 +806,12 @@ export default function Home() {
                     <svg width="20" height="20" className="mx-auto group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                  </motion.button>
+                  </m.button>
 
                   <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 p-6 sm:p-8 lg:p-10">
                     {/* Speaker Image */}
                     {selectedSpeaker.image && (
-                      <motion.div
+                      <m.div
                         className="flex-shrink-0 mx-auto lg:mx-0"
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
@@ -795,11 +827,11 @@ export default function Home() {
                             decoding="async"
                           />
                         </div>
-                      </motion.div>
+                      </m.div>
                     )}
 
                     {/* Speaker Details */}
-                    <motion.div
+                    <m.div
                       className="flex-1 text-center lg:text-left space-y-4 sm:space-y-6"
                       initial={{ x: 20, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
@@ -830,7 +862,7 @@ export default function Home() {
                       {(selectedSpeaker.social?.linkedin || selectedSpeaker.social?.x) && (
                         <div className="flex items-center justify-center lg:justify-start gap-4 pt-4">
                           {selectedSpeaker.social?.linkedin && (
-                            <motion.a
+                            <m.a
                               href={selectedSpeaker.social.linkedin}
                               target="_blank"
                               rel="noopener noreferrer"
@@ -840,10 +872,10 @@ export default function Home() {
                             >
                               <FaLinkedin className="w-5 h-5" />
                               <span>LinkedIn</span>
-                            </motion.a>
+                            </m.a>
                           )}
                           {selectedSpeaker.social?.x && (
-                            <motion.a
+                            <m.a
                               href={selectedSpeaker.social.x}
                               target="_blank"
                               rel="noopener noreferrer"
@@ -853,15 +885,15 @@ export default function Home() {
                             >
                               <FaTwitter className="w-5 h-5" />
                               <span>X (Twitter)</span>
-                            </motion.a>
+                            </m.a>
                           )}
                         </div>
                       )}
-                    </motion.div>
+                    </m.div>
                   </div>
                 </div>
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
           )}
         </AnimatePresence>
       </section>
@@ -872,7 +904,7 @@ export default function Home() {
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -885,9 +917,9 @@ export default function Home() {
             <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
               In collaboration with
             </p>
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -905,22 +937,22 @@ export default function Home() {
               <div className="pt-4 sm:pt-6 md:pt-8">
                 <Marquee speed={40} gradient={false} pauseOnHover={true}>
                   {["IEEE Computer Society", "SYP Activities", "School of Computing", "CTECH"].map((partner) => (
-                    <motion.div
+                    <m.div
                       key={partner}
                       whileHover={{ scale: 1.05 }}
                       className="mx-4 sm:mx-6 md:mx-8 px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-lg md:rounded-xl bg-gradient-to-r from-orange-500/20 to-orange-400/20 backdrop-blur-sm border border-orange-500/30"
                     >
                       <p className="font-bold text-base sm:text-lg md:text-xl whitespace-nowrap">{partner}</p>
-                    </motion.div>
+                    </m.div>
                   ))}
                 </Marquee>
               </div>
             </div>
 
-            <motion.div
+            <m.div
               className="absolute -inset-[1px] bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 rounded-3xl opacity-20 blur-2xl -z-10"
             />
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
@@ -929,7 +961,7 @@ export default function Home() {
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -942,9 +974,9 @@ export default function Home() {
             <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
               Revisit highlights from previous HIZE events.
             </p>
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -983,7 +1015,7 @@ export default function Home() {
                 </div>
 
                 <div className="mt-4 flex items-center justify-center gap-3">
-                  <motion.a
+                  <m.a
                     href="https://www.ieeecshize.com/events"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -1005,7 +1037,7 @@ export default function Home() {
                         d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                       />
                     </svg>
-                  </motion.a>
+                  </m.a>
                 </div>
               </div>
 
@@ -1016,10 +1048,10 @@ export default function Home() {
               </div>
             </div>
 
-            <motion.div
+            <m.div
               className="absolute -inset-[1px] bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 rounded-3xl opacity-20 blur-2xl -z-10"
             />
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
@@ -1029,7 +1061,7 @@ export default function Home() {
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -1042,7 +1074,7 @@ export default function Home() {
             <p className="text-base sm:text-lg md:text-xl text-gray-200 font-serif max-w-2xl mx-auto mb-0 px-4">
               Our core student organizing team driving HIZE.
             </p>
-          </motion.div>
+          </m.div>
           {domains.length === 0 && (!students || students.length === 0) ? (
             <div className="text-center py-12">
               <p className="text-slate-400">Loading student team...</p>
@@ -1054,7 +1086,7 @@ export default function Home() {
                 const display = isDomain ? item.head : item
 
                 return (
-                  <motion.button
+                  <m.button
                     type="button"
                     key={(display?.name || "") + (display?.role || "") + (item?.domain || "")}
                     onClick={() => isDomain ? setSelectedDomain(item as DomainTeam) : null}
@@ -1075,6 +1107,11 @@ export default function Home() {
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-300"
                         sizes="(max-width: 640px) 80px, (max-width: 1024px) 96px, 112px"
+                        quality={85}
+                        placeholder="blur"
+                        blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbGw9JyMxNzE3MTcnLz48L3N2Zz4="
+                        priority={index < 4}
+                        loading={index < 4 ? 'eager' : 'lazy'}
                       />
                     </div>
                     {isDomain && (
@@ -1084,7 +1121,7 @@ export default function Home() {
                     )}
                     <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2 text-white group-hover:text-orange-100 transition-colors duration-300">{display.name}</h3>
                     <p className="text-orange-400 font-bold text-sm sm:text-base md:text-lg group-hover:text-orange-300 transition-colors duration-300">{display.role}</p>
-                  </motion.button>
+                  </m.button>
                 )
               })}
             </div>
@@ -1095,7 +1132,7 @@ export default function Home() {
 
       <AnimatePresence>
         {selectedDomain && (
-          <motion.div
+          <m.div
             key="domain-modal"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -1103,7 +1140,7 @@ export default function Home() {
             className="fixed inset-0 z-50 flex items-center justify-center px-4 sm:px-6 py-10 bg-black/70 backdrop-blur"
             onClick={() => setSelectedDomain(null)}
           >
-            <motion.div
+            <m.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
@@ -1132,6 +1169,10 @@ export default function Home() {
                         alt={selectedDomain.head.name}
                         fill
                         className="object-cover"
+                        sizes="56px"
+                        quality={85}
+                        placeholder="blur"
+                        blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbGw9JyMxNzE3MTcnLz48L3N2Zz4="
                       />
                     </div>
                     <div>
@@ -1173,8 +1214,8 @@ export default function Home() {
                   )}
                 </div>
               </div>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -1184,7 +1225,7 @@ export default function Home() {
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -1197,11 +1238,11 @@ export default function Home() {
             <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
               Reach our faculty coordinators for HIZE 2026
             </p>
-          </motion.div>
+          </m.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             {facultyContacts.map((coordinator, index) => (
-              <motion.div
+              <m.div
                 key={coordinator.name}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -1217,6 +1258,11 @@ export default function Home() {
                       fill
                       className="object-cover"
                       sizes="(max-width: 640px) 80px, (max-width: 1024px) 88px, 96px"
+                      quality={85}
+                      placeholder="blur"
+                      blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbGw9JyMxNzE3MTcnLz48L3N2Zz4="
+                      priority={index < 3}
+                      loading={index < 3 ? 'eager' : 'lazy'}
                     />
                   </div>
                   <div className="text-center">
@@ -1226,7 +1272,7 @@ export default function Home() {
                 </div>
 
                 <div className="space-y-3 sm:space-y-4 pt-3 sm:pt-4 border-t border-white/10">
-                  <motion.a
+                  <m.a
                     href={`mailto:${coordinator.email}`}
                     whileHover={{ x: 5 }}
                     className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg md:rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
@@ -1235,9 +1281,9 @@ export default function Home() {
                       <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <span className="text-xs sm:text-sm font-mono break-all">{coordinator.email}</span>
-                  </motion.a>
+                  </m.a>
 
-                  <motion.a
+                  <m.a
                     href={`tel:${coordinator.phone.replace(/\s/g, '')}`}
                     whileHover={{ x: 5 }}
                     className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg md:rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
@@ -1246,9 +1292,9 @@ export default function Home() {
                       <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <span className="text-xs sm:text-sm font-mono">{coordinator.phone}</span>
-                  </motion.a>
+                  </m.a>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
@@ -1263,14 +1309,14 @@ export default function Home() {
               </p>
             </div>
 
-            <motion.button
+            <m.button
               onClick={scrollToTop}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               className="w-12 h-12 rounded-full bg-gradient-to-r from-orange-600 to-orange-400 flex items-center justify-center shadow-lg hover:shadow-orange-500/50 transition-shadow"
             >
               <ChevronUp className="w-6 h-6" />
-            </motion.button>
+            </m.button>
           </div>
         </div>
 
@@ -1280,7 +1326,7 @@ export default function Home() {
       {/* Lightbox for speaker images */}
       <AnimatePresence>
         {lightboxImage && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -1295,7 +1341,7 @@ export default function Home() {
               <X className="w-6 h-6 text-white" />
             </button>
 
-            <motion.div
+            <m.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
@@ -1303,18 +1349,21 @@ export default function Home() {
               className="relative max-w-5xl max-h-[90vh] w-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-orange-500/50">
-                <img
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-orange-500/50\">
+                <Image
                   src={lightboxImage}
                   alt="Enlarged view"
+                  width={1200}
+                  height={800}
                   className="w-full h-full object-contain"
-                  loading="eager"
-                  decoding="async"
+                  priority
+                  quality={95}
+                  unoptimized
                 />
                 <div className="absolute inset-0 ring-1 ring-inset ring-orange-500/30 rounded-3xl pointer-events-none" />
               </div>
 
-              <motion.div
+              <m.div
                 className="absolute -inset-4 bg-gradient-to-r from-orange-600/30 via-orange-500/30 to-orange-600/30 rounded-3xl blur-3xl -z-10"
                 animate={{
                   opacity: [0.5, 0.8, 0.5],
@@ -1326,8 +1375,8 @@ export default function Home() {
                   ease: "easeInOut",
                 }}
               />
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -1337,5 +1386,6 @@ export default function Home() {
         onClose={() => setShowRegistrationPopup(false)} 
       />
     </div>
+    </LazyMotion>
   )
 }

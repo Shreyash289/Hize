@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useMemo } from "react"
 import Image from "next/image"
-import { motion } from "framer-motion"
+import { LazyMotion, domAnimation, m } from "framer-motion"
 import { X, Calendar, Clock } from "lucide-react"
 import { shouldReduceAnimations, isMobile } from "@/lib/mobileOptimization"
 
@@ -146,11 +146,12 @@ export default function EnhancedCountdown() {
   }, [])
 
   return (
+    <LazyMotion features={domAnimation} strict>
     <>
       {/* Modern Countdown Timer */}
       <div className="relative w-full py-6 sm:py-8 md:py-10 lg:py-12">
         <div className="mx-auto max-w-6xl px-3 sm:px-4 md:px-6">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -158,7 +159,7 @@ export default function EnhancedCountdown() {
           >
             {/* Countdown Header */}
             <div className="text-center mb-4 sm:mb-6 md:mb-8 lg:mb-10">
-              <motion.div
+              <m.div
                 className="inline-flex items-center gap-1.5 sm:gap-2 md:gap-3 px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-3 rounded-full bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-400/30 backdrop-blur-sm mb-3 sm:mb-4"
                 animate={reducedMotion || mobile ? {} : { 
                   boxShadow: [
@@ -174,7 +175,7 @@ export default function EnhancedCountdown() {
                   Event Countdown
                 </span>
                 <Clock className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 text-orange-400" />
-              </motion.div>
+              </m.div>
               
               <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold bg-gradient-to-r from-orange-400 via-orange-300 to-orange-500 bg-clip-text text-transparent mb-2 px-2">
                 Time Until HIZE 2026
@@ -187,7 +188,7 @@ export default function EnhancedCountdown() {
             {/* Countdown Display */}
             <div className="relative p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-black/80 via-zinc-900/90 to-black/80 backdrop-blur-2xl border border-orange-500/30 shadow-2xl">
               {/* Animated background gradient - simplified for mobile */}
-              <motion.div
+              <m.div
                 className="absolute -inset-[1px] rounded-2xl sm:rounded-3xl bg-gradient-to-r from-orange-500 via-pink-500 to-orange-400 opacity-30"
                 animate={reducedMotion || mobile ? {} : {
                   opacity: [0.2, 0.3, 0.2],
@@ -206,7 +207,7 @@ export default function EnhancedCountdown() {
                   { label: 'Minutes', value: timeLeft.minutes, color: 'from-pink-500 to-orange-500' },
                   { label: 'Seconds', value: timeLeft.seconds, color: 'from-orange-600 to-orange-400' }
                 ].map((item, index) => (
-                  <motion.div
+                  <m.div
                     key={item.label}
                     className="text-center"
                     initial={{ opacity: 0, y: 20 }}
@@ -214,7 +215,7 @@ export default function EnhancedCountdown() {
                     transition={{ delay: index * 0.1, duration: 0.6 }}
                   >
                     <div className="relative mb-2 sm:mb-3 md:mb-4">
-                      <motion.div
+                      <m.div
                         className={`relative p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 rounded-xl sm:rounded-2xl bg-gradient-to-br ${item.color} shadow-lg`}
                         animate={reducedMotion || mobile ? {} : (item.label === 'Seconds' ? {
                           scale: [1, 1.02, 1],
@@ -225,7 +226,7 @@ export default function EnhancedCountdown() {
                           ease: "linear"
                         } : {})}
                       >
-                        <motion.span
+                        <m.span
                           key={item.value}
                           className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black text-white block leading-none"
                           initial={reducedMotion ? { opacity: 1 } : { scale: 1.1, opacity: 0 }}
@@ -233,11 +234,11 @@ export default function EnhancedCountdown() {
                           transition={{ duration: reducedMotion ? 0.1 : 0.2 }}
                         >
                           {String(item.value).padStart(2, '0')}
-                        </motion.span>
+                        </m.span>
                         
                         {/* Shine effect */}
                         <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] animate-pulse" />
-                      </motion.div>
+                      </m.div>
                       
                       {/* Glow effect */}
                       <div className={`absolute -inset-1 sm:-inset-2 rounded-xl sm:rounded-2xl bg-gradient-to-br ${item.color} blur-lg sm:blur-xl opacity-30 -z-10`} />
@@ -246,12 +247,12 @@ export default function EnhancedCountdown() {
                     <p className="text-xs sm:text-sm md:text-base lg:text-lg font-bold text-orange-200 uppercase tracking-wider">
                       {item.label}
                     </p>
-                  </motion.div>
+                  </m.div>
                 ))}
               </div>
 
               {/* Event details */}
-              <motion.div
+              <m.div
                 className="mt-4 sm:mt-6 md:mt-8 pt-4 sm:pt-6 md:pt-8 border-t border-orange-500/20 text-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -271,9 +272,9 @@ export default function EnhancedCountdown() {
                     <span>Expert Speakers</span>
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </div>
 
@@ -287,7 +288,7 @@ export default function EnhancedCountdown() {
         <div className="mx-auto max-w-6xl px-3 sm:px-4 md:px-6">
           <div className="relative mx-auto w-full max-w-[280px] sm:max-w-[400px] md:max-w-[600px] lg:max-w-[800px] xl:max-w-[900px] aspect-square overflow-hidden rounded-2xl sm:rounded-3xl border border-orange-500/20 bg-black will-change-transform">
             {posters.map((src, i) => (
-              <motion.div
+              <m.div
                 key={src}
                 className="absolute inset-0"
                 style={{ willChange: "opacity" }}
@@ -307,7 +308,7 @@ export default function EnhancedCountdown() {
                   style={{ objectFit: "contain" }}
                   unoptimized
                 />
-              </motion.div>
+              </m.div>
             ))}
 
             <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/50 via-transparent to-black/20" />
@@ -347,7 +348,7 @@ export default function EnhancedCountdown() {
 
       {/* Lightbox */}
       {lightboxImage && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -362,7 +363,7 @@ export default function EnhancedCountdown() {
             <X className="w-6 h-6 text-white" />
           </button>
 
-          <motion.div
+          <m.div
             initial={{ scale: 0.98, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.98, opacity: 0 }}
@@ -378,9 +379,10 @@ export default function EnhancedCountdown() {
               />
               <div className="absolute inset-0 ring-1 ring-inset ring-orange-500/30 rounded-3xl pointer-events-none" />
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </>
+    </LazyMotion>
   )
 }
