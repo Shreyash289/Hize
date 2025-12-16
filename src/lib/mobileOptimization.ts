@@ -1,124 +1,200 @@
-// Mobile performance optimization utilities
+/* =========================================================
+   Mobile Performance Optimization Utilities (FINAL)
+   Safe for Android, iOS, Next.js, Framer Motion
+   ========================================================= */
 
-export const isMobile = () => {
-  if (typeof window === 'undefined') return false;
-  return window.innerWidth < 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-};
+type DeviceInfo = {
+  isMobile: boolean
+  isLowEnd: boolean
+  reduceMotion: boolean
+}
 
-export const isLowEndDevice = () => {
-  if (typeof navigator === 'undefined') return false;
-  
-  // Check for low-end device indicators
-  const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
-  const isSlowConnection = connection && (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g');
-  const isLowMemory = (navigator as any).deviceMemory && (navigator as any).deviceMemory < 4;
-  const isLowConcurrency = navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4;
-  
-  return isSlowConnection || isLowMemory || isLowConcurrency;
-};
+let cachedDeviceInfo: DeviceInfo | null = null
 
-export const shouldReduceAnimations = () => {
-  if (typeof window === 'undefined') return false;
-  
-  // Check for reduced motion preference
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  
-  return prefersReducedMotion || isMobile() || isLowEndDevice();
-};
+/* -------------------------------
+   Device capability detection
+-------------------------------- */
+const computeDeviceInfo = (): DeviceInfo => {
+  if (typeof window === "undefined" || typeof navigator === "undefined") {
+    return { isMobile: false, isLowEnd: false, reduceMotion: false }
+  }
 
+  const ua = navigator.userAgent
+
+  const isMobile =
+    window.matchMedia("(max-width: 768px)").matches ||
+    /Android|iPhone|iPad|iPod/i.test(ua)
+
+  const connection = (navigator as any).connection
+  const slowConnection =
+    connection?.effectiveType === "2g" ||
+    connection?.effectiveType === "slow-2g"
+
+  const lowMemory =
+    (navigator as any).deviceMemory !== undefined &&
+    (navigator as any).deviceMemory <= 3
+
+  const lowCPU =
+    navigator.hardwareConcurrency !== undefined &&
+    navigator.hardwareConcurrency <= 4
+
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches
+
+  return {
+    isMobile,
+    isLowEnd: slowConnection || lowMemory || lowCPU,
+    reduceMotion: prefersReducedMotion || isMobile || lowMemory,
+  }
+}
+
+const getDeviceInfo = (): DeviceInfo => {
+  if (!cachedDeviceInfo) {
+    cachedDeviceInfo = computeDeviceInfo()
+  }
+  return cachedDeviceInfo
+}
+
+/* -------------------------------
+   Public helpers
+-------------------------------- */
+export const isMobile = () => getDeviceInfo().isMobile
+
+export const isLowEndDevice = () => getDeviceInfo().isLowEnd
+
+export const shouldReduceAnimations = () =>
+  getDeviceInfo().reduceMotion
+
+/* -------------------------------
+   Animation configuration
+-------------------------------- */
 export const getOptimizedAnimationConfig = () => {
-  const shouldReduce = shouldReduceAnimations();
-  
-  return {
-    duration: shouldReduce ? 0.1 : 0.6,
-    ease: shouldReduce ? "linear" : "easeOut",
-    stagger: shouldReduce ? 0.01 : 0.1,
-    scale: shouldReduce ? 1 : 1.05,
-    y: shouldReduce ? 0 : 20,
-    opacity: shouldReduce ? 1 : [0, 1],
-  };
-};
+  const reduce = shouldReduceAnimations()
 
+  if (reduce) {
+    return {
+      duration: 0.12,
+      ease: "linear",
+      stagger: 0,
+      useTransform: false,
+    }
+  }
+
+  return {
+    duration: 0.5,
+    ease: "easeOut",
+    stagger: 0.08,
+    useTransform: true,
+  }
+}
+
+/* -------------------------------
+   Framer Motion variants
+-------------------------------- */
 export const getMobileOptimizedVariants = () => {
-  const config = getOptimizedAnimationConfig();
-  
+  const reduce = shouldReduceAnimations()
+  const config = getOptimizedAnimationConfig()
+
+  // Low-end / mobile: opacity only (GPU-safe)
+  if (reduce) {
+    return {
+      hidden: { opacity: 0.99 },
+      visible: {
+        opacity: 1,
+        transition: { duration: config.duration },
+      },
+    }
+  }
+
+  // Normal devices
   return {
-    hidden: { 
-      opacity: config.opacity === 1 ? 1 : 0, 
-      y: config.y,
-      scale: 1
+    hidden: { opacity: 0, y: 16 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: config.duration,
+        ease: config.ease,
+      },
     },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      scale: 1,
-      transition: { 
-        duration: config.duration, 
-        ease: config.ease 
-      }
-    },
-    hover: shouldReduceAnimations() ? {} : {
-      scale: config.scale,
+    hover: {
       y: -4,
-      transition: { duration: 0.2 }
-    }
-  };
-};
+      transition: { duration: 0.15 },
+    },
+  }
+}
 
-// Intersection Observer with mobile optimizations
-export const createOptimizedObserver = (callback: IntersectionObserverCallback) => {
-  const options: IntersectionObserverInit = {
-    threshold: isMobile() ? 0.1 : 0.3, // Lower threshold for mobile
-    rootMargin: isMobile() ? '50px' : '100px', // Smaller margin for mobile
-  };
-  
-  return new IntersectionObserver(callback, options);
-};
+/* -------------------------------
+   IntersectionObserver (singleton)
+-------------------------------- */
+let sharedObserver: IntersectionObserver | null = null
 
-// Debounced scroll handler for mobile
-export const createMobileScrollHandler = (handler: () => void, delay = 16) => {
-  let timeoutId: NodeJS.Timeout;
-  let lastCall = 0;
-  
+export const getOptimizedObserver = (
+  callback: IntersectionObserverCallback
+) => {
+  if (typeof window === "undefined") return null
+
+  if (!sharedObserver) {
+    const mobile = isMobile()
+
+    sharedObserver = new IntersectionObserver(callback, {
+      threshold: mobile ? 0.05 : 0.25,
+      rootMargin: mobile ? "40px" : "120px",
+    })
+  }
+
+  return sharedObserver
+}
+
+/* -------------------------------
+   Scroll handler (RAF based)
+-------------------------------- */
+export const createMobileScrollHandler = (handler: () => void) => {
+  let ticking = false
+
   return () => {
-    const now = Date.now();
-    
-    if (now - lastCall >= delay) {
-      handler();
-      lastCall = now;
-    } else {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        handler();
-        lastCall = Date.now();
-      }, delay);
-    }
-  };
-};
+    if (ticking) return
 
-// Performance monitoring
+    ticking = true
+    requestAnimationFrame(() => {
+      handler()
+      ticking = false
+    })
+  }
+}
+
+/* -------------------------------
+   Performance measurement (DEV)
+-------------------------------- */
 export const measurePerformance = (name: string, fn: () => void) => {
-  if (typeof performance === 'undefined') {
-    fn();
-    return;
+  if (
+    typeof performance === "undefined" ||
+    process.env.NODE_ENV === "production"
+  ) {
+    fn()
+    return
   }
-  
-  const start = performance.now();
-  fn();
-  const end = performance.now();
-  
-  if (end - start > 16) { // More than one frame
-    console.warn(`Performance warning: ${name} took ${end - start}ms`);
-  }
-};
 
+  const start = performance.now()
+  fn()
+  const duration = performance.now() - start
+
+  if (duration > 16) {
+    console.warn(`[perf] ${name}: ${duration.toFixed(2)}ms`)
+  }
+}
+
+/* -------------------------------
+   Default export
+-------------------------------- */
 export default {
   isMobile,
   isLowEndDevice,
   shouldReduceAnimations,
   getOptimizedAnimationConfig,
   getMobileOptimizedVariants,
-  createOptimizedObserver,
+  getOptimizedObserver,
   createMobileScrollHandler,
   measurePerformance,
-};
+}
