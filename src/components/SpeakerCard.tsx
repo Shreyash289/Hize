@@ -2,7 +2,6 @@
 
 import { memo } from "react"
 import { motion } from "framer-motion"
-import { FaLinkedin } from 'react-icons/fa'
 
 export interface Speaker {
   name: string
@@ -73,18 +72,6 @@ function SpeakerCard({
                 {speaker.name}
               </h3>
             </div>
-            {speaker.social?.linkedin && (
-              <a 
-                href={speaker.social.linkedin} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-blue-400 hover:text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-400 rounded-full flex-shrink-0 transition-all duration-300 hover:scale-110 mt-0.5" 
-                aria-label={`LinkedIn profile of ${speaker.name}`} 
-                onClick={e => e.stopPropagation()}
-              >
-                <FaLinkedin className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 drop-shadow-lg" />
-              </a>
-            )}
           </div>
           {speaker.title && (
             <p className="text-xs sm:text-sm md:text-base text-gray-300 group-hover:text-gray-200 mb-1 font-medium transition-colors duration-300 leading-tight">

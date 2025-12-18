@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Unstop",
+    "logo": "/partners/unstop.svg",
+    "url": "unstop.com"
+  },
+  {
+    "name": "SRM Institute of Science and Technology",
+    "logo": "/partners/srmlogo.png",
+    "url": "https://www.srmist.edu.in/"
+  },
+  {
+    "name": "Partner 3",
+    "logo": "/partners/partner3.png",
+    "url": ""
+  },
+  {
+    "name": "Partner 4",
+    "logo": "/partners/partner4.png",
+    "url": ""
+  },
+  {
+    "name": "Partner 5",
+    "logo": "/partners/partner5.png",
+    "url": ""
+  },
+  {
+    "name": "Partner 6",
+    "logo": "/partners/partner6.png",
+    "url": ""
+  },
+  {
+    "name": "Partner 7",
+    "logo": "/partners/partner7.png",
+    "url": ""
+  }
+]
+
