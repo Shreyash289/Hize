@@ -19,5 +19,33 @@
     "image": "guest/gambhir.jpg",
     "bio": "Founder & technology leader focused on scalable infra.",
     "social": { "linkedin": "https://www.linkedin.com/in/abhinavgambhir/" }
+  },
+  {
+    "name": "Rishabh R.",
+    "title": "Consultant | Node.js & React Full-Stack | AWS & Microservices | Client-Facing | Solution Architect | Tech Lead | 28 Patents | 321 Sessions",
+    "image": "guest/rishabh.jpg",
+    "bio": "Consultant at Cubastion Consulting specializing in Node.js & React Full-Stack development, AWS & Microservices architecture. Solution Architect and Tech Lead with 28 patents and 321 sessions.",
+    "social": {}
+  },
+  {
+    "name": "Palak Awasthi",
+    "title": "Engineering @Salesforce | 100K+ @LinkedIn | Women Techmakers Ambassador @Google | Mentor | Tech Speaker | Hackathons Judge",
+    "image": "guest/palak.jpg",
+    "bio": "Engineering professional at Salesforce with 100K+ LinkedIn followers. Women Techmakers Ambassador at Google, Mentor, Tech Speaker, and Hackathons Judge. Talks about DSA, Career Growth, AI/ML, and Hiring.",
+    "social": {}
+  },
+  {
+    "name": "Kshitij Jaisawl",
+    "title": "SWE @Google | Ex-Amazon, GoldmanSachs",
+    "image": "guest/kshitij.jpg",
+    "bio": "Software Engineer at Google with previous experience at Amazon and Goldman Sachs.",
+    "social": {}
+  },
+  {
+    "name": "Piyush Sharma",
+    "title": "Google Cloud Ready Facilitator",
+    "image": "guest/piyush.jpg",
+    "bio": "Google Cloud Ready Facilitator at Google Cloud Community India.",
+    "social": {}
   }
 ]

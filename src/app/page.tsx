@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from 'next/link'
 import { Code2, Lightbulb, Mic2, Mail, Phone, ArrowDown, ChevronUp, X, FileText } from "lucide-react"
-import { FaLinkedin, FaTwitter } from 'react-icons/fa'
+import { FaTwitter } from 'react-icons/fa'
 import Image from "next/image"
 import dynamic from "next/dynamic"
 import facultyContacts from "@/lib/facultyContacts"
@@ -45,6 +45,11 @@ const MagneticCursor = dynamic(() => import("@/components/MagneticCursor"), {
 const Marquee = dynamic(() => import("react-fast-marquee").then(mod => ({ default: mod.default })), {
   ssr: false,
   loading: () => <div className="h-16 bg-gradient-to-r from-orange-600/5 to-orange-400/5 rounded-lg"></div>
+})
+
+const PartnersMarquee = dynamic(() => import("@/components/PartnersMarquee"), {
+  ssr: false,
+  loading: () => <div className="h-32 bg-white"></div>
 })
 
 const SpeakerCard = dynamic(() => import('@/components/SpeakerCard'), {
@@ -842,34 +847,19 @@ export default function Home() {
                       )}
 
                       {/* Social Links */}
-                      {(selectedSpeaker.social?.linkedin || selectedSpeaker.social?.x) && (
+                      {selectedSpeaker.social?.x && (
                         <div className="flex items-center justify-center lg:justify-start gap-4 pt-4">
-                          {selectedSpeaker.social?.linkedin && (
-                            <motion.a
-                              href={selectedSpeaker.social.linkedin}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                            >
-                              <FaLinkedin className="w-5 h-5" />
-                              <span>LinkedIn</span>
-                            </motion.a>
-                          )}
-                          {selectedSpeaker.social?.x && (
-                            <motion.a
-                              href={selectedSpeaker.social.x}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-gray-800 to-black text-white font-semibold shadow-lg hover:shadow-gray-500/25 transition-all duration-300"
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                            >
-                              <FaTwitter className="w-5 h-5" />
-                              <span>X (Twitter)</span>
-                            </motion.a>
-                          )}
+                          <motion.a
+                            href={selectedSpeaker.social.x}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-gray-800 to-black text-white font-semibold shadow-lg hover:shadow-gray-500/25 transition-all duration-300"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <FaTwitter className="w-5 h-5" />
+                            <span>X (Twitter)</span>
+                          </motion.a>
                         </div>
                       )}
                     </motion.div>
@@ -903,38 +893,13 @@ export default function Home() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="relative p-6 sm:p-8 md:p-10 lg:p-12 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20"
+            className="relative overflow-hidden rounded-2xl md:rounded-3xl"
           >
-            <div className="text-center space-y-6 sm:space-y-7 md:space-y-8">
-              <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold px-4">
-                SRM Institute of Science & Technology
-              </h3>
-              <p className="text-sm sm:text-base md:text-lg text-slate-400 font-mono px-4">
-                Kattankulathur, Tamil Nadu, Chengalpattu, 603203, India
-              </p>
-
-              <div className="pt-4 sm:pt-6 md:pt-8">
-                <Marquee speed={40} gradient={false} pauseOnHover={true}>
-                  {["IEEE Computer Society", "SYP Activities", "School of Computing", "CTECH"].map((partner) => (
-                    <motion.div
-                      key={partner}
-                      whileHover={{ scale: 1.05 }}
-                      className="mx-4 sm:mx-6 md:mx-8 px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-lg md:rounded-xl bg-gradient-to-r from-orange-500/20 to-orange-400/20 backdrop-blur-sm border border-orange-500/30"
-                    >
-                      <p className="font-bold text-base sm:text-lg md:text-xl whitespace-nowrap">{partner}</p>
-                    </motion.div>
-                  ))}
-                </Marquee>
-              </div>
-            </div>
-
-            <motion.div
-              className="absolute -inset-[1px] bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 rounded-3xl opacity-20 blur-2xl -z-10"
-            />
+            <PartnersMarquee />
           </motion.div>
         </div>
       </section>
