@@ -1,5 +1,12 @@
 [
   {
+    "name": "Abhinav Gambhir",
+    "title": "Associate Director, Oracle",
+    "image": "guest/gambhir.jpg",
+    "bio": "Founder & technology leader focused on scalable infra.",
+    "social": { "linkedin": "https://www.linkedin.com/in/abhinavgambhir/" }
+  },
+  {
     "name": "Shivam Shivam",
     "title": "AI Architect, ZS Associates",
     "image": "guest/shivam.jpg",
@@ -10,35 +17,49 @@
     "name": "Mohan H.R",
     "title": "Chair - Events, IEEE Computer Society, India Council",
     "image": "guest/hrmohan.jpg",
-    "bio": "Mr. H. R. Mohan is a veteran ICT consultant and former technology leader at The Hindu, renowned for pioneering India’s first online newspaper and contributing over four decades of service to global computing societies.",
+    "bio": "Mr. H. R. Mohan is a veteran ICT consultant and former technology leader at The Hindu, renowned for pioneering India's first online newspaper and contributing over four decades of service to global computing societies.",
     "social": { "linkedin": "https://www.linkedin.com/in/hr-mohan/" }
   },
   {
-    "name": "Abhinav Gambhir",
-    "title": "Associate Director, Oracle",
-    "image": "guest/gambhir.jpg",
-    "bio": "Founder & technology leader focused on scalable infra.",
-    "social": { "linkedin": "https://www.linkedin.com/in/abhinavgambhir/" }
+    "name": "Vandana Chauhan",
+    "title": "Staff Software Engineer, Palo Alto Networks",
+    "image": "guest/vandana.jpg",
+    "bio": "Staff Software Engineer at Palo Alto Networks, specializing in cutting-edge cybersecurity solutions and software engineering excellence.",
+    "social": {}
   },
   {
-    "name": "Rishabh R.",
-    "title": "Consultant | Node.js & React Full-Stack | AWS & Microservices | Client-Facing | Solution Architect | Tech Lead | 28 Patents | 321 Sessions",
-    "image": "guest/rishabh.jpg",
-    "bio": "Consultant at Cubastion Consulting specializing in Node.js & React Full-Stack development, AWS & Microservices architecture. Solution Architect and Tech Lead with 28 patents and 321 sessions.",
+    "name": "Kshitij Jaiswal",
+    "title": "Software Engineer, Google",
+    "image": "guest/kshitij.jpg",
+    "bio": "Software Engineer at Google, working on innovative solutions and cutting-edge technology.",
+    "social": {}
+  },
+  {
+    "name": "Shaurya Mishra",
+    "title": "Co-Lead, IEEE CS SYP High Impact Zonal Events",
+    "image": "guest/shaurya.jpg",
+    "bio": "Co-Lead of IEEE CS SYP High Impact Zonal Events, driving impactful technical events and community engagement.",
+    "social": {}
+  },
+  {
+    "name": "Atul Kumar Rao",
+    "title": "Co-Lead, IEEE CS SYP High Impact Zonal Events",
+    "image": "guest/atul.jpg",
+    "bio": "Co-Lead of IEEE CS SYP High Impact Zonal Events, dedicated to organizing high-impact technical events and fostering innovation.",
     "social": {}
   },
   {
     "name": "Palak Awasthi",
-    "title": "Engineering @Salesforce | 100K+ @LinkedIn | Women Techmakers Ambassador @Google | Mentor | Tech Speaker | Hackathons Judge",
+    "title": "Software Engineering MTS, Salesforce",
     "image": "guest/palak.jpg",
-    "bio": "Engineering professional at Salesforce with 100K+ LinkedIn followers. Women Techmakers Ambassador at Google, Mentor, Tech Speaker, and Hackathons Judge. Talks about DSA, Career Growth, AI/ML, and Hiring.",
+    "bio": "Software Engineering MTS at Salesforce, specializing in enterprise software solutions and cloud technologies.",
     "social": {}
   },
   {
-    "name": "Kshitij Jaisawl",
-    "title": "SWE @Google | Ex-Amazon, GoldmanSachs",
-    "image": "guest/kshitij.jpg",
-    "bio": "Software Engineer at Google with previous experience at Amazon and Goldman Sachs.",
+    "name": "Rishabh Raj",
+    "title": "Senior Software Engineer, Cubastion",
+    "image": "guest/rishabh.jpg",
+    "bio": "Senior Software Engineer at Cubastion with expertise in full-stack development. Has filed 28 patents, demonstrating innovation and technical excellence.",
     "social": {}
   },
   {
