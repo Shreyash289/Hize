@@ -10,6 +10,7 @@ import dynamic from "next/dynamic"
 import facultyContacts from "@/lib/facultyContacts"
 import { isMobile, shouldReduceAnimations, getMobileOptimizedVariants } from "@/lib/mobileOptimization"
 import RegistrationPopup from "@/components/RegistrationPopup"
+import EarlybirdNotification from "@/components/EarlybirdNotification"
 
 // Conditionally load heavy components based on device capabilities
 const LoadingScreen = dynamic(() => import("@/components/LoadingScreen"), {
@@ -164,6 +165,19 @@ export default function Home() {
   const [selectedDomain, setSelectedDomain] = useState<DomainTeam | null>(null)
   const [infoTab, setInfoTab] = useState<"map" | "previous">("map")
   const [showRegistrationPopup, setShowRegistrationPopup] = useState(false)
+  const [hasAutoOpened, setHasAutoOpened] = useState(false)
+
+  // Auto-open registration popup after 4 seconds (only once)
+  useEffect(() => {
+    if (hasAutoOpened || !loadingComplete) return
+
+    const timer = setTimeout(() => {
+      setShowRegistrationPopup(true)
+      setHasAutoOpened(true)
+    }, 4000) // 4 seconds
+
+    return () => clearTimeout(timer)
+  }, [loadingComplete, hasAutoOpened])
 
   useEffect(() => {
     let mounted = true
@@ -1321,6 +1335,9 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* EARLYBIRD Notification */}
+      <EarlybirdNotification onRegisterClick={() => setShowRegistrationPopup(true)} />
 
       {/* Registration Popup */}
       <RegistrationPopup 
