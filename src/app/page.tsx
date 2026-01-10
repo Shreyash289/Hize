@@ -10,7 +10,6 @@ import dynamic from "next/dynamic"
 import facultyContacts from "@/lib/facultyContacts"
 import { isMobile, shouldReduceAnimations, getMobileOptimizedVariants } from "@/lib/mobileOptimization"
 import RegistrationPopup from "@/components/RegistrationPopup"
-import EarlybirdNotification from "@/components/EarlybirdNotification"
 
 // Conditionally load heavy components based on device capabilities
 const LoadingScreen = dynamic(() => import("@/components/LoadingScreen"), {
@@ -1335,9 +1334,6 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* EARLYBIRD Notification */}
-      <EarlybirdNotification onRegisterClick={() => setShowRegistrationPopup(true)} />
 
       {/* Registration Popup */}
       <RegistrationPopup 

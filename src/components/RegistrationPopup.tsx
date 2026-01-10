@@ -15,47 +15,10 @@ import Image from "next/image";
 /* -------------------------------
    Types
 -------------------------------- */
-interface PricingOption {
-  id: string;
-  label: string;
-  basePrice: number;
-  url: string;
-}
-
 interface RegistrationPopupProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
-/* -------------------------------
-   Constants
--------------------------------- */
-const PRICING_OPTIONS: PricingOption[] = [
-  {
-    id: "srm-ieee",
-    label: "IEEE Member (SRM Student)",
-    basePrice: 199,
-    url: "https://konfhub.com/high-impact-zonal-event-2026",
-  },
-  {
-    id: "srm-non-ieee",
-    label: "Non-IEEE Member + SRM Student",
-    basePrice: 299,
-    url: "https://konfhub.com/high-impact-zonal-event-2026",
-  },
-  {
-    id: "non-srm-ieee",
-    label: "IEEE Member (Non-SRM Student)",
-    basePrice: 299,
-    url: "https://konfhub.com/high-impact-zonal-event-2026",
-  },
-  {
-    id: "non-srm-non-ieee",
-    label: "Non-IEEE Member (Non-SRM...)",
-    basePrice: 399,
-    url: "https://konfhub.com/high-impact-zonal-event-2026",
-  },
-];
 
 /* -------------------------------
    Animation Variants
@@ -125,6 +88,38 @@ export default function RegistrationPopup({
 }: RegistrationPopupProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [includeGoodies, setIncludeGoodies] = useState(false);
+  const [isIEEEMember, setIsIEEEMember] = useState(false);
+  const [ieeeNumber, setIeeeNumber] = useState("");
+  const [isSRMStudent, setIsSRMStudent] = useState(false);
+
+  // Calculate price based on selections
+  const calculatePrice = () => {
+    let basePrice = 0;
+    
+    if (isIEEEMember && isSRMStudent) {
+      basePrice = 99;
+    } else if (!isIEEEMember && isSRMStudent) {
+      basePrice = 149;
+    } else if (isIEEEMember && !isSRMStudent) {
+      basePrice = 149;
+    } else {
+      basePrice = 199;
+    }
+    
+    return basePrice + (includeGoodies ? 400 : 0);
+  };
+
+  const getPriceLabel = () => {
+    if (isIEEEMember && isSRMStudent) {
+      return "IEEE Member + SRM Student";
+    } else if (!isIEEEMember && isSRMStudent) {
+      return "Non-IEEE Member + SRM Student";
+    } else if (isIEEEMember && !isSRMStudent) {
+      return "IEEE Member + Non-SRM Student";
+    } else {
+      return "Non-IEEE Member + Non-SRM Student";
+    }
+  };
 
   // Detect mobile
   useEffect(() => {
@@ -252,110 +247,170 @@ export default function RegistrationPopup({
                     id="registration-title"
                     className="text-3xl font-bold text-[#FACC15] mb-2"
                   >
-                    Event Tickets
+                    Event Registration
                   </h3>
                   <p className="text-gray-400 text-sm">
-                    Jan 6 - Jan 28, 2026 • Choose your ticket category
+                    Jan 6 - Jan 28, 2026 • Configure your registration
                   </p>
-                  {/* EARLYBIRD Discount Banner */}
-                  <div className="mt-4 p-3 rounded-lg bg-gradient-to-r from-green-600/20 to-green-400/20 border border-green-500/30">
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="h-4 w-4 text-green-400" />
-                      <span className="text-green-400 font-bold text-sm">
-                        15% OFF FOR EARLYBIRDS!
-                      </span>
-                    </div>
-                    <p className="text-green-300 text-xs mt-1">
-                      Use Coupon Code <span className="font-bold text-green-200 bg-green-900/30 px-2 py-0.5 rounded">"EARLYBIRD"</span> to Avail EarlyBird offers
-                    </p>
-                  </div>
                 </div>
 
-                {/* Goodies Toggle */}
-                <motion.div
-                  variants={cardVariants}
-                  initial="hidden"
-                  animate="visible"
-                  className="mb-6 p-4 rounded-xl border border-[#FACC15]/30 bg-black/50"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Sparkles className="h-5 w-5 text-[#FACC15]" />
-                      <div>
-                        <span className="text-white font-semibold block">
-                          Include Goodies
-                        </span>
-                        <span className="text-gray-400 text-sm">
-                          Event swag & exclusive merchandise (+₹400)
-                        </span>
-                        <div className="flex items-center gap-1 mt-1">
-                          <span className="text-green-400 text-xs font-semibold">
-                            ⭐ EARLYBIRD OFFER VALID
+                {/* Registration Form */}
+                <div className="space-y-6 mb-8">
+                  {/* Goodies Toggle */}
+                  <motion.div
+                    variants={cardVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="p-4 rounded-xl border border-[#FACC15]/30 bg-black/50"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Sparkles className="h-5 w-5 text-[#FACC15]" />
+                        <div>
+                          <span className="text-white font-semibold block">
+                            Include Goodies
+                          </span>
+                          <span className="text-gray-400 text-sm">
+                            Event swag & exclusive merchandise (+₹400)
                           </span>
                         </div>
                       </div>
-                    </div>
-                    <button
-                      onClick={() => setIncludeGoodies(!includeGoodies)}
-                      className={`relative w-14 h-7 rounded-full transition-all ${includeGoodies
-                        ? "bg-gradient-to-r from-[#FACC15] to-[#F97316]"
-                        : "bg-gray-700"
-                        }`}
-                      aria-label="Toggle goodies"
-                    >
-                      <div
-                        className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform ${includeGoodies ? "translate-x-7" : "translate-x-0"
+                      <button
+                        onClick={() => setIncludeGoodies(!includeGoodies)}
+                        className={`relative w-14 h-7 rounded-full transition-all ${includeGoodies
+                          ? "bg-gradient-to-r from-[#FACC15] to-[#F97316]"
+                          : "bg-gray-700"
                           }`}
-                      />
-                    </button>
-                  </div>
-                </motion.div>
-
-                {/* Ticket Options */}
-                <div className="mb-8">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
-                    <h4 className="text-white font-semibold">
-                      {includeGoodies ? "With Goodies" : "Base Tickets"}
-                    </h4>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {PRICING_OPTIONS.map((option, index) => (
-                      <motion.div
-                        key={option.id}
-                        variants={cardVariants}
-                        initial="hidden"
-                        animate="visible"
-                        transition={{ delay: index * 0.1 }}
-                        className="p-4 rounded-xl border border-[#FACC15]/30 bg-black/50 hover:border-[#FACC15]/50 transition-all"
+                        aria-label="Toggle goodies"
                       >
-                        <div className="flex items-start justify-between mb-3">
-                          <span className="text-white font-semibold text-sm">
-                            {option.label}
+                        <div
+                          className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform ${includeGoodies ? "translate-x-7" : "translate-x-0"
+                            }`}
+                        />
+                      </button>
+                    </div>
+                  </motion.div>
+
+                  {/* IEEE Member Toggle */}
+                  <motion.div
+                    variants={cardVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="p-4 rounded-xl border border-[#FACC15]/30 bg-black/50"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="h-5 w-5 rounded bg-blue-500 flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">IEEE</span>
+                        </div>
+                        <div>
+                          <span className="text-white font-semibold block">
+                            IEEE Member
+                          </span>
+                          <span className="text-gray-400 text-sm">
+                            Are you an IEEE member?
                           </span>
                         </div>
-
-                        <div className="flex items-center gap-2 text-gray-400 text-xs mb-3">
-                          <Calendar className="h-3 w-3" />
-                          <span>Jan 6 - Jan 28, 2026</span>
-                        </div>
-
-                        <div className="flex items-start justify-between align-top">
-                          <div className="text-gray-400 text-xs flex-shrink-0">
-                            {includeGoodies && (
-                              <div className="space-y-0.5">
-                                <div>Base: ₹{option.basePrice}</div>
-                                <div>Goodies: +₹400</div>
-                              </div>
-                            )}
-                          </div>
-                          <span className="text-[#FACC15] font-bold text-lg text-right ml-2">
-                            ₹{option.basePrice + (includeGoodies ? 400 : 0)}
-                          </span>
-                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setIsIEEEMember(!isIEEEMember);
+                          if (!isIEEEMember) setIeeeNumber("");
+                        }}
+                        className={`relative w-14 h-7 rounded-full transition-all ${isIEEEMember
+                          ? "bg-gradient-to-r from-[#FACC15] to-[#F97316]"
+                          : "bg-gray-700"
+                          }`}
+                        aria-label="Toggle IEEE membership"
+                      >
+                        <div
+                          className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform ${isIEEEMember ? "translate-x-7" : "translate-x-0"
+                            }`}
+                        />
+                      </button>
+                    </div>
+                    
+                    {/* IEEE Number Input */}
+                    {isIEEEMember && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mt-3"
+                      >
+                        <input
+                          type="text"
+                          placeholder="Enter IEEE Member Number"
+                          value={ieeeNumber}
+                          onChange={(e) => setIeeeNumber(e.target.value)}
+                          className="w-full px-3 py-2 bg-black/70 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-[#FACC15] focus:outline-none transition-colors"
+                        />
                       </motion.div>
-                    ))}
+                    )}
+                  </motion.div>
+
+                  {/* SRM Student Toggle */}
+                  <motion.div
+                    variants={cardVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="p-4 rounded-xl border border-[#FACC15]/30 bg-black/50"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-5 w-5 rounded bg-green-500 flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">SRM</span>
+                        </div>
+                        <div>
+                          <span className="text-white font-semibold block">
+                            SRM Student
+                          </span>
+                          <span className="text-gray-400 text-sm">
+                            Are you a SRM student?
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setIsSRMStudent(!isSRMStudent)}
+                        className={`relative w-14 h-7 rounded-full transition-all ${isSRMStudent
+                          ? "bg-gradient-to-r from-[#FACC15] to-[#F97316]"
+                          : "bg-gray-700"
+                          }`}
+                        aria-label="Toggle SRM student status"
+                      >
+                        <div
+                          className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform ${isSRMStudent ? "translate-x-7" : "translate-x-0"
+                            }`}
+                        />
+                      </button>
+                    </div>
+                  </motion.div>
+                </div>
+
+                {/* Price Summary */}
+                <div className="mb-8">
+                  <div className="p-6 rounded-xl border-2 border-[#FACC15]/50 bg-gradient-to-br from-[#FACC15]/10 to-[#F97316]/5">
+                    <div className="text-center">
+                      <h4 className="text-white font-semibold text-lg mb-2">
+                        {getPriceLabel()}
+                      </h4>
+                      <div className="space-y-2 text-sm text-gray-300 mb-4">
+                        <div className="flex justify-between">
+                          <span>Base Price:</span>
+                          <span>₹{calculatePrice() - (includeGoodies ? 400 : 0)}</span>
+                        </div>
+                        {includeGoodies && (
+                          <div className="flex justify-between">
+                            <span>Goodies:</span>
+                            <span>+₹400</span>
+                          </div>
+                        )}
+                        <div className="border-t border-gray-600 pt-2 flex justify-between font-bold text-lg">
+                          <span className="text-white">Total:</span>
+                          <span className="text-[#FACC15]">₹{calculatePrice()}</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -371,13 +426,6 @@ export default function RegistrationPopup({
                   Register on KonfHub
                   <ExternalLink className="inline-block ml-2 h-5 w-5" />
                 </motion.button>
-
-                {/* Coupon Code Reminder */}
-                <div className="mt-3 p-3 rounded-lg bg-gradient-to-r from-green-600/10 to-green-400/10 border border-green-500/20">
-                  <p className="text-center text-green-300 text-sm">
-                    💡 Don't forget to use coupon code <span className="font-bold text-green-200 bg-green-900/40 px-2 py-1 rounded text-xs">"EARLYBIRD"</span> at checkout
-                  </p>
-                </div>
 
                 <p className="text-center text-gray-500 text-xs mt-2">
                   Redirects to KonfHub for secure registration
@@ -422,23 +470,11 @@ export default function RegistrationPopup({
                 {/* Header */}
                 <div className="mb-6 text-center">
                   <h3 className="text-2xl font-bold text-[#FACC15] mb-2">
-                    Event Tickets
+                    Event Registration
                   </h3>
                   <p className="text-gray-400 text-sm">
-                    Jan 6 - Jan 28, 2026 • Choose your ticket category
+                    Jan 6 - Jan 28, 2026 • Configure your registration
                   </p>
-                  {/* EARLYBIRD Discount Banner */}
-                  <div className="mt-3 p-3 rounded-lg bg-gradient-to-r from-green-600/20 to-green-400/20 border border-green-500/30">
-                    <div className="flex items-center justify-center gap-2">
-                      <Sparkles className="h-4 w-4 text-green-400" />
-                      <span className="text-green-400 font-bold text-sm">
-                        15% OFF FOR EARLYBIRDS!
-                      </span>
-                    </div>
-                    <p className="text-green-300 text-xs mt-1 text-center">
-                      Use Coupon Code <span className="font-bold text-green-200 bg-green-900/30 px-2 py-0.5 rounded">"EARLYBIRD"</span> to Avail EarlyBird offers
-                    </p>
-                  </div>
                   <div className="flex items-center justify-center gap-4 mt-4 text-sm text-gray-300">
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-[#FACC15]" />
@@ -451,86 +487,148 @@ export default function RegistrationPopup({
                   </div>
                 </div>
 
-                {/* Goodies Toggle */}
-                <div className="mb-6 p-4 rounded-xl border border-[#FACC15]/30 bg-black/50">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Sparkles className="h-5 w-5 text-[#FACC15]" />
-                      <div>
-                        <span className="text-white font-semibold text-sm block">
-                          Include Goodies
-                        </span>
-                        <span className="text-gray-400 text-xs">
-                          +₹400
-                        </span>
-                        <div className="flex items-center gap-1 mt-1">
-                          <span className="text-green-400 text-xs font-semibold">
-                            ⭐ EARLYBIRD OFFER VALID
+                {/* Registration Form */}
+                <div className="space-y-4 mb-6">
+                  {/* Goodies Toggle */}
+                  <div className="p-4 rounded-xl border border-[#FACC15]/30 bg-black/50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Sparkles className="h-5 w-5 text-[#FACC15]" />
+                        <div>
+                          <span className="text-white font-semibold text-sm block">
+                            Include Goodies
+                          </span>
+                          <span className="text-gray-400 text-xs">
+                            +₹400
                           </span>
                         </div>
                       </div>
-                    </div>
-                    <button
-                      onClick={() => setIncludeGoodies(!includeGoodies)}
-                      className={`relative w-12 h-6 rounded-full transition-all touch-manipulation ${includeGoodies
-                        ? "bg-gradient-to-r from-[#FACC15] to-[#F97316]"
-                        : "bg-gray-700"
-                        }`}
-                      aria-label="Toggle goodies"
-                    >
-                      <div
-                        className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${includeGoodies ? "translate-x-5" : "translate-x-0"
+                      <button
+                        onClick={() => setIncludeGoodies(!includeGoodies)}
+                        className={`relative w-12 h-6 rounded-full transition-all touch-manipulation ${includeGoodies
+                          ? "bg-gradient-to-r from-[#FACC15] to-[#F97316]"
+                          : "bg-gray-700"
                           }`}
-                      />
-                    </button>
+                        aria-label="Toggle goodies"
+                      >
+                        <div
+                          className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${includeGoodies ? "translate-x-5" : "translate-x-0"
+                            }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* IEEE Member Toggle */}
+                  <div className="p-4 rounded-xl border border-[#FACC15]/30 bg-black/50">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="h-5 w-5 rounded bg-blue-500 flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">IEEE</span>
+                        </div>
+                        <div>
+                          <span className="text-white font-semibold text-sm block">
+                            IEEE Member
+                          </span>
+                          <span className="text-gray-400 text-xs">
+                            Are you an IEEE member?
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setIsIEEEMember(!isIEEEMember);
+                          if (!isIEEEMember) setIeeeNumber("");
+                        }}
+                        className={`relative w-12 h-6 rounded-full transition-all touch-manipulation ${isIEEEMember
+                          ? "bg-gradient-to-r from-[#FACC15] to-[#F97316]"
+                          : "bg-gray-700"
+                          }`}
+                        aria-label="Toggle IEEE membership"
+                      >
+                        <div
+                          className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${isIEEEMember ? "translate-x-5" : "translate-x-0"
+                            }`}
+                        />
+                      </button>
+                    </div>
+                    
+                    {/* IEEE Number Input */}
+                    {isIEEEMember && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mt-3"
+                      >
+                        <input
+                          type="text"
+                          placeholder="Enter IEEE Member Number"
+                          value={ieeeNumber}
+                          onChange={(e) => setIeeeNumber(e.target.value)}
+                          className="w-full px-3 py-2 bg-black/70 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-[#FACC15] focus:outline-none transition-colors text-sm"
+                        />
+                      </motion.div>
+                    )}
+                  </div>
+
+                  {/* SRM Student Toggle */}
+                  <div className="p-4 rounded-xl border border-[#FACC15]/30 bg-black/50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-5 w-5 rounded bg-green-500 flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">SRM</span>
+                        </div>
+                        <div>
+                          <span className="text-white font-semibold text-sm block">
+                            SRM Student
+                          </span>
+                          <span className="text-gray-400 text-xs">
+                            Are you a SRM student?
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setIsSRMStudent(!isSRMStudent)}
+                        className={`relative w-12 h-6 rounded-full transition-all touch-manipulation ${isSRMStudent
+                          ? "bg-gradient-to-r from-[#FACC15] to-[#F97316]"
+                          : "bg-gray-700"
+                          }`}
+                        aria-label="Toggle SRM student status"
+                      >
+                        <div
+                          className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${isSRMStudent ? "translate-x-5" : "translate-x-0"
+                            }`}
+                        />
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                {/* Ticket Options */}
+                {/* Price Summary */}
                 <div className="mb-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
-                    <h4 className="text-white font-semibold text-sm">
-                      {includeGoodies ? "With Goodies" : "Base Tickets"}
-                    </h4>
-                  </div>
-
-                  <div className="space-y-3">
-                    {PRICING_OPTIONS.map((option, index) => (
-                      <motion.div
-                        key={option.id}
-                        variants={cardVariants}
-                        initial="hidden"
-                        animate="visible"
-                        transition={{ delay: index * 0.1 }}
-                        className="p-3 rounded-xl border border-[#FACC15]/30 bg-black/50"
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <span className="text-white font-semibold text-xs leading-tight">
-                            {option.label}
-                          </span>
+                  <div className="p-4 rounded-xl border-2 border-[#FACC15]/50 bg-gradient-to-br from-[#FACC15]/10 to-[#F97316]/5">
+                    <div className="text-center">
+                      <h4 className="text-white font-semibold text-sm mb-2">
+                        {getPriceLabel()}
+                      </h4>
+                      <div className="space-y-1 text-xs text-gray-300 mb-3">
+                        <div className="flex justify-between">
+                          <span>Base Price:</span>
+                          <span>₹{calculatePrice() - (includeGoodies ? 400 : 0)}</span>
                         </div>
-
-                        <div className="flex items-center gap-2 text-gray-400 text-xs mb-2">
-                          <Calendar className="h-3 w-3" />
-                          <span>Jan 6 - Jan 28, 2026</span>
-                        </div>
-
-                        <div className="flex items-start justify-between align-top">
-                          <div className="text-gray-400 text-xs flex-shrink-0">
-                            {includeGoodies && (
-                              <div className="space-y-0.5">
-                                <div>Base: ₹{option.basePrice}</div>
-                                <div>Goodies: +₹400</div>
-                              </div>
-                            )}
+                        {includeGoodies && (
+                          <div className="flex justify-between">
+                            <span>Goodies:</span>
+                            <span>+₹400</span>
                           </div>
-                          <span className="text-[#FACC15] font-bold text-right ml-2">
-                            ₹{option.basePrice + (includeGoodies ? 400 : 0)}
-                          </span>
+                        )}
+                        <div className="border-t border-gray-600 pt-1 flex justify-between font-bold text-sm">
+                          <span className="text-white">Total:</span>
+                          <span className="text-[#FACC15]">₹{calculatePrice()}</span>
                         </div>
-                      </motion.div>
-                    ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -543,13 +641,6 @@ export default function RegistrationPopup({
                   Register on KonfHub
                   <ExternalLink className="inline-block ml-2 h-5 w-5" />
                 </motion.button>
-
-                {/* Coupon Code Reminder */}
-                <div className="mt-3 p-3 rounded-lg bg-gradient-to-r from-green-600/10 to-green-400/10 border border-green-500/20">
-                  <p className="text-center text-green-300 text-sm">
-                    💡 Use coupon code <span className="font-bold text-green-200 bg-green-900/40 px-2 py-1 rounded text-xs">"EARLYBIRD"</span> at checkout
-                  </p>
-                </div>
 
                 <p className="text-center text-gray-500 text-xs mt-2">
                   Redirects to KonfHub for secure registration
