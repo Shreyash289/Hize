@@ -294,7 +294,7 @@ export default function RegistrationPopup({
                       </div>
                       <div>
                         <p className="text-xs text-gray-400 font-medium">Event Dates</p>
-                        <p className="text-white font-semibold">January 6-28, 2026</p>
+                        <p className="text-white font-semibold">Jan 29th - Jan 31st, 2026</p>
                       </div>
                     </m.div>
 
@@ -374,7 +374,7 @@ export default function RegistrationPopup({
                     className="text-gray-400 text-sm lg:text-base flex items-center gap-2"
                   >
                     <span className="inline-block w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                    Jan 6 - Jan 28, 2026 • Configure your registration
+                    Jan 29th - Jan 31st, 2026 • Configure your registration
                   </m.p>
                 </div>
 
@@ -664,7 +664,7 @@ export default function RegistrationPopup({
                   </h3>
                   <p className="text-gray-400 text-sm flex items-center justify-center gap-2">
                     <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                    Jan 6 - Jan 28, 2026
+                    Jan 29th - Jan 31st, 2026
                   </p>
                   <div className="flex items-center justify-center gap-4 mt-4 text-sm text-gray-300">
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-lg border border-white/10">
