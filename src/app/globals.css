@@ -126,8 +126,6 @@
     /* iOS Safari viewport fixes */
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
-    /* Prevent zoom on input focus */
-    -webkit-text-size-adjust: none;
     /* Fix iOS Safari bounce scrolling */
     overscroll-behavior: none;
   }

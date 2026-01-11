@@ -371,8 +371,45 @@ export default function Home() {
   }, [loadingComplete])
 
   const scrollToSection = useCallback((index: number) => {
-    sectionsRef.current[index]?.scrollIntoView({ behavior: "smooth" })
-  }, [])
+    const section = sectionsRef.current[index]
+    if (!section) return
+
+    try {
+      // iOS Safari compatibility: Use manual smooth scroll as fallback
+      if (isIOS) {
+        const elementTop = section.offsetTop
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop
+        const distance = elementTop - currentScroll
+        const duration = 500
+        let start: number | null = null
+
+        const step = (timestamp: number) => {
+          if (!start) start = timestamp
+          const progress = timestamp - start
+          const percent = Math.min(progress / duration, 1)
+          
+          // Easing function
+          const ease = percent < 0.5 
+            ? 2 * percent * percent 
+            : 1 - Math.pow(-2 * percent + 2, 2) / 2
+          
+          window.scrollTo(0, currentScroll + distance * ease)
+          
+          if (progress < duration) {
+            window.requestAnimationFrame(step)
+          }
+        }
+        window.requestAnimationFrame(step)
+      } else {
+        // Use native smooth scroll for non-iOS devices
+        section.scrollIntoView({ behavior: "smooth", block: "start" })
+      }
+    } catch (error) {
+      // Fallback to instant scroll if smooth scroll fails
+      console.warn('Smooth scroll failed, using instant scroll:', error)
+      section.scrollIntoView({ behavior: "auto", block: "start" })
+    }
+  }, [isIOS])
 
   const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: "smooth" })
@@ -519,14 +556,14 @@ export default function Home() {
             transition={{ delay: 0.7, duration: 0.6 }}
             className="pt-12 flex flex-col items-center gap-4"
           >
-            <motion.button
+              <motion.button
               onClick={() => setShowRegistrationPopup(true)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-6 sm:px-8 md:px-12 py-3 sm:py-4 md:py-5 rounded-xl md:rounded-2xl bg-gradient-to-r from-orange-600 to-orange-400 font-black text-base sm:text-lg md:text-xl text-black shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 transition-all w-full sm:w-auto"
-            >
-              REGISTER NOW
-            </motion.button>
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-6 sm:px-8 md:px-12 py-3 sm:py-4 md:py-5 rounded-xl md:rounded-2xl bg-gradient-to-r from-orange-600 to-orange-400 font-black text-base sm:text-lg md:text-xl text-black shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 transition-all w-full sm:w-auto"
+              >
+                REGISTER NOW
+              </motion.button>
 
             <motion.div
               animate={{ y: [0, 12, 0] }}
@@ -595,7 +632,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              
+
 
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="text-slate-300 text-sm sm:text-base font-mono">

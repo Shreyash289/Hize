@@ -1,0 +1,20 @@
+[Unit]
+Description=IEEE Membership Validator Worker
+After=network.target redis.service
+Requires=redis.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/ieee-validator/worker
+Environment="PATH=/opt/ieee-validator/worker/venv/bin:/usr/local/bin:/usr/bin:/bin"
+EnvironmentFile=/opt/ieee-validator/worker/.env
+ExecStart=/opt/ieee-validator/worker/venv/bin/python3 /opt/ieee-validator/worker/ieee_worker.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/ieee-validator/worker.log
+StandardError=append:/var/log/ieee-validator/worker-error.log
+
+[Install]
+WantedBy=multi-user.target
+
