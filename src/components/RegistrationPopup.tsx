@@ -150,7 +150,7 @@ export default function RegistrationPopup({
   }, [isOpen, handleKeyDown]);
 
   const handleRegisterOnKonfHub = () => {
-    window.open("hhttps://konfhub.com/checkout/high-impact-zonal-event-2026", "_blank", "noopener,noreferrer");
+    window.open("https://konfhub.com/checkout/high-impact-zonal-event-2026", "_blank", "noopener,noreferrer");
   };
 
   if (!isOpen) return null;
