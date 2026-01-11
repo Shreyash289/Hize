@@ -178,7 +178,7 @@ export default function RegistrationPopup({
         {!isMobile && (
           <m.div
             variants={modalVariants}
-            className="relative w-full max-w-6xl mx-4 max-h-[90vh] overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-950 to-black border border-[#FACC15]/40 shadow-[0_0_80px_rgba(250,204,21,0.15)] backdrop-blur-xl"
+            className="relative w-full max-w-6xl mx-4 max-h-[90vh] overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-950 to-black border border-[#FACC15]/40 shadow-[0_0_80px_rgba(250,204,21,0.15)] backdrop-blur-xl flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Animated Border Glow */}
@@ -206,9 +206,9 @@ export default function RegistrationPopup({
               <X className="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" />
             </button>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[500px] max-h-[90vh] relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 flex-1 min-h-0 relative z-10 overflow-hidden">
               {/* Left Panel - Visual */}
-              <div className="relative bg-gradient-to-br from-zinc-950 via-zinc-900 to-black p-6 lg:p-10 xl:p-12 flex flex-col justify-between overflow-hidden">
+              <div className="relative bg-gradient-to-br from-zinc-950 via-zinc-900 to-black p-4 lg:p-6 flex flex-col justify-between overflow-hidden min-h-0">
                 {/* Animated Background Gradients */}
                 <div className="absolute inset-0">
                   <m.div
@@ -239,13 +239,13 @@ export default function RegistrationPopup({
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(250,204,21,0.05),transparent_70%)]" />
                 </div>
 
-                <div className="relative z-10 space-y-8">
+                <div className="relative z-10 space-y-4">
                   {/* Logo with Glow */}
                   <m.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="mb-6 lg:mb-8"
+                    className="mb-4"
                   >
                     <div className="relative inline-block">
                       <div className="absolute inset-0 bg-[#FACC15]/20 blur-xl rounded-full" />
@@ -266,7 +266,7 @@ export default function RegistrationPopup({
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 }}
                   >
-                    <h2 className="text-3xl lg:text-4xl xl:text-5xl font-black text-white mb-3 lg:mb-4 leading-tight tracking-tight">
+                    <h2 className="text-2xl lg:text-3xl xl:text-4xl font-black text-white mb-2 leading-tight tracking-tight">
                       High Impact.
                       <br />
                       <span className="relative inline-block">
@@ -276,7 +276,7 @@ export default function RegistrationPopup({
                         </span>
                       </span>
                     </h2>
-                    <p className="text-gray-400 text-sm lg:text-base mt-3">
+                    <p className="text-gray-400 text-xs lg:text-sm mt-2">
                       Join India's premier tech event bringing together innovators, creators, and industry leaders
                     </p>
                   </m.div>
@@ -289,7 +289,7 @@ export default function RegistrationPopup({
                       transition={{ delay: 0.4 }}
                       className="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors group"
                     >
-                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-[#FACC15] to-[#F97316] shadow-lg shadow-[#FACC15]/30 group-hover:scale-110 transition-transform">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-[#FACC15] to-[#F97316] shadow-lg shadow-[#FACC15]/30">
                         <Calendar className="h-5 w-5 text-black" />
                       </div>
                       <div>
@@ -304,7 +304,7 @@ export default function RegistrationPopup({
                       transition={{ delay: 0.5 }}
                       className="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors group"
                     >
-                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-[#F97316] to-[#F59E0B] shadow-lg shadow-[#F97316]/30 group-hover:scale-110 transition-transform">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-[#F97316] to-[#F59E0B] shadow-lg shadow-[#F97316]/30">
                         <MapPin className="h-5 w-5 text-black" />
                       </div>
                       <div>
@@ -319,7 +319,7 @@ export default function RegistrationPopup({
                       transition={{ delay: 0.6 }}
                       className="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors group"
                     >
-                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-[#FACC15] to-[#F97316] shadow-lg shadow-[#FACC15]/30 group-hover:scale-110 transition-transform">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-[#FACC15] to-[#F97316] shadow-lg shadow-[#FACC15]/30">
                         <Users className="h-5 w-5 text-black" />
                       </div>
                       <div>
@@ -355,15 +355,15 @@ export default function RegistrationPopup({
               </div>
 
               {/* Right Panel - Registration Form */}
-              <div className="bg-gradient-to-br from-zinc-950 to-black p-6 lg:p-8 xl:p-10 flex flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-[#FACC15]/30 scrollbar-track-transparent">
+              <div className="bg-gradient-to-br from-zinc-950 to-black p-4 lg:p-6 flex flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-[#FACC15]/30 scrollbar-track-transparent min-h-0">
                 {/* Header */}
-                <div className="mb-6 lg:mb-8">
+                <div className="mb-4">
                   <m.h3
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
                     id="registration-title"
-                    className="text-2xl lg:text-3xl font-black bg-gradient-to-r from-[#FACC15] via-[#F59E0B] to-[#F97316] bg-clip-text text-transparent mb-2"
+                    className="text-xl lg:text-2xl font-black bg-gradient-to-r from-[#FACC15] via-[#F59E0B] to-[#F97316] bg-clip-text text-transparent mb-1"
                   >
                     Event Registration
                   </m.h3>
@@ -371,15 +371,15 @@ export default function RegistrationPopup({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4 }}
-                    className="text-gray-400 text-sm lg:text-base flex items-center gap-2"
+                    className="text-gray-400 text-xs lg:text-sm flex items-center gap-2"
                   >
-                    <span className="inline-block w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                    <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
                     Jan 29th - Jan 31st, 2026 • Configure your registration
                   </m.p>
                 </div>
 
                 {/* Registration Form */}
-                <div className="space-y-4 lg:space-y-5 mb-6 lg:mb-8">
+                <div className="space-y-3 mb-4">
                   {/* Goodies Toggle */}
                   <m.div
                     variants={cardVariants}
@@ -390,7 +390,7 @@ export default function RegistrationPopup({
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#FACC15]/5 via-transparent to-[#F97316]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                     <div className="flex items-center justify-between gap-4 relative z-10">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-[#FACC15]/20 to-[#F97316]/20 border border-[#FACC15]/30 group-hover:scale-110 transition-transform">
+                        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-[#FACC15]/20 to-[#F97316]/20 border border-[#FACC15]/30">
                           <Sparkles className="h-5 w-5 text-[#FACC15]" />
                         </div>
                         <div className="min-w-0">
@@ -437,7 +437,7 @@ export default function RegistrationPopup({
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#FACC15]/5 via-transparent to-[#F97316]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                     <div className="flex items-center justify-between gap-4 mb-3 relative z-10">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+                        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30">
                           <Award className="h-5 w-5 text-white" />
                         </div>
                         <div className="min-w-0">
@@ -474,27 +474,6 @@ export default function RegistrationPopup({
                         />
                       </button>
                     </div>
-                    
-                    {/* IEEE Number Input */}
-                    {isIEEEMember && (
-                      <m.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="mt-3 relative z-10"
-                      >
-                        <div className="relative">
-                          <input
-                            type="text"
-                            placeholder="Enter IEEE Member Number"
-                            value={ieeeNumber}
-                            onChange={(e) => setIeeeNumber(e.target.value)}
-                            className="w-full px-4 lg:px-5 py-2.5 lg:py-3 bg-black/70 border-2 border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-[#FACC15] focus:outline-none focus:ring-2 focus:ring-[#FACC15]/20 transition-all text-sm lg:text-base hover:border-gray-500"
-                          />
-                          <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#FACC15]/5 to-[#F97316]/5 pointer-events-none" />
-                        </div>
-                      </m.div>
-                    )}
                   </m.div>
 
                   {/* SRM Student Toggle */}
@@ -507,7 +486,7 @@ export default function RegistrationPopup({
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#FACC15]/5 via-transparent to-[#F97316]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                     <div className="flex items-center justify-between gap-4 relative z-10">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform">
+                        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 shadow-lg shadow-green-500/30">
                           <Zap className="h-5 w-5 text-white" />
                         </div>
                         <div className="min-w-0">
@@ -545,21 +524,21 @@ export default function RegistrationPopup({
                 </div>
 
                 {/* Price Summary */}
-                <div className="mb-6 lg:mb-8">
+                <div className="mb-4">
                   <m.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
-                    className="relative p-6 lg:p-7 rounded-2xl border-2 border-[#FACC15]/50 bg-gradient-to-br from-[#FACC15]/10 via-[#F97316]/5 to-transparent overflow-hidden"
+                    className="relative p-4 lg:p-5 rounded-2xl border-2 border-[#FACC15]/50 bg-gradient-to-br from-[#FACC15]/10 via-[#F97316]/5 to-transparent overflow-hidden"
                   >
                     {/* Animated Glow */}
                     <div className="absolute inset-0 bg-gradient-to-r from-[#FACC15]/10 via-[#F97316]/10 to-[#FACC15]/10 animate-pulse" />
                     
                     <div className="relative z-10 text-center">
-                      <h4 className="text-white font-black text-lg lg:text-xl mb-3 lg:mb-4 tracking-wide">
+                      <h4 className="text-white font-black text-base lg:text-lg mb-2 tracking-wide">
                         {getPriceLabel()}
                       </h4>
-                      <div className="space-y-3 text-sm lg:text-base text-gray-300 mb-4">
+                      <div className="space-y-2 text-sm text-gray-300 mb-3">
                         <div className="flex justify-between items-center py-2 border-b border-white/10">
                           <span className="font-medium">Base Price:</span>
                           <span className="font-bold text-white">₹{calculatePrice() - (includeGoodies ? 400 : 0)}</span>
@@ -577,13 +556,13 @@ export default function RegistrationPopup({
                             <span className="font-bold text-[#F97316]">+₹400</span>
                           </m.div>
                         )}
-                        <div className="pt-3 flex justify-between items-center">
-                          <span className="text-lg lg:text-xl font-black text-white">Total Amount:</span>
+                        <div className="pt-2 flex justify-between items-center">
+                          <span className="text-base lg:text-lg font-black text-white">Total Amount:</span>
                           <m.span
                             key={calculatePrice()}
                             initial={{ scale: 1.5, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
-                            className="text-2xl lg:text-3xl font-black bg-gradient-to-r from-[#FACC15] via-[#F59E0B] to-[#F97316] bg-clip-text text-transparent"
+                            className="text-xl lg:text-2xl font-black bg-gradient-to-r from-[#FACC15] via-[#F59E0B] to-[#F97316] bg-clip-text text-transparent"
                           >
                             ₹{calculatePrice()}
                           </m.span>
@@ -601,7 +580,7 @@ export default function RegistrationPopup({
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleRegisterOnKonfHub}
-                  className="relative w-full py-4 lg:py-5 rounded-xl font-black text-base lg:text-lg bg-gradient-to-r from-[#FACC15] via-[#F59E0B] to-[#F97316] text-black hover:shadow-2xl hover:shadow-[#F97316]/50 transition-all group overflow-hidden"
+                  className="relative w-full py-3 lg:py-4 rounded-xl font-black text-sm lg:text-base bg-gradient-to-r from-[#FACC15] via-[#F59E0B] to-[#F97316] text-black hover:shadow-2xl hover:shadow-[#F97316]/50 transition-all group overflow-hidden flex items-center justify-center"
                 >
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     Register on KonfHub
@@ -749,27 +728,6 @@ export default function RegistrationPopup({
                         />
                       </button>
                     </div>
-                    
-                    {/* IEEE Number Input */}
-                    {isIEEEMember && (
-                      <m.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="mt-3"
-                      >
-                        <div className="relative">
-                          <input
-                            type="text"
-                            placeholder="IEEE Member Number"
-                            value={ieeeNumber}
-                            onChange={(e) => setIeeeNumber(e.target.value)}
-                            className="w-full px-4 py-2.5 bg-black/70 border-2 border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-[#FACC15] focus:outline-none focus:ring-2 focus:ring-[#FACC15]/20 transition-all text-sm"
-                          />
-                          <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#FACC15]/5 to-[#F97316]/5 pointer-events-none" />
-                        </div>
-                      </m.div>
-                    )}
                   </div>
 
                   {/* SRM Student Toggle */}
@@ -846,7 +804,7 @@ export default function RegistrationPopup({
                 <m.button
                   whileTap={{ scale: 0.97 }}
                   onClick={handleRegisterOnKonfHub}
-                  className="relative w-full py-4 rounded-xl font-black text-base bg-gradient-to-r from-[#FACC15] via-[#F59E0B] to-[#F97316] text-black transition-all touch-manipulation active:scale-95 shadow-lg shadow-[#FACC15]/30 group overflow-hidden"
+                  className="relative w-full py-4 rounded-xl font-black text-base bg-gradient-to-r from-[#FACC15] via-[#F59E0B] to-[#F97316] text-black transition-all touch-manipulation active:scale-95 shadow-lg shadow-[#FACC15]/30 group overflow-hidden flex items-center justify-center"
                 >
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     Register on KonfHub
