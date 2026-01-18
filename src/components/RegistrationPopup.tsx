@@ -143,8 +143,19 @@ export default function RegistrationPopup({
       setIsMobile(window.innerWidth < 1024);
     };
     checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    
+    // Throttle resize to prevent Safari reload loops
+    let resizeTimeout: NodeJS.Timeout | null = null
+    const throttledCheckMobile = () => {
+      if (resizeTimeout) clearTimeout(resizeTimeout)
+      resizeTimeout = setTimeout(checkMobile, 150) // Throttle to 150ms
+    };
+    
+    window.addEventListener("resize", throttledCheckMobile, { passive: true });
+    return () => {
+      if (resizeTimeout) clearTimeout(resizeTimeout)
+      window.removeEventListener("resize", throttledCheckMobile);
+    };
   }, []);
 
   // Job polling state

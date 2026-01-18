@@ -160,6 +160,9 @@ export default function Home() {
   const [infoTab, setInfoTab] = useState<"map" | "previous">("map")
   const [showRegistrationPopup, setShowRegistrationPopup] = useState(false)
   const [hasAutoOpened, setHasAutoOpened] = useState(false)
+  const [harshClickCount, setHarshClickCount] = useState(0)
+  const [showIronMan, setShowIronMan] = useState(false)
+  const harshClickTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Auto-open registration popup after 4 seconds (only once)
   useEffect(() => {
@@ -300,6 +303,15 @@ export default function Home() {
 
   const sections = ["Hero", "Venue Map", "Events", "Guests", "Partners", "Previous Events", "Student Team", "Contact"]
 
+  // Cleanup harsh click timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (harshClickTimeoutRef.current) {
+        clearTimeout(harshClickTimeoutRef.current)
+      }
+    }
+  }, [])
+
   // Detect iOS device
   useEffect(() => {
     const checkIOS = () => {
@@ -320,18 +332,27 @@ export default function Home() {
     let rafId: number | null = null
     let lastScrollY = 0
     let lastSectionUpdate = 0
+    let scrollTimeout: NodeJS.Timeout | null = null
 
     const handleScroll = () => {
+      // Throttle scroll handler more aggressively for iOS
+      if (scrollTimeout) return
+      
+      scrollTimeout = setTimeout(() => {
+        scrollTimeout = null
       const currentScrollY = window.scrollY
 
-      // Only process if scroll position changed significantly
-      if (Math.abs(currentScrollY - lastScrollY) < 10) return
+        // Only process if scroll position changed significantly (increased threshold for iOS)
+        const threshold = isIOS ? 50 : 10
+        if (Math.abs(currentScrollY - lastScrollY) < threshold) return
       lastScrollY = currentScrollY
 
       if (!ticking) {
         rafId = requestAnimationFrame(() => {
           const now = Date.now()
-          if (now - lastSectionUpdate < 100) {
+            // Increase throttling for iOS Safari
+            const throttleMs = isIOS ? 300 : 100
+            if (now - lastSectionUpdate < throttleMs) {
             ticking = false
             return
           }
@@ -353,6 +374,7 @@ export default function Home() {
         })
         ticking = true
       }
+      }, isIOS ? 100 : 50) // Throttle scroll events more on iOS
     }
 
     // Use passive listener for better scroll performance with throttling
@@ -360,10 +382,11 @@ export default function Home() {
     handleScroll()
 
     return () => {
+      if (scrollTimeout) clearTimeout(scrollTimeout)
       window.removeEventListener("scroll", handleScroll)
       if (rafId !== null) cancelAnimationFrame(rafId)
     }
-  }, [loadingComplete])
+  }, [loadingComplete, isIOS])
 
   const scrollToSection = useCallback((index: number) => {
     const section = sectionsRef.current[index]
@@ -422,8 +445,8 @@ export default function Home() {
         activeSection={activeSection}
         onRegisterClick={() => setShowRegistrationPopup(true)}
       />
-      <DynamicBackground />
-      <MagneticCursor />
+      {!isIOS && <DynamicBackground />}
+      {!isIOS && <MagneticCursor />}
       <ScrollProgress
         sections={sections}
         activeSection={activeSection}
@@ -537,6 +560,16 @@ export default function Home() {
             </div>
           </motion.div>
 
+          {/* DISABLED: EnhancedCountdown - causes Safari reloads on iOS */}
+          {/* Using direct DOM updates still causes issues, so disabled for now */}
+          {/* <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+          >
+            <EnhancedCountdown />
+          </motion.div> */}
+
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -603,6 +636,24 @@ export default function Home() {
 
               <div className="relative w-full rounded-xl md:rounded-2xl overflow-hidden bg-black/40 border border-orange-500/30 shadow-2xl">
                 <div className="relative aspect-[4/3] w-full">
+                  {isIOS ? (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-black via-slate-900 to-black">
+                      <div className="text-center p-8">
+                        <p className="text-orange-200 mb-4">Map requires full browser</p>
+                        <motion.a
+                          href="https://www.google.com/maps/d/u/0/viewer?mid=18kGFk2ClDWeZPYT0rkdUHRDRw98Mj5U&ehbc=2E312F"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-orange-600 to-orange-400 font-semibold text-black shadow-lg"
+                        >
+                          Open in Maps
+                        </motion.a>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
                   <iframe
                     src="https://www.google.com/maps/d/embed?mid=1UfC_a8sotHQhQRM1hjjGmziJiRXu-7c&ehbc=2E312F"
                     className="w-full h-full absolute inset-0"
@@ -610,14 +661,23 @@ export default function Home() {
                     allowFullScreen
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
+                        sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+                        onError={(e) => {
+                          console.warn('Google Maps iframe error:', e)
+                          e.currentTarget.style.display = 'none'
+                        }}
                   />
                   <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                    </>
+                  )}
                 </div>
+                {!isIOS && (
                 <div className="absolute top-4 right-4">
                   <div className="px-3 py-2 rounded-full bg-black/50 border border-white/10 text-xs text-orange-100">
                     Drag, zoom, or open in Maps
                   </div>
                 </div>
+                )}
               </div>
 
 
@@ -1070,12 +1130,60 @@ export default function Home() {
                 const isDomain = domains.length > 0
                 const display = isDomain ? item.head : item
                 const isCoreTeam = isDomain && item.domain === "CORE TEAM"
+                const isHarsh = display?.name === "Harsh Agarwal"
+                // Allow clicks for Harsh even if he's in core team
+                const shouldDisable = isCoreTeam && !isHarsh
 
                 return (
                   <motion.button
                     type="button"
                     key={(display?.name || "") + (display?.role || "") + (item?.domain || "")}
                     onClick={(e) => {
+                      // Easter egg: Harsh Agarwal special interaction
+                      if (isHarsh) {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        
+                        // Clear existing timeout
+                        if (harshClickTimeoutRef.current) {
+                          clearTimeout(harshClickTimeoutRef.current)
+                        }
+                        
+                        const newCount = harshClickCount + 1
+                        setHarshClickCount(newCount)
+                        
+                        console.log(`Harsh clicked ${newCount} times`) // Debug log
+                        
+                        if (newCount === 1) {
+                          // First click: Open LinkedIn (only on first click)
+                          window.open("https://in.linkedin.com/in/harshxagarwal", "_blank", "noopener,noreferrer")
+                          
+                          // Reset counter after 3 seconds if no more clicks
+                          harshClickTimeoutRef.current = setTimeout(() => {
+                            setHarshClickCount(0)
+                          }, 3000)
+                        } else if (newCount >= 5) {
+                          // Fifth click: Show Iron Man animation
+                          setShowIronMan(true)
+                          
+                          // Play audio
+                          const audio = new Audio("/back-in-black.mp3")
+                          audio.play().catch(err => console.warn("Audio play failed:", err))
+                          
+                          // Hide after 5 seconds and reset
+                          harshClickTimeoutRef.current = setTimeout(() => {
+                            setShowIronMan(false)
+                            setHarshClickCount(0)
+                          }, 5000)
+                        } else {
+                          // Reset counter after 3 seconds if not reached 5
+                          harshClickTimeoutRef.current = setTimeout(() => {
+                            setHarshClickCount(0)
+                          }, 3000)
+                        }
+                        return
+                      }
+                      
                       if (isCoreTeam) {
                         e.preventDefault()
                         e.stopPropagation()
@@ -1090,8 +1198,8 @@ export default function Home() {
                     viewport={{ once: true, margin: "-100px" }}
                     transition={{ duration: 0.6, delay: index * 0.15, ease: "easeOut" }}
                     whileHover={{ y: -8, scale: 1.02 }}
-                    className={`relative p-6 sm:p-7 md:p-8 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/70 to-zinc-900/70 backdrop-blur-xl border border-orange-500/30 flex flex-col items-center text-center shadow-2xl group w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 ${isCoreTeam ? "cursor-default" : "cursor-pointer"}`}
-                    disabled={isCoreTeam}
+                    className={`relative p-6 sm:p-7 md:p-8 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/70 to-zinc-900/70 backdrop-blur-xl border border-orange-500/30 flex flex-col items-center text-center shadow-2xl group w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 ${shouldDisable ? "cursor-default" : "cursor-pointer"}`}
+                    disabled={shouldDisable}
                   >
                     {/* Glow effect on hover */}
                     <div className="absolute -inset-1 bg-gradient-to-r from-orange-600/20 via-orange-500/20 to-orange-600/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
@@ -1352,6 +1460,58 @@ export default function Home() {
                   duration: 3,
                   repeat: Infinity,
                   ease: "easeInOut",
+                }}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Iron Man Easter Egg */}
+      <AnimatePresence>
+        {showIronMan && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="fixed inset-0 z-[10000] flex items-center justify-center pointer-events-none"
+            style={{ backgroundColor: "transparent" }}
+          >
+            {/* Iron Man Image with flip animation (like a globe) */}
+            <motion.div
+              initial={{ scale: 0, rotateY: -180 }}
+              animate={{ 
+                scale: 1,
+              }}
+              exit={{ scale: 0, rotateY: 180 }}
+              transition={{ 
+                duration: 1,
+                type: "spring",
+                stiffness: 200,
+                damping: 15
+              }}
+              className="relative z-10"
+              style={{ perspective: "1000px" }}
+            >
+              <motion.img
+                src="/18943d8f53eaac950f6eb00e1a49ac55-removebg-preview.png"
+                alt="Iron Man"
+                className="w-64 md:w-96 lg:w-[500px] h-auto"
+                animate={{
+                  rotateY: [0, 360],
+                }}
+                transition={{
+                  rotateY: {
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "linear",
+                  },
+                }}
+                style={{ 
+                  transformStyle: "preserve-3d",
+                  filter: "invert(1)",
+                  mixBlendMode: "normal",
                 }}
               />
             </motion.div>

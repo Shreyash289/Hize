@@ -20,10 +20,16 @@ export default function EnhancedCountdown() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const [lightboxImage, setLightboxImage] = useState<string | null>(null)
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+  // Use refs instead of state to avoid re-renders
+  const timeLeftRef = useRef<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+  const daysRef = useRef<HTMLSpanElement>(null)
+  const hoursRef = useRef<HTMLSpanElement>(null)
+  const minutesRef = useRef<HTMLSpanElement>(null)
+  const secondsRef = useRef<HTMLSpanElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const autoplayRef = useRef<NodeJS.Timeout | null>(null)
   const lastScrollRef = useRef(0)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
   
   // Memoize performance settings
   const mobile = useMemo(() => isMobile(), [])
@@ -32,8 +38,19 @@ export default function EnhancedCountdown() {
   // Target date: January 29th, 2026
   const targetDate = new Date('2026-01-29T00:00:00').getTime()
 
-  // Countdown timer logic
+  // Countdown timer logic - uses direct DOM updates to avoid React re-renders
   useEffect(() => {
+    const updateDisplay = (days: number, hours: number, minutes: number, seconds: number) => {
+      // Update refs
+      timeLeftRef.current = { days, hours, minutes, seconds }
+      
+      // Direct DOM updates - no React re-render
+      if (daysRef.current) daysRef.current.textContent = String(days).padStart(2, '0')
+      if (hoursRef.current) hoursRef.current.textContent = String(hours).padStart(2, '0')
+      if (minutesRef.current) minutesRef.current.textContent = String(minutes).padStart(2, '0')
+      if (secondsRef.current) secondsRef.current.textContent = String(seconds).padStart(2, '0')
+    }
+
     const calculateTimeLeft = () => {
       const now = new Date().getTime()
       const difference = targetDate - now
@@ -44,16 +61,33 @@ export default function EnhancedCountdown() {
         const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
         const seconds = Math.floor((difference % (1000 * 60)) / 1000)
 
-        setTimeLeft({ days, hours, minutes, seconds })
+        // Only update DOM if values changed
+        const current = timeLeftRef.current
+        if (
+          current.days !== days ||
+          current.hours !== hours ||
+          current.minutes !== minutes ||
+          current.seconds !== seconds
+        ) {
+          updateDisplay(days, hours, minutes, seconds)
+        }
       } else {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+        updateDisplay(0, 0, 0, 0)
       }
     }
 
+    // Initial calculation
     calculateTimeLeft()
-    const timer = setInterval(calculateTimeLeft, 1000)
+    
+    // Update every second - but only updates DOM, no React re-renders
+    timerRef.current = setInterval(calculateTimeLeft, 1000)
 
-    return () => clearInterval(timer)
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
+        timerRef.current = null
+      }
+    }
   }, [targetDate])
 
   const goTo = (nextIndex: number) => {
@@ -201,17 +235,17 @@ export default function EnhancedCountdown() {
               
               <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6 xl:gap-8">
                 {[
-                  { label: 'Days', value: timeLeft.days, color: 'from-orange-500 to-orange-400' },
-                  { label: 'Hours', value: timeLeft.hours, color: 'from-orange-400 to-pink-500' },
-                  { label: 'Minutes', value: timeLeft.minutes, color: 'from-pink-500 to-orange-500' },
-                  { label: 'Seconds', value: timeLeft.seconds, color: 'from-orange-600 to-orange-400' }
-                ].map((item, index) => (
+                  { label: 'Days', ref: daysRef, color: 'from-orange-500 to-orange-400', index: 0 },
+                  { label: 'Hours', ref: hoursRef, color: 'from-orange-400 to-pink-500', index: 1 },
+                  { label: 'Minutes', ref: minutesRef, color: 'from-pink-500 to-orange-500', index: 2 },
+                  { label: 'Seconds', ref: secondsRef, color: 'from-orange-600 to-orange-400', index: 3 }
+                ].map((item) => (
                   <motion.div
                     key={item.label}
                     className="text-center"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1, duration: 0.6 }}
+                    transition={{ delay: item.index * 0.1, duration: 0.6 }}
                   >
                     <div className="relative mb-2 sm:mb-3 md:mb-4">
                       <motion.div
@@ -225,15 +259,12 @@ export default function EnhancedCountdown() {
                           ease: "linear"
                         } : {})}
                       >
-                        <motion.span
-                          key={item.value}
+                        <span
+                          ref={item.ref}
                           className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black text-white block leading-none"
-                          initial={reducedMotion ? { opacity: 1 } : { scale: 1.1, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ duration: reducedMotion ? 0.1 : 0.2 }}
                         >
-                          {String(item.value).padStart(2, '0')}
-                        </motion.span>
+                          00
+                        </span>
                         
                         {/* Shine effect */}
                         <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] animate-pulse" />

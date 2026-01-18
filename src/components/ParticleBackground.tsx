@@ -124,9 +124,14 @@ export default function ParticleBackground() {
     createParticles()
     animate()
 
+    // Throttle resize to prevent Safari reload loops
+    let resizeTimeout: NodeJS.Timeout | null = null
     const handleResize = () => {
+      if (resizeTimeout) clearTimeout(resizeTimeout)
+      resizeTimeout = setTimeout(() => {
       resizeCanvas()
       createParticles()
+      }, 150) // Throttle to 150ms
     }
 
     // iOS Safari visibility handling
@@ -134,10 +139,11 @@ export default function ParticleBackground() {
       isVisible = !document.hidden
     }
 
-    window.addEventListener("resize", handleResize)
+    window.addEventListener("resize", handleResize, { passive: true })
     document.addEventListener("visibilitychange", handleVisibilityChange)
 
     return () => {
+      if (resizeTimeout) clearTimeout(resizeTimeout)
       window.removeEventListener("resize", handleResize)
       document.removeEventListener("visibilitychange", handleVisibilityChange)
       cancelAnimationFrame(animationFrameId)
