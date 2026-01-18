@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Excel files
+*.xlsx
+*.xls
+!ieee_numbers_template.xlsx
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Cookie files (never commit!)
+ieee_cookie.txt
+*.cookie
+cookies.txt
+
+# Playwright
+.playwright/
+playwright-report/
+test-results/
+
+# Jupyter notebooks (temporary/test files)
+*.ipynb
+dummy.ipynb
+
+# Jupyter notebooks
+*.ipynb
+!*.ipynb.checkpoints
+
+# Temporary files
+dummy.ipynb
+

@@ -55,7 +55,7 @@ export default function PartnersMarquee() {
       
       <div className="relative z-10">
         <Marquee
-          speed={50}
+          speed={80}
           gradient={false}
           pauseOnHover={true}
           pauseOnClick={true}

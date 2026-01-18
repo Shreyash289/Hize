@@ -17,15 +17,17 @@ export default function LoadingScreen({ onLoadingComplete }: LoadingScreenProps)
     const steps = 30
     const stepDuration = duration / steps
     let currentStep = 0
+    let intervalId: NodeJS.Timeout | null = null
 
-    const interval = setInterval(() => {
+    intervalId = setInterval(() => {
       if (!mounted) return
       currentStep++
       const easeProgress = 1 - Math.pow(1 - currentStep / steps, 2)
       setProgress(Math.min(Math.floor(easeProgress * 100), 100))
 
       if (currentStep >= steps) {
-        clearInterval(interval)
+        if (intervalId) clearInterval(intervalId)
+        intervalId = null
         if (mounted) {
           setTimeout(() => {
             if (mounted) {
@@ -41,7 +43,7 @@ export default function LoadingScreen({ onLoadingComplete }: LoadingScreenProps)
 
     return () => {
       mounted = false
-      clearInterval(interval)
+      if (intervalId) clearInterval(intervalId)
     }
   }, [onLoadingComplete])
 

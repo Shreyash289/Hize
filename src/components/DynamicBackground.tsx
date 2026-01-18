@@ -43,6 +43,7 @@ export default function DynamicBackground() {
     const drawGradientMesh = () => {
       if (!isVisible) return
       
+      try {
       const width = isIOS ? canvas.width : canvas.width / devicePixelRatio
       const height = isIOS ? canvas.height : canvas.height / devicePixelRatio
 
@@ -105,6 +106,10 @@ export default function DynamicBackground() {
       ctx.fillRect(0, 0, width, height)
 
       ctx.globalCompositeOperation = "source-over"
+      } catch (error) {
+        // Silently fail on canvas errors to prevent crashes
+        console.warn('Canvas rendering error (non-critical):', error)
+      }
 
       animationFrameId = requestAnimationFrame(drawGradientMesh)
     }
@@ -112,8 +117,13 @@ export default function DynamicBackground() {
     resizeCanvas()
     drawGradientMesh()
 
+    // Throttle resize to prevent Safari reload loops
+    let resizeTimeout: NodeJS.Timeout | null = null
     const handleResize = () => {
+      if (resizeTimeout) clearTimeout(resizeTimeout)
+      resizeTimeout = setTimeout(() => {
       resizeCanvas()
+      }, 150) // Throttle to 150ms
     }
 
     // iOS Safari visibility handling
@@ -121,10 +131,11 @@ export default function DynamicBackground() {
       isVisible = !document.hidden
     }
 
-    window.addEventListener("resize", handleResize)
+    window.addEventListener("resize", handleResize, { passive: true })
     document.addEventListener("visibilitychange", handleVisibilityChange)
 
     return () => {
+      if (resizeTimeout) clearTimeout(resizeTimeout)
       window.removeEventListener("resize", handleResize)
       document.removeEventListener("visibilitychange", handleVisibilityChange)
       cancelAnimationFrame(animationFrameId)
