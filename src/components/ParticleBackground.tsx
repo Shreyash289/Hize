@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react"
 import { motion } from "framer-motion"
+import { getAnimationManager, createVisibilityObserver } from "@/lib/animationManager"
 
 interface Particle {
   x: number
@@ -16,6 +17,7 @@ interface Particle {
 
 export default function ParticleBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const containerRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -24,9 +26,11 @@ export default function ParticleBackground() {
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
+    const animationManager = getAnimationManager()
     let animationFrameId: number
     let particles: Particle[] = []
     let isVisible = true
+    let isIntersecting = true
 
     // iOS Safari performance optimization
     const devicePixelRatio = window.devicePixelRatio || 1
@@ -117,12 +121,49 @@ export default function ParticleBackground() {
         drawParticle(particle)
       })
 
-      animationFrameId = requestAnimationFrame(animate)
+      // Use throttled RAF for 30 FPS background animation
+      animationFrameId = animationManager.requestThrottledAnimationFrame(animate)
     }
+
+    // Animation controller for pause/resume
+    const controller = {
+      isPaused: false,
+      pause: () => {
+        if (animationFrameId) {
+          animationManager.cancelThrottledAnimationFrame(animationFrameId)
+          animationFrameId = 0
+        }
+        controller.isPaused = true
+      },
+      resume: () => {
+        if (controller.isPaused) {
+          controller.isPaused = false
+          animate()
+        }
+      },
+    }
+
+    animationManager.register(controller)
 
     resizeCanvas()
     createParticles()
     animate()
+
+    // IntersectionObserver to pause when off-screen
+    const visibilityObserver = containerRef.current
+      ? createVisibilityObserver((visible) => {
+          isIntersecting = visible
+          if (!visible && !controller.isPaused) {
+            controller.pause()
+          } else if (visible && controller.isPaused && animationManager.isVisible()) {
+            controller.resume()
+          }
+        })
+      : null
+
+    if (visibilityObserver && containerRef.current) {
+      visibilityObserver.observe(containerRef.current)
+    }
 
     // Throttle resize to prevent Safari reload loops
     let resizeTimeout: NodeJS.Timeout | null = null
@@ -137,6 +178,11 @@ export default function ParticleBackground() {
     // iOS Safari visibility handling
     const handleVisibilityChange = () => {
       isVisible = !document.hidden
+      if (!isVisible && !controller.isPaused) {
+        controller.pause()
+      } else if (isVisible && isIntersecting && controller.isPaused) {
+        controller.resume()
+      }
     }
 
     window.addEventListener("resize", handleResize, { passive: true })
@@ -146,15 +192,24 @@ export default function ParticleBackground() {
       if (resizeTimeout) clearTimeout(resizeTimeout)
       window.removeEventListener("resize", handleResize)
       document.removeEventListener("visibilitychange", handleVisibilityChange)
-      cancelAnimationFrame(animationFrameId)
+      if (animationFrameId) {
+        animationManager.cancelThrottledAnimationFrame(animationFrameId)
+      }
+      if (visibilityObserver && containerRef.current) {
+        visibilityObserver.unobserve(containerRef.current)
+      }
+      animationManager.unregister(controller)
     }
   }, [])
 
   return (
     <canvas
-      ref={canvasRef}
+      ref={(node) => {
+        canvasRef.current = node
+        containerRef.current = node
+      }}
       className="fixed inset-0 pointer-events-none z-0"
-      style={{ opacity: 0.8 }}
+      style={{ opacity: 0.8, willChange: 'transform' }}
     />
   )
 }
