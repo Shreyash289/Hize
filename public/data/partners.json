@@ -1,5 +1,10 @@
 [
   {
+    "name": "GradeX",
+    "logo": "/partners/futurix-logo.png",
+    "url": "Gradex.bond"
+  },
+  {
     "name": "SRM Institute of Science and Technology",
     "logo": "/partners/srmlogo.png",
     "url": "https://www.srmist.edu.in/"

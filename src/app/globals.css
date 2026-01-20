@@ -282,6 +282,44 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* GPU acceleration for animations - Performance optimization */
+  [class*="motion-"],
+  [data-animate],
+  .animate-gpu {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    perspective: 1000px;
+    -webkit-perspective: 1000px;
+  }
+
+  /* Optimize backdrop-blur on mobile/low-end devices */
+  @media (max-width: 768px), (prefers-reduced-motion: reduce) {
+    .backdrop-blur-xl,
+    .backdrop-blur-md,
+    .backdrop-blur-sm {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      /* Use gradient fallback for visual equivalence */
+      background: rgba(0, 0, 0, 0.85) !important;
+    }
+  }
+
+  /* Low-end device optimizations */
+  @supports (device-memory: 2) {
+    @media (device-memory: <= 2) {
+      .backdrop-blur-xl,
+      .backdrop-blur-md,
+      .backdrop-blur-sm {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background: rgba(0, 0, 0, 0.9) !important;
+      }
+    }
+  }
+
   /* GPU acceleration for animations */
   [class*="motion-"],
   [class*="animate-"],

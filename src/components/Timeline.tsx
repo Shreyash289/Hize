@@ -52,7 +52,7 @@ const timelineData: TimelineDay[] = [
         icon: Mic,
         isSpecial: true,
         buttonText: "Register with Futurix",
-        buttonUrl: "https://futurix.in/register"
+        buttonUrl: "https://docs.google.com/forms/d/e/1FAIpQLSefkPMAEefrHS7mVTe3k5GTP5QaD0EClXtYP_bCur6rd5jHkw/viewform"
       },
     ],
   },
