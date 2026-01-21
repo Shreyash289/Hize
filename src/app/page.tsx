@@ -143,7 +143,8 @@ export default function Home() {
   const [selectedDomain, setSelectedDomain] = useState<DomainTeam | null>(null)
   const [infoTab, setInfoTab] = useState<"map" | "previous">("map")
   const [showRegistrationPopup, setShowRegistrationPopup] = useState(false)
-  const [hasAutoOpened, setHasAutoOpened] = useState(false)
+  const [showRegistrationBanner, setShowRegistrationBanner] = useState(false)
+  const [bannerDismissed, setBannerDismissed] = useState(false)
   const [harshClickCount, setHarshClickCount] = useState(0)
   const [showIronMan, setShowIronMan] = useState(false)
   const harshClickTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -160,7 +161,7 @@ export default function Home() {
       audio.volume = 1.0 // Full volume for clarity
       audio.playbackRate = 1.0 // Normal speed
       // Ensure high quality playback
-      audio.mozPreservesPitch = false
+      ;(audio as any).mozPreservesPitch = false // Firefox-specific
       audio.preservesPitch = false
       audioRef.current = audio
     }
@@ -183,17 +184,16 @@ export default function Home() {
     }
   }, [])
 
-  // Auto-open registration popup after 4 seconds (only once)
+  // Show registration banner after 3 seconds (if not dismissed)
   useEffect(() => {
-    if (hasAutoOpened || !loadingComplete) return
+    if (bannerDismissed || !loadingComplete) return
 
     const timer = setTimeout(() => {
-      setShowRegistrationPopup(true)
-      setHasAutoOpened(true)
-    }, 4000) // 4 seconds
+      setShowRegistrationBanner(true)
+    }, 3000) // 3 seconds
 
     return () => clearTimeout(timer)
-  }, [loadingComplete, hasAutoOpened])
+  }, [loadingComplete, bannerDismissed])
 
   useEffect(() => {
     let mounted = true
@@ -433,6 +433,54 @@ export default function Home() {
       />
       {!isIOS && <DynamicBackground />}
       {!isIOS && <MagneticCursor />}
+
+      {/* Registration Banner */}
+      <AnimatePresence>
+        {showRegistrationBanner && !bannerDismissed && (
+          <motion.div
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -100, opacity: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 max-w-2xl w-full mx-4"
+          >
+            <div className="relative bg-gradient-to-r from-orange-600/95 to-orange-500/95 backdrop-blur-xl border-2 border-orange-400/50 rounded-2xl shadow-2xl shadow-orange-500/30 p-4 sm:p-5">
+              <button
+                onClick={() => {
+                  setBannerDismissed(true)
+                  setShowRegistrationBanner(false)
+                }}
+                className="absolute top-2 right-2 p-1.5 rounded-lg hover:bg-white/20 transition-colors"
+                aria-label="Dismiss"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+              <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 pr-8">
+                <div className="flex-1 text-center sm:text-left">
+                  <p className="text-white font-bold text-base sm:text-lg mb-1">
+                    🎉 Don't miss out on HIZE 2026!
+                  </p>
+                  <p className="text-orange-100 text-sm sm:text-base">
+                    Register now to secure your spot for this amazing event
+                  </p>
+                </div>
+                <motion.button
+                  onClick={() => {
+                    setShowRegistrationPopup(true)
+                    setBannerDismissed(true)
+                    setShowRegistrationBanner(false)
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-6 py-2.5 bg-black text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
+                >
+                  Register Now
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <section
         ref={(el) => { sectionsRef.current[0] = el }}
@@ -711,6 +759,9 @@ export default function Home() {
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
               Detailed schedule of all activities across the three days
+            </p>
+            <p className="text-sm sm:text-base text-orange-300/70 font-serif max-w-2xl mx-auto px-4 mt-2">
+              Click on events to view more information
             </p>
           </motion.div>
           <Timeline />
