@@ -163,41 +163,6 @@ export default function Home() {
   const [harshClickCount, setHarshClickCount] = useState(0)
   const [showIronMan, setShowIronMan] = useState(false)
   const harshClickTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const [showEww, setShowEww] = useState(false)
-  const [treasurerClickCount, setTreasurerClickCount] = useState(0)
-  const treasurerClickTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-
-  // Initialize audio only when needed (lazy loading)
-  const initializeAudio = useCallback(() => {
-    if (!audioRef.current) {
-      const audio = new Audio("/back-in-black.mp3")
-      audio.preload = "auto"
-      audio.volume = 1.0 // Full volume for clarity
-      audio.playbackRate = 1.0 // Normal speed
-      // Ensure high quality playback
-      audio.mozPreservesPitch = false
-      audio.preservesPitch = false
-      audioRef.current = audio
-    }
-  }, [])
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause()
-        audioRef.current.src = ""
-        audioRef.current = null
-      }
-      if (harshClickTimeoutRef.current) {
-        clearTimeout(harshClickTimeoutRef.current)
-      }
-      if (treasurerClickTimeoutRef.current) {
-        clearTimeout(treasurerClickTimeoutRef.current)
-      }
-    }
-  }, [])
 
   // Auto-open registration popup after 4 seconds (only once)
   useEffect(() => {
@@ -1193,9 +1158,6 @@ export default function Home() {
                           // First click: Open LinkedIn (only on first click)
                           window.open("https://in.linkedin.com/in/harshxagarwal", "_blank", "noopener,noreferrer")
                           
-                          // Preload audio on first click (when user shows interest)
-                          initializeAudio()
-                          
                           // Reset counter after 3 seconds if no more clicks
                           harshClickTimeoutRef.current = setTimeout(() => {
                             setHarshClickCount(0)
@@ -1204,30 +1166,16 @@ export default function Home() {
                           // Fifth click: Show Iron Man animation
                           setShowIronMan(true)
                           
-                          // Ensure audio is initialized
-                          initializeAudio()
+                          // Play audio
+                          const audio = new Audio("/back-in-black.mp3")
+                          audio.play().catch(err => console.warn("Audio play failed:", err))
                           
-                          // Play audio with proper initialization for clarity
-                          if (audioRef.current) {
-                            // Reset audio to start for clarity
-                            audioRef.current.currentTime = 0
-                            audioRef.current.volume = 1.0
-                            audioRef.current.playbackRate = 1.0
-                            audioRef.current.play().catch(err => console.warn("Audio play failed:", err))
-                          }
-                          
-                          // Hide after 5 seconds and reset (but let audio continue playing)
+                          // Hide after 5 seconds and reset
                           harshClickTimeoutRef.current = setTimeout(() => {
                             setShowIronMan(false)
                             setHarshClickCount(0)
-                            // Audio continues playing - don't stop it
                           }, 5000)
                         } else {
-                          // Preload audio when getting close (on 3rd or 4th click)
-                          if (newCount >= 3) {
-                            initializeAudio()
-                          }
-                          
                           // Reset counter after 3 seconds if not reached 5
                           harshClickTimeoutRef.current = setTimeout(() => {
                             setHarshClickCount(0)
@@ -1271,42 +1219,7 @@ export default function Home() {
                       </p>
                     )}
                     <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2 text-white group-hover:text-orange-100 transition-colors duration-300">{display.name}</h3>
-                    <p 
-                      className={`text-orange-400 font-bold text-sm sm:text-base md:text-lg group-hover:text-orange-300 transition-colors duration-300 ${isHarsh && display.role?.toLowerCase().includes("treasurer") ? "cursor-pointer select-none" : ""}`}
-                      onClick={(e) => {
-                        // Easter egg: Click "Treasurer" text 4 times
-                        if (isHarsh && display.role?.toLowerCase().includes("treasurer")) {
-                          e.stopPropagation()
-                          e.preventDefault()
-                          
-                          // Clear existing timeout
-                          if (treasurerClickTimeoutRef.current) {
-                            clearTimeout(treasurerClickTimeoutRef.current)
-                          }
-                          
-                          const newCount = treasurerClickCount + 1
-                          setTreasurerClickCount(newCount)
-                          
-                          if (newCount === 4) {
-                            // Fourth click: Show "Hello Eww" easter egg
-                            setShowEww(true)
-                            setTreasurerClickCount(0)
-                            
-                            // Hide after 2.5 seconds
-                            setTimeout(() => {
-                              setShowEww(false)
-                            }, 2500)
-                          } else {
-                            // Reset counter after 1.2 seconds if not reached 4
-                            treasurerClickTimeoutRef.current = setTimeout(() => {
-                              setTreasurerClickCount(0)
-                            }, 1200)
-                          }
-                        }
-                      }}
-                    >
-                      {display.role}
-                    </p>
+                    <p className="text-orange-400 font-bold text-sm sm:text-base md:text-lg group-hover:text-orange-300 transition-colors duration-300">{display.role}</p>
                   </motion.button>
                 )
               })}
@@ -1602,171 +1515,6 @@ export default function Home() {
                 }}
               />
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Hello Eww Easter Egg - Gold × Black Luxury */}
-      <AnimatePresence>
-        {showEww && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 flex items-center justify-center pointer-events-none"
-            style={{ backgroundColor: "#000", zIndex: 999999 }}
-          >
-            {/* Gold line sweep effect */}
-            <motion.div
-              className="absolute inset-0 overflow-hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-              style={{ zIndex: 1 }}
-            >
-              {/* Diagonal gold lines */}
-              {[...Array(3)].map((_, i) => (
-                <motion.div
-                  key={`line-${i}`}
-                  className="absolute w-full h-[2px]"
-                  style={{
-                    background: "linear-gradient(to right, transparent, #FFD700, transparent)",
-                    top: `${30 + i * 20}%`,
-                    transform: `rotate(${-45 + i * 15}deg)`,
-                  }}
-                  initial={{ x: "-100%" }}
-                  animate={{ x: "200%" }}
-                  transition={{
-                    duration: 1.4,
-                    delay: i * 0.2,
-                    ease: "easeOut",
-                  }}
-                />
-              ))}
-              {/* Radial gold lines */}
-              {[...Array(4)].map((_, i) => (
-                <motion.div
-                  key={`radial-${i}`}
-                  className="absolute w-[2px] h-full"
-                  style={{
-                    background: "linear-gradient(to bottom, transparent, #FFD700, transparent)",
-                    left: `${25 + i * 16.66}%`,
-                  }}
-                  initial={{ y: "-100%" }}
-                  animate={{ y: "200%" }}
-                  transition={{
-                    duration: 1.2,
-                    delay: 0.3 + i * 0.15,
-                    ease: "easeOut",
-                  }}
-                />
-              ))}
-            </motion.div>
-
-            {/* Main text with gold shimmer */}
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0, letterSpacing: "0.6em" }}
-              animate={{ 
-                scale: 1,
-                opacity: 1,
-                letterSpacing: "0.35em",
-              }}
-              exit={{ 
-                scale: 0.9,
-                opacity: 0,
-                letterSpacing: "0.4em",
-              }}
-              transition={{ 
-                duration: 0.6,
-                ease: "easeOut",
-              }}
-              className="relative"
-              style={{ zIndex: 2 }}
-            >
-              <motion.h1
-                className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-center uppercase tracking-[0.35em] flex items-center justify-center gap-2"
-                style={{
-                  fontFamily: "'Space Grotesk', system-ui, -apple-system, sans-serif",
-                }}
-              >
-                <motion.span
-                  style={{
-                    background: "linear-gradient(120deg, #FFD700 30%, #fff2b0 50%, #FFD700 70%)",
-                    backgroundSize: "200% 200%",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                    filter: "drop-shadow(0 0 30px rgba(255, 215, 0, 0.4))",
-                  }}
-                  className="inline-block"
-                  animate={{
-                    backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-                  }}
-                  transition={{
-                    backgroundPosition: {
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "linear",
-                    },
-                  }}
-                >
-                  Hello&nbsp;Eww&nbsp;!!
-                </motion.span>
-                <motion.span
-                  className="inline-block"
-                  animate={{
-                    rotate: [0, 20, -15, 20, -15, 0],
-                    y: [0, -8, 0],
-                  }}
-                  transition={{
-                    duration: 0.6,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  style={{
-                    fontSize: "1em",
-                    display: "inline-block",
-                    filter: "drop-shadow(0 0 20px rgba(255, 215, 0, 0.5))",
-                  }}
-                >
-                  👋
-                </motion.span>
-              </motion.h1>
-
-              {/* Subtle film grain effect */}
-              <motion.div
-                className="absolute inset-0 opacity-[0.03]"
-                style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                  pointerEvents: "none",
-                }}
-                animate={{
-                  opacity: [0.03, 0.05, 0.03],
-                }}
-                transition={{
-                  duration: 0.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-            </motion.div>
-
-            {/* Fade out animation */}
-            <motion.div
-              className="absolute inset-0 bg-black"
-              initial={{ opacity: 0 }}
-              animate={{
-                opacity: [0, 1, 1, 0],
-              }}
-              transition={{
-                duration: 2.5,
-                times: [0, 0.15, 0.85, 1],
-                ease: "easeInOut",
-              }}
-              style={{ zIndex: 0 }}
-            />
           </motion.div>
         )}
       </AnimatePresence>

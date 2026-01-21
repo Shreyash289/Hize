@@ -2,11 +2,9 @@
 
 import { useEffect, useRef } from "react"
 import { motion } from "framer-motion"
-import { getAnimationManager, createVisibilityObserver } from "@/lib/animationManager"
 
 export default function DynamicBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -15,11 +13,9 @@ export default function DynamicBackground() {
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
-    const animationManager = getAnimationManager()
     let animationFrameId: number
     let time = 0
     let isVisible = true
-    let isIntersecting = true
 
     // iOS Safari performance optimization
     const devicePixelRatio = window.devicePixelRatio || 1
@@ -115,48 +111,11 @@ export default function DynamicBackground() {
         console.warn('Canvas rendering error (non-critical):', error)
       }
 
-      // Use throttled RAF for 30 FPS background animation
-      animationFrameId = animationManager.requestThrottledAnimationFrame(drawGradientMesh)
+      animationFrameId = requestAnimationFrame(drawGradientMesh)
     }
-
-    // Animation controller for pause/resume
-    const controller = {
-      isPaused: false,
-      pause: () => {
-        if (animationFrameId) {
-          animationManager.cancelThrottledAnimationFrame(animationFrameId)
-          animationFrameId = 0
-        }
-        controller.isPaused = true
-      },
-      resume: () => {
-        if (controller.isPaused) {
-          controller.isPaused = false
-          drawGradientMesh()
-        }
-      },
-    }
-
-    animationManager.register(controller)
 
     resizeCanvas()
     drawGradientMesh()
-
-    // IntersectionObserver to pause when off-screen
-    const visibilityObserver = containerRef.current
-      ? createVisibilityObserver((visible) => {
-          isIntersecting = visible
-          if (!visible && !controller.isPaused) {
-            controller.pause()
-          } else if (visible && controller.isPaused && animationManager.isVisible()) {
-            controller.resume()
-          }
-        })
-      : null
-
-    if (visibilityObserver && containerRef.current) {
-      visibilityObserver.observe(containerRef.current)
-    }
 
     // Throttle resize to prevent Safari reload loops
     let resizeTimeout: NodeJS.Timeout | null = null
@@ -170,11 +129,6 @@ export default function DynamicBackground() {
     // iOS Safari visibility handling
     const handleVisibilityChange = () => {
       isVisible = !document.hidden
-      if (!isVisible && !controller.isPaused) {
-        controller.pause()
-      } else if (isVisible && isIntersecting && controller.isPaused) {
-        controller.resume()
-      }
     }
 
     window.addEventListener("resize", handleResize, { passive: true })
@@ -184,18 +138,12 @@ export default function DynamicBackground() {
       if (resizeTimeout) clearTimeout(resizeTimeout)
       window.removeEventListener("resize", handleResize)
       document.removeEventListener("visibilitychange", handleVisibilityChange)
-      if (animationFrameId) {
-        animationManager.cancelThrottledAnimationFrame(animationFrameId)
-      }
-      if (visibilityObserver && containerRef.current) {
-        visibilityObserver.unobserve(containerRef.current)
-      }
-      animationManager.unregister(controller)
+      cancelAnimationFrame(animationFrameId)
     }
   }, [])
 
   return (
-    <div ref={containerRef} className="fixed inset-0 pointer-events-none z-0">
+    <div className="fixed inset-0 pointer-events-none z-0">
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full"
