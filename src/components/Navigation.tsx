@@ -48,12 +48,15 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
     setMobileMenuOpen(false)
   }
 
-  const handleContactClick = () => {
+  const handleContactClick = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault()
+    }
     if (isHomepage && onSectionClick) {
       // Contact is at index 8 in sections array
       onSectionClick(8)
     } else {
-      // Navigate to contact page if not on homepage
+      // Navigate to contact page if not on homepage using router
       window.location.href = "/contact"
     }
     setMobileMenuOpen(false)
@@ -71,9 +74,34 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
             : "bg-black/40 backdrop-blur-lg border border-orange-500/10"
         } rounded-xl sm:rounded-2xl mx-auto max-w-7xl`}
       >
-        <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-center relative">
-          {/* Desktop Navigation - Centered */}
-          <div className="hidden md:flex items-center gap-1 flex-wrap justify-center max-w-full">
+        <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between relative">
+          {/* Logo/Brand - Desktop */}
+          <Link href="/" className="hidden md:flex items-center gap-2 group flex-shrink-0">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="relative h-8 sm:h-9 md:h-10 w-auto flex items-center gap-2"
+            >
+              <Image
+                src="/logo_white.png"
+                alt="IEEE Computer Society HIZE 2026"
+                width={140}
+                height={40}
+                className="h-full w-auto object-contain"
+                priority
+              />
+              <Image
+                src="/srmlogo.png"
+                alt="SRM Institute of Science & Technology"
+                width={100}
+                height={40}
+                className="h-full w-auto object-contain"
+                priority
+              />
+            </motion.div>
+          </Link>
+
+          {/* Desktop Navigation - Centered/Flexible */}
+          <div className="hidden md:flex items-center gap-1 flex-1 justify-center min-w-0 px-4">
             {isHomepage && sections ? (
               homepageLinks.map((link, idx) => (
                 <button
@@ -117,28 +145,48 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
                     )}
                   </Link>
                 ))}
-                <button
-                  onClick={handleContactClick}
-                  className={`relative px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
-                    isHomepage && activeSection === 8
-                      ? "text-orange-400 bg-orange-500/10"
-                      : "text-gray-300 hover:text-orange-400 hover:bg-white/5"
-                  }`}
-                >
-                  Contact
-                  {isHomepage && activeSection === 8 && (
-                    <motion.div
-                      layoutId="activeNavIndicator"
-                      className="absolute inset-0 rounded-lg bg-orange-500/20 border border-orange-500/30 -z-10"
-                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                </button>
+                {isHomepage ? (
+                  <button
+                    onClick={handleContactClick}
+                    className={`relative px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                      activeSection === 8
+                        ? "text-orange-400 bg-orange-500/10"
+                        : "text-gray-300 hover:text-orange-400 hover:bg-white/5"
+                    }`}
+                  >
+                    Contact
+                    {activeSection === 8 && (
+                      <motion.div
+                        layoutId="activeNavIndicator"
+                        className="absolute inset-0 rounded-lg bg-orange-500/20 border border-orange-500/30 -z-10"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                  </button>
+                ) : (
+                  <Link
+                    href="/contact"
+                    className={`relative px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                      pathname === "/contact"
+                        ? "text-orange-400 bg-orange-500/10"
+                        : "text-gray-300 hover:text-orange-400 hover:bg-white/5"
+                    }`}
+                  >
+                    Contact
+                    {pathname === "/contact" && (
+                      <motion.div
+                        layoutId="activeNavIndicator"
+                        className="absolute inset-0 rounded-lg bg-orange-500/20 border border-orange-500/30 -z-10"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                  </Link>
+                )}
               </>
             )}
             <button
               onClick={() => onRegisterClick?.()}
-              className="px-5 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-orange-600 to-orange-400 text-black hover:from-orange-500 hover:to-orange-300 transition-all shadow-lg shadow-orange-500/30 whitespace-nowrap"
+              className="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-gradient-to-r from-orange-600 to-orange-400 text-black hover:from-orange-500 hover:to-orange-300 transition-all shadow-lg shadow-orange-500/30 whitespace-nowrap flex-shrink-0"
             >
               Register
             </button>
@@ -153,14 +201,22 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
           
-          {/* Mobile Logo - Only on mobile */}
-          <Link href="/" className="md:hidden absolute left-3 sm:left-4 flex items-center">
+          {/* Mobile Logos - Only on mobile */}
+          <Link href="/" className="md:hidden absolute left-3 sm:left-4 flex items-center gap-2">
             <Image
               src="/logo_white.png"
               alt="IEEE Computer Society HIZE 2026"
-              width={120}
-              height={36}
-              className="h-8 w-auto object-contain"
+              width={100}
+              height={30}
+              className="h-7 w-auto object-contain"
+              priority
+            />
+            <Image
+              src="/srmlogo.png"
+              alt="SRM Institute of Science & Technology"
+              width={80}
+              height={30}
+              className="h-7 w-auto object-contain"
               priority
             />
           </Link>
@@ -219,16 +275,30 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
                         {link.label}
                       </Link>
                     ))}
-                    <button
-                      onClick={handleContactClick}
-                      className={`px-4 py-3 rounded-lg text-base font-medium transition-all ${
-                        isHomepage && activeSection === 8
-                          ? "text-orange-400 bg-orange-500/10 border border-orange-500/30"
-                          : "text-gray-300 hover:text-orange-400 hover:bg-white/5"
-                      }`}
-                    >
-                      Contact
-                    </button>
+                    {isHomepage ? (
+                      <button
+                        onClick={handleContactClick}
+                        className={`px-4 py-3 rounded-lg text-base font-medium transition-all ${
+                          activeSection === 8
+                            ? "text-orange-400 bg-orange-500/10 border border-orange-500/30"
+                            : "text-gray-300 hover:text-orange-400 hover:bg-white/5"
+                        }`}
+                      >
+                        Contact
+                      </button>
+                    ) : (
+                      <Link
+                        href="/contact"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`px-4 py-3 rounded-lg text-base font-medium transition-all ${
+                          pathname === "/contact"
+                            ? "text-orange-400 bg-orange-500/10 border border-orange-500/30"
+                            : "text-gray-300 hover:text-orange-400 hover:bg-white/5"
+                        }`}
+                      >
+                        Contact
+                      </Link>
+                    )}
                   </div>
                 )}
                 <button

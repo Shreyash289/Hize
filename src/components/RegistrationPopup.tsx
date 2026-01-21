@@ -11,6 +11,7 @@ import {
   Sparkles,
   Users,
   Zap,
+  Award,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -92,16 +93,36 @@ export default function RegistrationPopup({
 }: RegistrationPopupProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [includeGoodies, setIncludeGoodies] = useState(false);
+  const [isIEEEMember, setIsIEEEMember] = useState(false);
   const [isSRMStudent, setIsSRMStudent] = useState(false);
 
   // Calculate price based on selections
   const calculatePrice = () => {
-    const basePrice = isSRMStudent ? 149 : 199;
+    let basePrice = 0;
+    
+    if (isIEEEMember && isSRMStudent) {
+      basePrice = 99;
+    } else if (!isIEEEMember && isSRMStudent) {
+      basePrice = 149;
+    } else if (isIEEEMember && !isSRMStudent) {
+      basePrice = 149;
+    } else {
+      basePrice = 199;
+    }
+    
     return basePrice + (includeGoodies ? 400 : 0);
   };
 
   const getPriceLabel = () => {
-    return isSRMStudent ? "SRM Student" : "Non-SRM Student";
+    if (isIEEEMember && isSRMStudent) {
+      return "IEEE Member + SRM Student";
+    } else if (!isIEEEMember && isSRMStudent) {
+      return "Non-IEEE Member + SRM Student";
+    } else if (isIEEEMember && !isSRMStudent) {
+      return "IEEE Member + Non-SRM Student";
+    } else {
+      return "Non-IEEE Member + Non-SRM Student";
+    }
   };
 
   // Detect mobile and tablet
@@ -417,6 +438,52 @@ export default function RegistrationPopup({
                     </div>
                   </m.div>
 
+                  {/* IEEE Member Toggle */}
+                  <m.div
+                    variants={cardVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="group relative p-4 lg:p-5 rounded-xl border border-[#FACC15]/30 bg-gradient-to-br from-black/50 to-zinc-900/30 hover:border-[#FACC15]/60 hover:bg-gradient-to-br hover:from-black/70 hover:to-zinc-900/50 transition-all duration-300 hover:shadow-lg hover:shadow-[#FACC15]/10"
+                  >
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#FACC15]/5 via-transparent to-[#F97316]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="flex items-center justify-between gap-4 mb-3 relative z-10">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30">
+                          <Award className="h-5 w-5 text-white" />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-white font-bold block text-sm lg:text-base">
+                            IEEE Member
+                          </span>
+                          <span className="text-gray-400 text-xs lg:text-sm">
+                            Are you an IEEE member?
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setIsIEEEMember(!isIEEEMember)}
+                        className={`relative w-14 lg:w-16 h-7 lg:h-8 rounded-full transition-all flex-shrink-0 shadow-lg ${
+                          isIEEEMember
+                            ? "bg-gradient-to-r from-[#FACC15] to-[#F97316] shadow-[#FACC15]/50"
+                            : "bg-gray-700 hover:bg-gray-600"
+                        }`}
+                        aria-label="Toggle IEEE membership"
+                      >
+                        <m.div
+                          animate={{
+                            x: isIEEEMember ? 28 : 2,
+                          }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 500,
+                            damping: 30,
+                          }}
+                          className="absolute top-1 w-5 lg:w-6 h-5 lg:h-6 bg-white rounded-full shadow-md"
+                        />
+                      </button>
+                    </div>
+                  </m.div>
+
                   {/* SRM Student Toggle */}
                   <m.div
                     variants={cardVariants}
@@ -628,6 +695,40 @@ export default function RegistrationPopup({
                         <div
                           className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-md ${
                             includeGoodies ? "translate-x-6" : "translate-x-0"
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* IEEE Member Toggle */}
+                  <div className="p-4 rounded-xl border border-[#FACC15]/30 bg-gradient-to-br from-black/50 to-zinc-900/30 active:border-[#FACC15]/60 active:bg-gradient-to-br active:from-black/70 active:to-zinc-900/50 transition-all">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30">
+                          <Award className="h-4 w-4 text-white" />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-white font-bold text-sm block">
+                            IEEE Member
+                          </span>
+                          <span className="text-gray-400 text-xs">
+                            IEEE member?
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setIsIEEEMember(!isIEEEMember)}
+                        className={`relative w-12 h-6 rounded-full transition-all touch-manipulation flex-shrink-0 shadow-lg ${
+                          isIEEEMember
+                            ? "bg-gradient-to-r from-[#FACC15] to-[#F97316] shadow-[#FACC15]/50"
+                            : "bg-gray-700"
+                        }`}
+                        aria-label="Toggle IEEE membership"
+                      >
+                        <div
+                          className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-md ${
+                            isIEEEMember ? "translate-x-6" : "translate-x-0"
                           }`}
                         />
                       </button>

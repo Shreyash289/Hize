@@ -705,17 +705,7 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             className="relative p-6 sm:p-8 md:p-10 lg:p-12 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20"
           >
-            <div className="flex flex-col gap-6 sm:gap-7 md:gap-8">
-              <div className="flex items-center gap-3">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-orange-500/40 text-sm font-semibold text-orange-200 shadow-lg">
-                  <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
-                  Map
-                </div>
-                <p className="text-sm text-slate-400">
-                  Google Maps embed with campus location
-                </p>
-              </div>
-
+            <div className="flex flex-col gap-6 sm:gap-8">
               <motion.a
                 href="https://www.google.com/maps/d/u/0/viewer?mid=18kGFk2ClDWeZPYT0rkdUHRDRw98Mj5U&ehbc=2E312F"
                 target="_blank"
@@ -726,7 +716,7 @@ export default function Home() {
               >
                 <div className="relative aspect-[4/3] w-full flex items-center justify-center bg-gradient-to-br from-black via-slate-900 to-black">
                   {/* Map Icon/Visual */}
-                  <div className="text-center p-4 sm:p-6 space-y-3 sm:space-y-4">
+                  <div className="text-center p-4 sm:p-6 space-y-4">
                     <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full bg-gradient-to-r from-orange-600 to-orange-400 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
                       <svg className="w-8 h-8 sm:w-10 sm:h-10 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -734,18 +724,15 @@ export default function Home() {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-orange-400 font-bold text-lg sm:text-xl mb-1 sm:mb-2 group-hover:text-orange-300 transition-colors">
+                      <p className="text-orange-400 font-bold text-lg sm:text-xl mb-2 group-hover:text-orange-300 transition-colors">
                         View Campus Location
-                      </p>
-                      <p className="text-orange-200/70 text-xs sm:text-sm max-w-sm mx-auto">
-                        Click to open interactive map in Google Maps
                       </p>
                     </div>
                     <motion.div
-                      className="inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg bg-gradient-to-r from-orange-600 to-orange-400 font-bold text-black shadow-lg group-hover:shadow-xl transition-all text-xs sm:text-sm"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-orange-600 to-orange-400 font-bold text-black shadow-lg group-hover:shadow-xl transition-all text-sm"
                       whileHover={{ scale: 1.05 }}
                     >
-                      <span>Open in Maps</span>
+                      <span>Open in Google Maps</span>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                       </svg>
@@ -756,24 +743,11 @@ export default function Home() {
                 </div>
               </motion.a>
 
-
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="text-slate-300 text-sm sm:text-base font-mono">
+              {/* Address */}
+              <div className="text-center">
+                <p className="text-slate-300 text-sm sm:text-base font-mono">
                   SRM Institute of Science & Technology, Kattankulathur, Tamil Nadu
-                </div>
-                <motion.a
-                  href="https://www.google.com/maps/d/u/0/viewer?mid=18kGFk2ClDWeZPYT0rkdUHRDRw98Mj5U&ehbc=2E312F"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-orange-600 to-orange-400 font-semibold text-black shadow-lg shadow-orange-500/40 hover:shadow-orange-500/70 transition-all duration-300"
-                >
-                  Open Full Map
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </motion.a>
+                </p>
               </div>
             </div>
 
@@ -1186,10 +1160,10 @@ export default function Home() {
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.4 }}
             className="text-center mb-8 sm:mb-10 md:mb-12"
           >
             <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-3 sm:mb-4 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
@@ -1289,10 +1263,10 @@ export default function Home() {
                         setSelectedDomain(item as DomainTeam)
                       }
                     }}
-                    initial={{ opacity: 0, y: 50 }}
+                    initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 0.6, delay: index * 0.15, ease: "easeOut" }}
+                    transition={{ duration: 0.4, delay: index * 0.05, ease: "easeOut" }}
                     whileHover={{ y: -8, scale: 1.02 }}
                     className={`relative p-6 sm:p-7 md:p-8 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/70 to-zinc-900/70 backdrop-blur-xl border border-orange-500/30 flex flex-col items-center text-center shadow-2xl group w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 ${shouldDisable ? "cursor-default" : "cursor-pointer"}`}
                     disabled={shouldDisable}
@@ -1451,10 +1425,10 @@ export default function Home() {
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.4 }}
             className="text-center mb-12 sm:mb-16 md:mb-20"
           >
             <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-4 sm:mb-6 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
@@ -1469,10 +1443,10 @@ export default function Home() {
             {facultyContacts.map((coordinator, index) => (
               <motion.div
                 key={coordinator.name}
-                initial={{ opacity: 0, y: 50 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.2, duration: 0.8 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ delay: index * 0.1, duration: 0.4 }}
                 className="relative p-6 sm:p-7 md:p-8 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20 space-y-5 sm:space-y-6"
               >
                 <div className="flex flex-col items-center space-y-3 sm:space-y-4">
