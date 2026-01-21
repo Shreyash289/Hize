@@ -65,17 +65,17 @@ export default function PartnersMarquee() {
             const isGradeX = partner.name === "GradeX"
             
             return (
-              <div 
-                key={`${partner.name}-${index}`} 
-                className="mx-8 md:mx-12 flex items-center justify-center group"
-              >
-                {partner.url ? (
-                  <a
-                    href={formatUrl(partner.url)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block relative"
-                  >
+            <div 
+              key={`${partner.name}-${index}`} 
+              className="mx-8 md:mx-12 flex items-center justify-center group"
+            >
+              {partner.url ? (
+                <a
+                  href={formatUrl(partner.url)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block relative"
+                >
                     <div 
                       className={`relative px-6 py-4 rounded-xl backdrop-blur-sm shadow-sm transition-all duration-300 hover:scale-105 hover:-translate-y-1 ${
                         isGradeX 
@@ -93,26 +93,26 @@ export default function PartnersMarquee() {
                       )}
                       {/* Subtle glow on hover for other partners */}
                       {!isGradeX && (
-                        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-orange-500/0 via-orange-400/0 to-orange-500/0 group-hover:from-orange-500/5 group-hover:via-orange-400/10 group-hover:to-orange-500/5 transition-all duration-300 opacity-0 group-hover:opacity-100 -z-10 blur-xl"></div>
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-orange-500/0 via-orange-400/0 to-orange-500/0 group-hover:from-orange-500/5 group-hover:via-orange-400/10 group-hover:to-orange-500/5 transition-all duration-300 opacity-0 group-hover:opacity-100 -z-10 blur-xl"></div>
                       )}
-                      
-                      <img
-                        alt={partner.name}
-                        src={partner.logo}
+                    
+                    <img
+                      alt={partner.name}
+                      src={partner.logo}
                         className={`h-16 md:h-20 w-auto object-contain transition-all duration-300 ${
                           isGradeX 
                             ? "filter drop-shadow-[0_2px_8px_rgba(255,215,0,0.3)] group-hover:drop-shadow-[0_4px_12px_rgba(255,215,0,0.5)]"
                             : "filter drop-shadow-sm group-hover:drop-shadow-md"
                         }`}
                         style={isGradeX ? { filter: 'drop-shadow(0 2px 8px rgba(255, 215, 0, 0.3))' } : {}}
-                        loading="lazy"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none'
-                        }}
-                      />
-                    </div>
-                  </a>
-                ) : (
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none'
+                      }}
+                    />
+                  </div>
+                </a>
+              ) : (
                   <div 
                     className={`relative px-6 py-4 rounded-xl backdrop-blur-sm shadow-sm transition-all duration-300 hover:scale-105 hover:-translate-y-1 ${
                       isGradeX 
@@ -130,26 +130,26 @@ export default function PartnersMarquee() {
                     )}
                     {/* Subtle glow on hover for other partners */}
                     {!isGradeX && (
-                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-orange-500/0 via-orange-400/0 to-orange-500/0 group-hover:from-orange-500/5 group-hover:via-orange-400/10 group-hover:to-orange-500/5 transition-all duration-300 opacity-0 group-hover:opacity-100 -z-10 blur-xl"></div>
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-orange-500/0 via-orange-400/0 to-orange-500/0 group-hover:from-orange-500/5 group-hover:via-orange-400/10 group-hover:to-orange-500/5 transition-all duration-300 opacity-0 group-hover:opacity-100 -z-10 blur-xl"></div>
                     )}
-                    
-                    <img
-                      alt={partner.name}
-                      src={partner.logo}
+                  
+                  <img
+                    alt={partner.name}
+                    src={partner.logo}
                       className={`h-16 md:h-20 w-auto object-contain transition-all duration-300 ${
                         isGradeX 
                           ? "filter drop-shadow-[0_2px_8px_rgba(255,215,0,0.3)] group-hover:drop-shadow-[0_4px_12px_rgba(255,215,0,0.5)]"
                           : "filter drop-shadow-sm group-hover:drop-shadow-md"
                       }`}
                       style={isGradeX ? { filter: 'drop-shadow(0 2px 8px rgba(255, 215, 0, 0.3))' } : {}}
-                      loading="lazy"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none'
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
+                    loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none'
+                    }}
+                  />
+                </div>
+              )}
+            </div>
             )
           })}
         </Marquee>

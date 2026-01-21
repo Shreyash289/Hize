@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "update": "./scripts/update-vps.sh",
     "backend:dev": "cd backend && npm run dev",
     "backend:start": "cd backend && npm start",
     "worker:start": "cd worker && source venv/bin/activate && python3 ieee_worker.py",

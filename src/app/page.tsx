@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from 'next/link'
-import { Code2, Lightbulb, Mic2, Mail, Phone, ArrowDown, ChevronUp, X, FileText } from "lucide-react"
+import { Mail, ArrowDown, ChevronUp, X, FileText } from "lucide-react"
 import { FaTwitter } from 'react-icons/fa'
 import Image from "next/image"
 import dynamic from "next/dynamic"
@@ -23,10 +23,6 @@ const DynamicBackground = dynamic(() => import("@/components/DynamicBackground")
   loading: () => <div className="fixed inset-0 bg-black"></div>
 })
 
-const ScrollProgress = dynamic(() => import("@/components/ScrollProgress"), {
-  ssr: false,
-  loading: () => null
-})
 
 // Only load magnetic cursor on desktop
 const MagneticCursor = dynamic(() => import("@/components/MagneticCursor"), {
@@ -73,13 +69,6 @@ interface Speaker {
   }
 }
 
-interface EventItem {
-  icon?: string
-  title: string
-  tags?: string[]
-  description?: string
-  color?: string
-}
 
 interface StudentMember {
   name: string
@@ -93,11 +82,6 @@ interface DomainTeam {
   team?: StudentMember[]
 }
 
-const ICON_MAP: Record<string, any> = {
-  Code2,
-  Lightbulb,
-  Mic2,
-} as const
 
 const normalizeStudentImage = (image?: string) => {
   const fallback = "/studentteam/falll.png"
@@ -151,8 +135,8 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null)
   const sectionsRef = useRef<(HTMLElement | null)[]>([])
   const activeSectionRef = useRef(0)
+  const timelineRef = useRef<HTMLElement | null>(null)
   const [speakers, setSpeakers] = useState<Speaker[]>([])
-  const [eventsData, setEventsData] = useState<EventItem[] | null>(null) // null = loading, [] = loaded empty
   const [selectedSpeaker, setSelectedSpeaker] = useState<Speaker | null>(null)
   const [students, setStudents] = useState<any[]>(INITIAL_STUDENTS);
   const [domains, setDomains] = useState<DomainTeam[]>([])
@@ -240,39 +224,6 @@ export default function Home() {
     }
   }, [])
 
-  useEffect(() => {
-    let mounted = true
-    let abortController = new AbortController()
-
-    // Use static cache with revalidation for better performance
-    fetch("/data/events.json", {
-      cache: "force-cache",
-      next: { revalidate: 3600 }, // Revalidate every hour
-      signal: abortController.signal
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to load events")
-        return res.json()
-      })
-      .then((data) => {
-        if (mounted) {
-          // Validate it's an array
-          if (Array.isArray(data)) setEventsData(data as EventItem[])
-          else setEventsData([])
-        }
-      })
-      .catch((error) => {
-        if (mounted && error.name !== 'AbortError') {
-          console.warn('Failed to load events:', error)
-          setEventsData([])
-        }
-      })
-
-    return () => {
-      mounted = false
-      abortController.abort()
-    }
-  }, [])
 
   useEffect(() => {
     let mounted = true
@@ -336,7 +287,7 @@ export default function Home() {
     }
   }, []);
 
-  const sections = ["Hero", "Venue Map", "Events", "Guests", "Partners", "Previous Events", "Student Team", "Contact"]
+  const sections = ["Hero", "Venue Map", "Guests", "Partners", "Previous Events", "Student Team", "Contact"]
 
   // Cleanup harsh click timeout on unmount
   useEffect(() => {
@@ -482,11 +433,6 @@ export default function Home() {
       />
       {!isIOS && <DynamicBackground />}
       {!isIOS && <MagneticCursor />}
-      <ScrollProgress
-        sections={sections}
-        activeSection={activeSection}
-        onSectionClick={scrollToSection}
-      />
 
       <section
         ref={(el) => { sectionsRef.current[0] = el }}
@@ -620,13 +566,20 @@ export default function Home() {
                 REGISTER NOW
               </motion.button>
 
-            <motion.div
+            <motion.button
+              onClick={() => {
+                if (timelineRef.current) {
+                  timelineRef.current.scrollIntoView({ behavior: "smooth", block: "start" })
+                }
+              }}
               animate={{ y: [0, 12, 0] }}
               transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-              className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-r from-orange-500/20 to-orange-400/20 backdrop-blur-sm border-2 border-orange-500/30"
+              className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-r from-orange-500/20 to-orange-400/20 backdrop-blur-sm border-2 border-orange-500/30 cursor-pointer hover:border-orange-400/50 transition-colors"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
             >
               <ArrowDown className="w-7 h-7 text-orange-400" strokeWidth={3} />
-            </motion.div>
+            </motion.button>
           </motion.div>
         </motion.div>
       </section>
@@ -743,87 +696,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section
-        ref={(el) => { sectionsRef.current[2] = el }}
-        className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
-      >
-        <div className="max-w-7xl mx-auto w-full relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-8 sm:mb-10 md:mb-12"
-          >
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-3 sm:mb-4 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
-              EVENTS
-            </h2>
-            <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
-              Explore our lineup of competitions, workshops and keynotes
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
-            {eventsData === null ? (
-              <div className="col-span-1 sm:col-span-2 lg:col-span-3 text-center py-12">
-                <p className="text-slate-400">Loading events…</p>
-              </div>
-            ) : eventsData.length === 0 ? (
-              <div className="col-span-1 sm:col-span-2 lg:col-span-3 text-center py-12">
-                <p className="text-slate-400">No events available.</p>
-              </div>
-            ) : (
-              eventsData.map((event, index) => {
-                const Icon = event.icon ? ICON_MAP[event.icon] ?? Code2 : Code2
-                return (
-                  <motion.div
-                    key={event.title ?? index}
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ delay: index * 0.15, duration: 0.6, ease: "easeOut" }}
-                    className="group relative h-full flex flex-col"
-                    style={{ transformStyle: "preserve-3d", willChange: "transform, opacity" }}
-                  >
-                    <div className="relative p-5 sm:p-6 md:p-8 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20 overflow-hidden h-full flex flex-col">
-
-                      <div className="relative z-10 flex flex-col flex-grow space-y-4 sm:space-y-5 md:space-y-6">
-                        <div className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl md:rounded-2xl ${event.color ?? "bg-gradient-to-br from-orange-600 to-orange-400"} flex items-center justify-center shadow-lg`}>
-                          <Icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" />
-                        </div>
-
-                        <div className="flex-grow">
-                          <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3">{event.title}</h3>
-                          <div className="flex gap-1.5 sm:gap-2 flex-wrap mb-3 sm:mb-4">
-                            {(event.tags ?? []).map((tag) => (
-                              <span
-                                key={tag}
-                                className="px-2 sm:px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm text-xs sm:text-sm font-medium"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                          <p className="text-sm sm:text-base text-slate-400 font-serif leading-relaxed">
-                            {event.description}
-                          </p>
-                        </div>
-
-                        <button className="w-full py-2.5 sm:py-3 rounded-lg md:rounded-xl text-sm sm:text-base font-semibold bg-gradient-to-r from-orange-600 to-orange-400 transition-all duration-300">
-                          View Details
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
-                )
-              })
-            )}
-          </div>
-        </div>
-      </section>
-
       {/* Timeline Section */}
-      <section className="relative py-10 sm:py-12 md:py-14">
+      <section ref={(el) => { timelineRef.current = el }} className="relative py-10 sm:py-12 md:py-14">
         <div className="max-w-7xl mx-auto w-full relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -844,7 +718,7 @@ export default function Home() {
       </section>
 
       <section
-        ref={(el) => { sectionsRef.current[3] = el }}
+        ref={(el) => { sectionsRef.current[2] = el }}
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -1005,7 +879,7 @@ export default function Home() {
 
 
       <section
-        ref={(el) => { sectionsRef.current[4] = el }}
+        ref={(el) => { sectionsRef.current[3] = el }}
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -1037,7 +911,7 @@ export default function Home() {
       </section>
 
       <section
-        ref={(el) => { sectionsRef.current[5] = el }}
+        ref={(el) => { sectionsRef.current[4] = el }}
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -1137,7 +1011,7 @@ export default function Home() {
 
 
       <section
-        ref={(el) => { sectionsRef.current[6] = el }}
+        ref={(el) => { sectionsRef.current[5] = el }}
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -1403,7 +1277,7 @@ export default function Home() {
 
 
       <section
-        ref={(el) => { sectionsRef.current[7] = el }}
+        ref={(el) => { sectionsRef.current[6] = el }}
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -1458,17 +1332,6 @@ export default function Home() {
                       <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <span className="text-xs sm:text-sm font-mono break-all">{coordinator.email}</span>
-                  </motion.a>
-
-                  <motion.a
-                    href={`tel:${coordinator.phone.replace(/\s/g, '')}`}
-                    whileHover={{ x: 5 }}
-                    className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg md:rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
-                  >
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-r from-orange-400 to-orange-600 flex items-center justify-center flex-shrink-0">
-                      <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </div>
-                    <span className="text-xs sm:text-sm font-mono">{coordinator.phone}</span>
                   </motion.a>
                 </div>
               </motion.div>

@@ -29,15 +29,12 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const homepageLinks = [
-    { label: "Venue Map", section: 1 },
-    { label: "Events", section: 2 },
-    { label: "Guests", section: 3 },
-    { label: "Partners", section: 4 },
-    { label: "Previous Events", section: 5 },
-    { label: "Student Team", section: 6 },
-    { label: "Contact", section: 7 },
-  ]
+  // Generate homepage links dynamically from sections prop, skipping "Hero" (index 0)
+  const homepageLinks = sections && sections.length > 0
+    ? sections
+        .map((label, index) => ({ label, section: index }))
+        .filter((_, index) => index > 0) // Skip "Hero" section (index 0)
+    : []
 
   const regularLinks = [
     { href: "/events", label: "Events" },
