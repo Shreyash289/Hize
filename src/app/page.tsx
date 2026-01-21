@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from 'next/link'
-import { Mail, ArrowDown, ChevronUp, X, FileText } from "lucide-react"
+import { Mail, ArrowDown, ChevronUp, X, FileText, Phone } from "lucide-react"
 import { FaTwitter } from 'react-icons/fa'
 import Image from "next/image"
 import dynamic from "next/dynamic"
