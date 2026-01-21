@@ -131,55 +131,6 @@ export default function HackathonPage() {
                             <HudPill icon={Clock} text="48 HOURS" delay={0.7} />
                             <HudPill icon={MapPin} text="SRM IST" delay={0.8} />
                         </motion.div>
-
-                        {/* Register Now Button */}
-                        <motion.a
-                            href="https://konfhub.com/checkout/high-impact-zonal-event-2026"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 1, duration: 0.5 }}
-                            className="relative flex items-center gap-3 px-5 py-2.5 border-2 border-red-900/40 bg-[#1a0505]/80 backdrop-blur-md rounded-lg hover:border-red-500/70 hover:bg-red-950/50 transition-all cursor-pointer shadow-[0_0_20px_rgba(0,0,0,0.6)] group whitespace-nowrap mt-8 overflow-hidden"
-                        >
-                            {/* Red shine effect around border */}
-                            <motion.div
-                                className="absolute inset-0 rounded-lg"
-                                style={{
-                                    background: "linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.6), transparent)",
-                                    backgroundSize: "200% 100%",
-                                }}
-                                animate={{
-                                    backgroundPosition: ["-200% 0", "200% 0"],
-                                }}
-                                transition={{
-                                    duration: 2,
-                                    repeat: Infinity,
-                                    repeatDelay: 1,
-                                    ease: "easeInOut",
-                                }}
-                            />
-                            
-                            {/* Red glow around border */}
-                            <motion.div
-                                className="absolute -inset-[2px] rounded-lg border-2 border-red-500/50"
-                                animate={{
-                                    opacity: [0.3, 0.8, 0.3],
-                                    boxShadow: [
-                                        "0 0 10px rgba(220, 38, 38, 0.3)",
-                                        "0 0 20px rgba(220, 38, 38, 0.6), 0 0 30px rgba(220, 38, 38, 0.4)",
-                                        "0 0 10px rgba(220, 38, 38, 0.3)",
-                                    ],
-                                }}
-                                transition={{
-                                    duration: 2,
-                                    repeat: Infinity,
-                                    ease: "easeInOut",
-                                }}
-                            />
-                            
-                            <span className="relative z-10 font-mono text-xs text-red-200/80 tracking-[0.15em] font-bold group-hover:text-red-100 whitespace-nowrap">Register Now!</span>
-                        </motion.a>
                     </div>
                 </header>
 
@@ -459,6 +410,7 @@ function FleshyPortalButton({ onClick }: { onClick: () => void }) {
                     <div className="relative z-10 flex items-center gap-2">
                         {/* Pulsing Core */}
                         <div className="w-3 h-3 rounded-full bg-red-400 animate-ping absolute sm:relative opacity-70" />
+                        <div className="w-2 h-2 rounded-full bg-white relative" />
 
                         <span className="hidden sm:block font-mono text-xs text-red-200 tracking-[0.2em] font-bold group-hover:text-white group-hover:tracking-[0.3em] transition-all duration-500 drop-shadow-md">
                             THE RIGHT SIDE UP
@@ -473,31 +425,8 @@ function FleshyPortalButton({ onClick }: { onClick: () => void }) {
 // 2. UPDATED: Visible Creeping Vines (Glowing Veins)
 // 2. UPDATED: Visible Creeping Vines (Glowing Veins - Dense Version)
 function CreepingVines() {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [isVisible, setIsVisible] = useState(true);
-    
-    // Reduce animations on mobile for better performance
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-    if (isMobile) return null; // Disable vines on mobile for performance
-    
-    useEffect(() => {
-        // Use IntersectionObserver to pause when off-screen
-        if (typeof window !== 'undefined' && containerRef.current) {
-            const observer = new IntersectionObserver(
-                (entries) => {
-                    entries.forEach((entry) => {
-                        setIsVisible(entry.isIntersecting);
-                    });
-                },
-                { rootMargin: '200px', threshold: 0 }
-            );
-            observer.observe(containerRef.current);
-            return () => observer.disconnect();
-        }
-    }, []);
-    
     return (
-        <div ref={containerRef} className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
 
             {/* --- TOP LEFT CLUSTER (Primary Overgrowth) --- */}
             <svg className="absolute -top-10 -left-10 w-[60vw] h-[60vw] text-[#8a3a3a] opacity-60 filter drop-shadow-[0_0_8px_rgba(220,50,50,0.6)]" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -505,55 +434,29 @@ function CreepingVines() {
                 <motion.path
                     d="M0,0 Q30,15 50,40 T80,90"
                     fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"
-                    initial={{ pathLength: 0 }} 
-                    animate={isVisible ? { pathLength: 1 } : { pathLength: 0 }} 
-                    transition={{ duration: 8, ease: "easeInOut" }}
-                    style={{ willChange: 'stroke-dasharray, stroke-dashoffset' }}
+                    initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 8, ease: "easeInOut" }}
                 />
                 {/* Secondary branching vein */}
                 <motion.path
                     d="M10,-10 Q40,30 65,60 T100,100"
                     fill="none" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round"
-                    initial={{ pathLength: 0 }} 
-                    animate={isVisible ? { pathLength: 1 } : { pathLength: 0 }} 
-                    transition={{ duration: 10, ease: "easeInOut", delay: 1 }}
-                    style={{ willChange: 'stroke-dasharray, stroke-dashoffset' }}
+                    initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 10, ease: "easeInOut", delay: 1 }}
                 />
                 {/* New: Wide creeping tendril */}
                 <motion.path
                     d="M-5,20 Q25,25 45,55 T75,95"
                     fill="none" stroke="currentColor" strokeWidth="0.6" strokeLinecap="round"
-                    initial={{ pathLength: 0 }} 
-                    animate={isVisible ? { pathLength: 1 } : { pathLength: 0 }} 
-                    transition={{ duration: 12, ease: "easeInOut", delay: 0.5 }}
-                    style={{ willChange: 'stroke-dasharray, stroke-dashoffset' }}
+                    initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 12, ease: "easeInOut", delay: 0.5 }}
                 />
                 {/* New: Horizontal reaching vine */}
                 <motion.path
                     d="M0,10 Q40,5 80,30"
                     fill="none" stroke="currentColor" strokeWidth="0.4" strokeLinecap="round"
-                    initial={{ pathLength: 0 }} 
-                    animate={isVisible ? { pathLength: 1 } : { pathLength: 0 }} 
-                    transition={{ duration: 9, ease: "easeInOut", delay: 2 }}
-                    style={{ willChange: 'stroke-dasharray, stroke-dashoffset' }}
+                    initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 9, ease: "easeInOut", delay: 2 }}
                 />
                 {/* Small branching veins */}
-                <motion.path 
-                    d="M50,40 Q60,30 70,20" 
-                    fill="none" stroke="currentColor" strokeWidth="0.3" 
-                    initial={{ pathLength: 0 }} 
-                    animate={isVisible ? { pathLength: 1 } : { pathLength: 0 }} 
-                    transition={{ duration: 2, delay: 4 }}
-                    style={{ willChange: 'stroke-dasharray, stroke-dashoffset' }}
-                />
-                <motion.path 
-                    d="M30,15 Q40,25 35,45" 
-                    fill="none" stroke="currentColor" strokeWidth="0.3" 
-                    initial={{ pathLength: 0 }} 
-                    animate={isVisible ? { pathLength: 1 } : { pathLength: 0 }} 
-                    transition={{ duration: 3, delay: 3.5 }}
-                    style={{ willChange: 'stroke-dasharray, stroke-dashoffset' }}
-                />
+                <motion.path d="M50,40 Q60,30 70,20" fill="none" stroke="currentColor" strokeWidth="0.3" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 2, delay: 4 }} />
+                <motion.path d="M30,15 Q40,25 35,45" fill="none" stroke="currentColor" strokeWidth="0.3" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 3, delay: 3.5 }} />
             </svg>
 
             {/* --- BOTTOM RIGHT CLUSTER (Intrusion) --- */}
@@ -561,44 +464,21 @@ function CreepingVines() {
                 <motion.path
                     d="M0,0 Q25,20 45,50 T95,95"
                     fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"
-                    initial={{ pathLength: 0 }} 
-                    animate={isVisible ? { pathLength: 1 } : { pathLength: 0 }} 
-                    transition={{ duration: 9, ease: "easeInOut" }}
-                    style={{ willChange: 'stroke-dasharray, stroke-dashoffset' }}
+                    initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 9, ease: "easeInOut" }}
                 />
                 <motion.path
                     d="M20,0 Q40,30 60,60 T90,90"
                     fill="none" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round"
-                    initial={{ pathLength: 0 }} 
-                    animate={isVisible ? { pathLength: 1 } : { pathLength: 0 }} 
-                    transition={{ duration: 11, ease: "easeInOut", delay: 1.5 }}
-                    style={{ willChange: 'stroke-dasharray, stroke-dashoffset' }}
+                    initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 11, ease: "easeInOut", delay: 1.5 }}
                 />
                 {/* New: Aggressive curved hook */}
                 <motion.path
                     d="M-10,10 Q30,50 50,80 T80,100"
                     fill="none" stroke="currentColor" strokeWidth="0.6" strokeLinecap="round"
-                    initial={{ pathLength: 0 }} 
-                    animate={isVisible ? { pathLength: 1 } : { pathLength: 0 }} 
-                    transition={{ duration: 13, ease: "easeInOut", delay: 0.5 }}
-                    style={{ willChange: 'stroke-dasharray, stroke-dashoffset' }}
+                    initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 13, ease: "easeInOut", delay: 0.5 }}
                 />
-                <motion.path 
-                    d="M45,50 Q35,60 25,70" 
-                    fill="none" stroke="currentColor" strokeWidth="0.4" 
-                    initial={{ pathLength: 0 }} 
-                    animate={isVisible ? { pathLength: 1 } : { pathLength: 0 }} 
-                    transition={{ duration: 3, delay: 5 }}
-                    style={{ willChange: 'stroke-dasharray, stroke-dashoffset' }}
-                />
-                <motion.path 
-                    d="M60,60 Q70,50 85,55" 
-                    fill="none" stroke="currentColor" strokeWidth="0.4" 
-                    initial={{ pathLength: 0 }} 
-                    animate={isVisible ? { pathLength: 1 } : { pathLength: 0 }} 
-                    transition={{ duration: 3, delay: 6 }}
-                    style={{ willChange: 'stroke-dasharray, stroke-dashoffset' }}
-                />
+                <motion.path d="M45,50 Q35,60 25,70" fill="none" stroke="currentColor" strokeWidth="0.4" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 3, delay: 5 }} />
+                <motion.path d="M60,60 Q70,50 85,55" fill="none" stroke="currentColor" strokeWidth="0.4" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 3, delay: 6 }} />
             </svg>
 
             {/* --- NEW: BOTTOM LEFT CLUSTER (Subtle Filler) --- */}
@@ -606,18 +486,12 @@ function CreepingVines() {
                 <motion.path
                     d="M0,100 Q20,70 50,50 T90,20"
                     fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round"
-                    initial={{ pathLength: 0 }} 
-                    animate={isVisible ? { pathLength: 1 } : { pathLength: 0 }} 
-                    transition={{ duration: 10, ease: "easeInOut", delay: 2 }}
-                    style={{ willChange: 'stroke-dasharray, stroke-dashoffset' }}
+                    initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 10, ease: "easeInOut", delay: 2 }}
                 />
                 <motion.path
                     d="M10,100 Q30,80 40,60"
                     fill="none" stroke="currentColor" strokeWidth="0.5" strokeLinecap="round"
-                    initial={{ pathLength: 0 }} 
-                    animate={isVisible ? { pathLength: 1 } : { pathLength: 0 }} 
-                    transition={{ duration: 8, ease: "easeInOut", delay: 4 }}
-                    style={{ willChange: 'stroke-dasharray, stroke-dashoffset' }}
+                    initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 8, ease: "easeInOut", delay: 4 }}
                 />
             </svg>
         </div>
@@ -627,37 +501,13 @@ function CreepingVines() {
 // 3. UPDATED: Dense Spore Storm (More particles, varying sizes/colors)
 function SporeStorm() {
     const [isMounted, setIsMounted] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [isVisible, setIsVisible] = useState(true);
-    
-    useEffect(() => {
-        setIsMounted(true);
-        
-        // Use IntersectionObserver to pause when off-screen
-        if (typeof window !== 'undefined' && containerRef.current) {
-            const observer = new IntersectionObserver(
-                (entries) => {
-                    entries.forEach((entry) => {
-                        setIsVisible(entry.isIntersecting);
-                    });
-                },
-                { rootMargin: '100px', threshold: 0 }
-            );
-            observer.observe(containerRef.current);
-            return () => observer.disconnect();
-        }
-    }, []);
-    
+    useEffect(() => setIsMounted(true), []);
     if (!isMounted) return null;
 
-    // Reduced count for better performance (was 100, now adaptive based on device)
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-    const isLowEnd = typeof navigator !== 'undefined' && 
-        ((navigator as any).deviceMemory !== undefined && (navigator as any).deviceMemory <= 2);
-    const sporeCount = isMobile ? 15 : isLowEnd ? 30 : 50;
+    // Increased count to 100 for density
     return (
-        <div ref={containerRef} className="absolute inset-0 overflow-hidden pointer-events-none z-15">
-            {Array.from({ length: sporeCount }).map((_, i) => {
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-15">
+            {Array.from({ length: 100 }).map((_, i) => {
                 const isRed = Math.random() > 0.7; // 30% are red spores
                 const size = Math.random() * 4 + 1;
                 return (
@@ -668,22 +518,21 @@ function SporeStorm() {
                             width: size + "px",
                             height: size + "px",
                             filter: `blur(${Math.random() * 3}px)`,
-                            boxShadow: isRed ? '0 0 5px red' : 'none',
-                            willChange: 'transform, opacity'
+                            boxShadow: isRed ? '0 0 5px red' : 'none'
                         }}
                         initial={{
                             x: Math.random() * window.innerWidth,
                             y: Math.random() * window.innerHeight,
                             opacity: 0
                         }}
-                        animate={isVisible ? {
+                        animate={{
                             y: [null, Math.random() * -200 - 50], // Stronger upward drift
                             x: [null, (Math.random() - 0.5) * 100], // Wider sideways drift
                             opacity: [0, Math.random() * 0.8 + 0.2, 0] // Brighter peaks
-                        } : {}}
+                        }}
                         transition={{
                             duration: Math.random() * 15 + 15, // Slower, more floaty
-                            repeat: isVisible ? Infinity : 0,
+                            repeat: Infinity,
                             ease: "linear",
                             delay: Math.random() * 20
                         }}
@@ -707,7 +556,7 @@ function HeroLogos() {
                     transition={{ delay: 0.2 }}
                     className="relative group"
                 >
-                    <img src="/srmlogo.png" alt="Sponsors" className="h-12 sm:h-16 object-contain" />
+                    <img src="/srmlogo.png" alt="Sponsors" className="h-12 sm:h-16 object-contain mix-blend-screen brightness-150 contrast-125 drop-shadow-[0_0_10px_rgba(255,100,100,0.5)]" />
                 </motion.div>
 
                 <div className="hidden sm:block h-10 w-[2px] bg-red-900/50 rounded-full" />
@@ -718,7 +567,7 @@ function HeroLogos() {
                     transition={{ delay: 0.3 }}
                     className="relative group"
                 >
-                    <img src="/Gemini_Generated_Image_73pbja73pbja73pb-removebg-preview.png" alt="Partners" className="h-10 sm:h-14 object-contain mix-blend-screen brightness-150 contrast-125 drop-shadow-[0_0_10px_rgba(100,100,255,0.5)]" />
+                    <img src="/FUTURIXLOGO.png" alt="Partners" className="h-10 sm:h-14 object-contain mix-blend-screen brightness-150 contrast-125 drop-shadow-[0_0_10px_rgba(100,100,255,0.5)]" />
                 </motion.div>
             </div>
 
@@ -742,10 +591,10 @@ function HudPill({ icon: Icon, text, delay }: { icon: any, text: string, delay: 
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay, duration: 0.5 }}
-            className="flex items-center gap-3 px-5 py-2.5 border-2 border-red-900/40 bg-[#1a0505]/80 backdrop-blur-md rounded-lg hover:border-red-500/70 hover:bg-red-950/50 transition-all cursor-default shadow-[0_0_20px_rgba(0,0,0,0.6)] group whitespace-nowrap"
+            className="flex items-center gap-3 px-5 py-2.5 border-2 border-red-900/40 bg-[#1a0505]/80 backdrop-blur-md rounded-lg hover:border-red-500/70 hover:bg-red-950/50 transition-all cursor-default shadow-[0_0_20px_rgba(0,0,0,0.6)] group"
         >
-            <Icon className="w-4 h-4 text-red-500 group-hover:text-red-300 transition-colors flex-shrink-0" />
-            <span className="font-mono text-xs text-red-200/80 tracking-[0.15em] font-bold group-hover:text-red-100 whitespace-nowrap">{text}</span>
+            <Icon className="w-4 h-4 text-red-500 group-hover:text-red-300 transition-colors" />
+            <span className="font-mono text-xs text-red-200/80 tracking-[0.15em] font-bold group-hover:text-red-100">{text}</span>
         </motion.div>
     );
 }
