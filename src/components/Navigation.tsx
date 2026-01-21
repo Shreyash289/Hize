@@ -71,40 +71,15 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
             : "bg-black/40 backdrop-blur-lg border border-orange-500/10"
         } rounded-xl sm:rounded-2xl mx-auto max-w-7xl`}
       >
-        <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between">
-          {/* Logo/Brand */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="relative h-8 sm:h-10 md:h-12 w-auto flex items-center gap-3"
-            >
-              <Image
-                src="/logo_white.png"
-                alt="IEEE Computer Society HIZE 2026"
-                width={160}
-                height={48}
-                className="h-full w-auto object-contain"
-                priority
-              />
-              <Image
-                src="/srmlogo.png"
-                alt="SRM Institute of Science & Technology"
-                width={120}
-                height={48}
-                className="h-full w-auto object-contain"
-                priority
-              />
-            </motion.div>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
+        <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-center relative">
+          {/* Desktop Navigation - Centered */}
+          <div className="hidden md:flex items-center gap-1 flex-wrap justify-center max-w-full">
             {isHomepage && sections ? (
               homepageLinks.map((link, idx) => (
                 <button
                   key={link.label}
                   onClick={() => handleNavClick(link.section)}
-                  className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`relative px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                     activeSection === link.section
                       ? "text-orange-400 bg-orange-500/10"
                       : "text-gray-300 hover:text-orange-400 hover:bg-white/5"
@@ -126,7 +101,7 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    className={`relative px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                       pathname === link.href
                         ? "text-orange-400 bg-orange-500/10"
                         : "text-gray-300 hover:text-orange-400 hover:bg-white/5"
@@ -144,7 +119,7 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
                 ))}
                 <button
                   onClick={handleContactClick}
-                  className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`relative px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                     isHomepage && activeSection === 8
                       ? "text-orange-400 bg-orange-500/10"
                       : "text-gray-300 hover:text-orange-400 hover:bg-white/5"
@@ -163,7 +138,7 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
             )}
             <button
               onClick={() => onRegisterClick?.()}
-              className="ml-2 px-6 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-orange-600 to-orange-400 text-black hover:from-orange-500 hover:to-orange-300 transition-all shadow-lg shadow-orange-500/30"
+              className="px-5 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-orange-600 to-orange-400 text-black hover:from-orange-500 hover:to-orange-300 transition-all shadow-lg shadow-orange-500/30 whitespace-nowrap"
             >
               Register
             </button>
@@ -172,11 +147,23 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-gray-300 hover:text-orange-400 hover:bg-white/5 transition-colors"
+            className="md:hidden absolute right-3 sm:right-4 p-2 rounded-lg text-gray-300 hover:text-orange-400 hover:bg-white/5 transition-colors"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
+          
+          {/* Mobile Logo - Only on mobile */}
+          <Link href="/" className="md:hidden absolute left-3 sm:left-4 flex items-center">
+            <Image
+              src="/logo_white.png"
+              alt="IEEE Computer Society HIZE 2026"
+              width={120}
+              height={36}
+              className="h-8 w-auto object-contain"
+              priority
+            />
+          </Link>
         </div>
       </motion.nav>
 
