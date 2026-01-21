@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback, useState, useRef } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import type { Variants } from "framer-motion";
 import {
@@ -9,7 +9,6 @@ import {
   MapPin,
   ExternalLink,
   Sparkles,
-  Award,
   Users,
   Zap,
 } from "lucide-react";
@@ -93,48 +92,16 @@ export default function RegistrationPopup({
 }: RegistrationPopupProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [includeGoodies, setIncludeGoodies] = useState(false);
-  const [isIEEEMember, setIsIEEEMember] = useState(false);
-  const [ieeeNumber, setIeeeNumber] = useState("");
   const [isSRMStudent, setIsSRMStudent] = useState(false);
-  const [ieeeValidationStatus, setIeeeValidationStatus] = useState<{
-    loading: boolean;
-    isValid: boolean | null;
-    error: string | null;
-    nameInitials: string | null;
-  }>({
-    loading: false,
-    isValid: null,
-    error: null,
-    nameInitials: null,
-  });
 
   // Calculate price based on selections
   const calculatePrice = () => {
-    let basePrice = 0;
-    
-    if (isIEEEMember && isSRMStudent) {
-      basePrice = 99;
-    } else if (!isIEEEMember && isSRMStudent) {
-      basePrice = 149;
-    } else if (isIEEEMember && !isSRMStudent) {
-      basePrice = 149;
-    } else {
-      basePrice = 199;
-    }
-    
+    const basePrice = isSRMStudent ? 149 : 199;
     return basePrice + (includeGoodies ? 400 : 0);
   };
 
   const getPriceLabel = () => {
-    if (isIEEEMember && isSRMStudent) {
-      return "IEEE Member + SRM Student";
-    } else if (!isIEEEMember && isSRMStudent) {
-      return "Non-IEEE Member + SRM Student";
-    } else if (isIEEEMember && !isSRMStudent) {
-      return "IEEE Member + Non-SRM Student";
-    } else {
-      return "Non-IEEE Member + Non-SRM Student";
-    }
+    return isSRMStudent ? "SRM Student" : "Non-SRM Student";
   };
 
   // Detect mobile and tablet
@@ -158,211 +125,6 @@ export default function RegistrationPopup({
     };
   }, []);
 
-  // Job polling state
-  const [pollingJobId, setPollingJobId] = useState<string | null>(null);
-  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Poll job status
-  const pollJobStatus = useCallback(async (jobId: string) => {
-    try {
-      const response = await fetch(`/api/ieee-validate/status?jobId=${encodeURIComponent(jobId)}`);
-      const data = await response.json();
-
-      if (data.status === 'completed' && data.result) {
-        // Job completed successfully
-        const result = data.result;
-        setIeeeValidationStatus({
-          loading: false,
-          isValid: result.isValid || false,
-          error: result.error || null,
-          nameInitials: result.nameInitials || null,
-        });
-        setIsIEEEMember(result.isValid || false);
-        
-        // Stop polling
-        if (pollingIntervalRef.current) {
-          clearInterval(pollingIntervalRef.current);
-          pollingIntervalRef.current = null;
-        }
-        setPollingJobId(null);
-      } else if (data.status === 'failed') {
-        // Job failed
-        setIeeeValidationStatus({
-          loading: false,
-          isValid: false,
-          error: data.error || 'Validation failed',
-          nameInitials: null,
-        });
-        setIsIEEEMember(false);
-        
-        // Stop polling
-        if (pollingIntervalRef.current) {
-          clearInterval(pollingIntervalRef.current);
-          pollingIntervalRef.current = null;
-        }
-        setPollingJobId(null);
-      } else if (data.status === 'processing') {
-        // Still processing, continue polling
-        setIeeeValidationStatus(prev => ({
-          ...prev,
-          loading: true,
-        }));
-      } else {
-        // Unknown status or not found
-        setIeeeValidationStatus({
-          loading: false,
-          isValid: false,
-          error: 'Validation status unknown',
-          nameInitials: null,
-        });
-        setIsIEEEMember(false);
-        
-        // Stop polling
-        if (pollingIntervalRef.current) {
-          clearInterval(pollingIntervalRef.current);
-          pollingIntervalRef.current = null;
-        }
-        setPollingJobId(null);
-      }
-    } catch (error: any) {
-      console.error('Polling error:', error);
-      // Continue polling on network errors (might be temporary)
-    }
-  }, []);
-
-  // Validate IEEE membership (creates job and starts polling)
-  const validateIEEEMembership = useCallback(async (memberId: string) => {
-    if (!memberId || memberId.trim().length < 6) {
-      setIeeeValidationStatus({
-        loading: false,
-        isValid: null,
-        error: null,
-        nameInitials: null,
-      });
-      return;
-    }
-
-    setIeeeValidationStatus({
-      loading: true,
-      isValid: null,
-      error: null,
-      nameInitials: null,
-    });
-
-    try {
-      const response = await fetch('/api/ieee-validate/check', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ memberId: memberId.trim() }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setIeeeValidationStatus({
-          loading: false,
-          isValid: false,
-          error: data.error || 'Validation failed',
-          nameInitials: null,
-        });
-        setIsIEEEMember(false);
-        return;
-      }
-
-      // If already completed (cached result), update immediately
-      if (data.status === 'completed' && data.result) {
-        const result = data.result;
-        setIeeeValidationStatus({
-          loading: false,
-          isValid: result.isValid || false,
-          error: result.error || null,
-          nameInitials: result.nameInitials || null,
-        });
-        setIsIEEEMember(result.isValid || false);
-      } else if (data.jobId) {
-        // Job created, start polling
-        setPollingJobId(data.jobId);
-        
-        // Start polling immediately
-        pollJobStatus(data.jobId);
-        
-        // Set up polling interval (every 1 second)
-        if (pollingIntervalRef.current) {
-          clearInterval(pollingIntervalRef.current);
-        }
-        pollingIntervalRef.current = setInterval(() => {
-          pollJobStatus(data.jobId);
-        }, 1000);
-      } else {
-        setIeeeValidationStatus({
-          loading: false,
-          isValid: false,
-          error: 'Failed to create validation job',
-          nameInitials: null,
-        });
-        setIsIEEEMember(false);
-      }
-    } catch (error: any) {
-      setIeeeValidationStatus({
-        loading: false,
-        isValid: false,
-        error: error.message || 'Failed to validate IEEE membership',
-        nameInitials: null,
-      });
-      setIsIEEEMember(false);
-    }
-  }, [pollJobStatus]);
-
-  // Cleanup polling when popup closes or unmounts
-  useEffect(() => {
-    if (!isOpen) {
-      // Stop polling when popup closes
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-        pollingIntervalRef.current = null;
-      }
-      setPollingJobId(null);
-    }
-    
-    return () => {
-      // Cleanup on unmount
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-        pollingIntervalRef.current = null;
-      }
-    };
-  }, [isOpen]);
-
-  // Debounced validation when IEEE number changes
-  useEffect(() => {
-    // Don't run if popup is closed
-    if (!isOpen) return;
-    
-    // Clear any existing polling
-    if (pollingIntervalRef.current) {
-      clearInterval(pollingIntervalRef.current);
-      pollingIntervalRef.current = null;
-    }
-    setPollingJobId(null);
-
-    if (!ieeeNumber || ieeeNumber.trim().length < 6) {
-      setIeeeValidationStatus({
-        loading: false,
-        isValid: null,
-        error: null,
-        nameInitials: null,
-      });
-      return;
-    }
-
-    const timeoutId = setTimeout(() => {
-      validateIEEEMembership(ieeeNumber);
-    }, 1000); // Wait 1 second after user stops typing
-
-    return () => clearTimeout(timeoutId);
-  }, [ieeeNumber, validateIEEEMembership, isOpen]);
 
   // ESC key close
   const handleKeyDown = useCallback(
@@ -655,55 +417,6 @@ export default function RegistrationPopup({
                     </div>
                   </m.div>
 
-                  {/* IEEE Member Toggle */}
-                  <m.div
-                    variants={cardVariants}
-                    initial="hidden"
-                    animate="visible"
-                    className="group relative p-4 lg:p-5 rounded-xl border border-[#FACC15]/30 bg-gradient-to-br from-black/50 to-zinc-900/30 hover:border-[#FACC15]/60 hover:bg-gradient-to-br hover:from-black/70 hover:to-zinc-900/50 transition-all duration-300 hover:shadow-lg hover:shadow-[#FACC15]/10"
-                  >
-                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#FACC15]/5 via-transparent to-[#F97316]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="flex items-center justify-between gap-4 mb-3 relative z-10">
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30">
-                          <Award className="h-5 w-5 text-white" />
-                        </div>
-                        <div className="min-w-0">
-                          <span className="text-white font-bold block text-sm lg:text-base">
-                            IEEE Member
-                          </span>
-                          <span className="text-gray-400 text-xs lg:text-sm">
-                            Are you an IEEE member?
-                          </span>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setIsIEEEMember(!isIEEEMember);
-                          if (!isIEEEMember) setIeeeNumber("");
-                        }}
-                        className={`relative w-14 lg:w-16 h-7 lg:h-8 rounded-full transition-all flex-shrink-0 shadow-lg ${
-                          isIEEEMember
-                            ? "bg-gradient-to-r from-[#FACC15] to-[#F97316] shadow-[#FACC15]/50"
-                            : "bg-gray-700 hover:bg-gray-600"
-                        }`}
-                        aria-label="Toggle IEEE membership"
-                      >
-                        <m.div
-                          animate={{
-                            x: isIEEEMember ? 28 : 2,
-                          }}
-                          transition={{
-                            type: "spring",
-                            stiffness: 500,
-                            damping: 30,
-                          }}
-                          className="absolute top-1 w-5 lg:w-6 h-5 lg:h-6 bg-white rounded-full shadow-md"
-                        />
-                      </button>
-                    </div>
-                  </m.div>
-
                   {/* SRM Student Toggle */}
                   <m.div
                     variants={cardVariants}
@@ -919,139 +632,6 @@ export default function RegistrationPopup({
                         />
                       </button>
                     </div>
-                  </div>
-
-                  {/* IEEE Member Toggle */}
-                  <div className="p-4 rounded-xl border border-[#FACC15]/30 bg-gradient-to-br from-black/50 to-zinc-900/30 active:border-[#FACC15]/60 active:bg-gradient-to-br active:from-black/70 active:to-zinc-900/50 transition-all">
-                    <div className="flex items-center justify-between gap-3 mb-3">
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30">
-                          <Award className="h-4 w-4 text-white" />
-                        </div>
-                        <div className="min-w-0">
-                          <span className="text-white font-bold text-sm block">
-                            IEEE Member
-                          </span>
-                          <span className="text-gray-400 text-xs">
-                            IEEE member?
-                          </span>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => {
-                          if (!isIEEEMember) {
-                            setIsIEEEMember(true);
-                          } else {
-                            setIsIEEEMember(false);
-                            setIeeeNumber("");
-                            setIeeeValidationStatus({
-                              loading: false,
-                              isValid: null,
-                              error: null,
-                              nameInitials: null,
-                            });
-                          }
-                        }}
-                        className={`relative w-12 h-6 rounded-full transition-all touch-manipulation flex-shrink-0 shadow-lg ${
-                          isIEEEMember
-                            ? "bg-gradient-to-r from-[#FACC15] to-[#F97316] shadow-[#FACC15]/50"
-                            : "bg-gray-700"
-                        }`}
-                        aria-label="Toggle IEEE membership"
-                      >
-                        <div
-                          className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-md ${
-                            isIEEEMember ? "translate-x-6" : "translate-x-0"
-                          }`}
-                        />
-                      </button>
-                    </div>
-                    
-                    {/* IEEE Number Input - Always visible for validation */}
-                    {isIEEEMember && (
-                      <m.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="mt-3 space-y-2"
-                      >
-                        <div className="relative">
-                          <input
-                            type="text"
-                            placeholder="Enter IEEE Member Number to verify"
-                            value={ieeeNumber}
-                            onChange={(e) => setIeeeNumber(e.target.value)}
-                            className={`w-full px-3 py-2 pr-10 bg-black/70 border rounded-lg text-white placeholder-gray-400 focus:outline-none transition-colors text-sm ${
-                              ieeeValidationStatus.isValid === true
-                                ? "border-green-500"
-                                : ieeeValidationStatus.isValid === false
-                                ? "border-red-500"
-                                : ieeeValidationStatus.loading
-                                ? "border-yellow-500"
-                                : "border-gray-600 focus:border-[#FACC15]"
-                            }`}
-                          />
-                          {/* Validation Status Icon */}
-                          {ieeeNumber.trim().length >= 6 && (
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                              {ieeeValidationStatus.loading ? (
-                                <div className="w-4 h-4 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin" />
-                              ) : ieeeValidationStatus.isValid === true ? (
-                                <svg
-                                  className="w-5 h-5 text-green-500"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M5 13l4 4L19 7"
-                                  />
-                                </svg>
-                              ) : ieeeValidationStatus.isValid === false ? (
-                                <svg
-                                  className="w-5 h-5 text-red-500"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M6 18L18 6M6 6l12 12"
-                                  />
-                                </svg>
-                              ) : null}
-                            </div>
-                          )}
-                        </div>
-                        
-                        {/* Validation Messages */}
-                        {ieeeNumber.trim().length >= 6 && (
-                          <div className="text-xs">
-                            {ieeeValidationStatus.loading && (
-                              <p className="text-yellow-400">Validating IEEE membership...</p>
-                            )}
-                            {ieeeValidationStatus.isValid === true && (
-                              <div className="text-green-400">
-                                <p>✓ Valid IEEE member</p>
-                                {ieeeValidationStatus.nameInitials && (
-                                  <p className="text-gray-400 mt-0.5">
-                                    {ieeeValidationStatus.nameInitials}
-                                  </p>
-                                )}
-                              </div>
-                            )}
-                            {ieeeValidationStatus.isValid === false && ieeeValidationStatus.error && (
-                              <p className="text-red-400">{ieeeValidationStatus.error}</p>
-                            )}
-                          </div>
-                        )}
-                      </m.div>
-                    )}
                   </div>
 
                   {/* SRM Student Toggle */}

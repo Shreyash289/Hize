@@ -288,7 +288,7 @@ export default function Home() {
     }
   }, []);
 
-  const sections = ["Hero", "Venue Map", "Guests", "Partners", "Previous Events", "Student Team", "Accommodation", "Contact"]
+  const sections = ["Hero", "Event Timeline", "Venue Map", "Guests", "Partners", "Accommodation", "Previous Events", "Student Team", "Contact"]
 
   // Cleanup harsh click timeout on unmount
   useEffect(() => {
@@ -376,8 +376,8 @@ export default function Home() {
   }, [loadingComplete, isIOS])
 
   const scrollToSection = useCallback((index: number) => {
-    // Contact section (index 7) opens popup instead of scrolling
-    if (index === 7) {
+    // Contact section (index 8) opens popup instead of scrolling
+    if (index === 8) {
       setShowContactPopup(true)
       return
     }
@@ -648,8 +648,38 @@ export default function Home() {
         </motion.div>
       </section>
 
+      {/* Timeline Section */}
+      <section 
+        ref={(el) => { 
+          sectionsRef.current[1] = el
+          timelineRef.current = el 
+        }} 
+        className="relative py-10 sm:py-12 md:py-14"
+      >
+        <div className="max-w-7xl mx-auto w-full relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-8 sm:mb-10 md:mb-12"
+          >
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-3 sm:mb-4 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
+              EVENT TIMELINE
+            </h2>
+            <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
+              Detailed schedule of all activities across the three days
+            </p>
+            <p className="text-sm sm:text-base text-orange-300/70 font-serif max-w-2xl mx-auto px-4 mt-2">
+              Click on events to view more information
+            </p>
+          </motion.div>
+          <Timeline />
+        </div>
+      </section>
+
       <section
-        ref={(el) => { sectionsRef.current[1] = el }}
+        ref={(el) => { sectionsRef.current[2] = el }}
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -690,33 +720,33 @@ export default function Home() {
                 href="https://www.google.com/maps/d/u/0/viewer?mid=18kGFk2ClDWeZPYT0rkdUHRDRw98Mj5U&ehbc=2E312F"
                 target="_blank"
                 rel="noopener noreferrer"
-                whileHover={{ scale: 1.02 }}
+                whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
-                className="relative w-full rounded-xl md:rounded-2xl overflow-hidden bg-gradient-to-br from-black/80 via-zinc-900/80 to-black/80 border-2 border-orange-500/30 shadow-2xl shadow-orange-500/20 hover:border-orange-400/50 hover:shadow-orange-500/40 transition-all duration-300 group cursor-pointer"
+                className="relative w-full max-w-2xl mx-auto rounded-xl overflow-hidden bg-gradient-to-br from-black/80 via-zinc-900/80 to-black/80 border-2 border-orange-500/30 shadow-xl shadow-orange-500/20 hover:border-orange-400/50 hover:shadow-orange-500/40 transition-all duration-300 group cursor-pointer"
               >
                 <div className="relative aspect-[4/3] w-full flex items-center justify-center bg-gradient-to-br from-black via-slate-900 to-black">
                   {/* Map Icon/Visual */}
-                  <div className="text-center p-8 space-y-4">
-                    <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-r from-orange-600 to-orange-400 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                      <svg className="w-10 h-10 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="text-center p-4 sm:p-6 space-y-3 sm:space-y-4">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full bg-gradient-to-r from-orange-600 to-orange-400 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      <svg className="w-8 h-8 sm:w-10 sm:h-10 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
                     </div>
                     <div>
-                      <p className="text-orange-400 font-bold text-lg sm:text-xl mb-2 group-hover:text-orange-300 transition-colors">
+                      <p className="text-orange-400 font-bold text-lg sm:text-xl mb-1 sm:mb-2 group-hover:text-orange-300 transition-colors">
                         View Campus Location
                       </p>
-                      <p className="text-orange-200/70 text-sm sm:text-base">
+                      <p className="text-orange-200/70 text-xs sm:text-sm max-w-sm mx-auto">
                         Click to open interactive map in Google Maps
                       </p>
                     </div>
                     <motion.div
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-orange-600 to-orange-400 font-bold text-black shadow-lg group-hover:shadow-xl transition-all"
+                      className="inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg bg-gradient-to-r from-orange-600 to-orange-400 font-bold text-black shadow-lg group-hover:shadow-xl transition-all text-xs sm:text-sm"
                       whileHover={{ scale: 1.05 }}
                     >
                       <span>Open in Maps</span>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                       </svg>
                     </motion.div>
@@ -754,32 +784,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Timeline Section */}
-      <section ref={(el) => { timelineRef.current = el }} className="relative py-10 sm:py-12 md:py-14">
-        <div className="max-w-7xl mx-auto w-full relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-8 sm:mb-10 md:mb-12"
-          >
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-3 sm:mb-4 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
-              EVENT TIMELINE
-            </h2>
-            <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
-              Detailed schedule of all activities across the three days
-            </p>
-            <p className="text-sm sm:text-base text-orange-300/70 font-serif max-w-2xl mx-auto px-4 mt-2">
-              Click on events to view more information
-            </p>
-          </motion.div>
-          <Timeline />
-        </div>
-      </section>
-
       <section
-        ref={(el) => { sectionsRef.current[2] = el }}
+        ref={(el) => { sectionsRef.current[3] = el }}
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -940,7 +946,7 @@ export default function Home() {
 
 
       <section
-        ref={(el) => { sectionsRef.current[3] = el }}
+        ref={(el) => { sectionsRef.current[4] = el }}
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -971,8 +977,111 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Accommodation Section */}
       <section
-        ref={(el) => { sectionsRef.current[4] = el }}
+        ref={(el) => { sectionsRef.current[5] = el }}
+        className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
+      >
+        <div className="max-w-7xl mx-auto w-full relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-8 sm:mb-10 md:mb-12"
+          >
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-3 sm:mb-4 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
+              ACCOMMODATION
+            </h2>
+            <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
+              Stay arrangements for HIZE 2026 participants
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="relative p-6 sm:p-8 md:p-10 lg:p-12 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20"
+          >
+            <div className="max-w-4xl mx-auto">
+              {/* Pricing Card */}
+              <div className="relative p-6 sm:p-8 md:p-10 rounded-2xl bg-gradient-to-br from-orange-500/10 via-orange-400/5 to-transparent border-2 border-orange-500/30 mb-8">
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/20 border border-orange-500/40 text-orange-300 text-sm font-semibold mb-4">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Per Day Rate</span>
+                  </div>
+                  <div className="mb-2">
+                    <span className="text-5xl sm:text-6xl md:text-7xl font-black bg-gradient-to-r from-orange-400 via-orange-300 to-orange-400 bg-clip-text text-transparent">
+                      ₹1,000
+                    </span>
+                  </div>
+                  <p className="text-slate-300 text-sm sm:text-base font-medium">
+                    All-inclusive accommodation package
+                  </p>
+                </div>
+
+                {/* Features Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-8">
+                  {/* Room Type */}
+                  <div className="p-4 sm:p-5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-sm">
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-orange-600 to-orange-400 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-white font-bold text-base sm:text-lg mb-1">Room Configuration</h4>
+                        <p className="text-slate-400 text-sm">3-sharing rooms with comfortable amenities</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Meals Included */}
+                  <div className="p-4 sm:p-5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-sm">
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-orange-600 to-orange-400 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-white font-bold text-base sm:text-lg mb-1">Meals Included</h4>
+                        <p className="text-slate-400 text-sm">Breakfast, Lunch & Dinner</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Information */}
+              <div className="text-center space-y-4">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-slate-300 text-sm">
+                  <svg className="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>Check-in and check-out details will be shared upon registration</span>
+                </div>
+                <p className="text-slate-400 text-sm font-serif max-w-2xl mx-auto">
+                  Comfortable accommodation with all essential amenities, ensuring a pleasant stay throughout the event duration.
+                </p>
+              </div>
+            </div>
+
+            <motion.div
+              className="absolute -inset-[1px] bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 rounded-3xl opacity-20 blur-2xl -z-10"
+            />
+          </motion.div>
+        </div>
+      </section>
+
+      <section
+        ref={(el) => { sectionsRef.current[6] = el }}
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -1072,7 +1181,7 @@ export default function Home() {
 
 
       <section
-        ref={(el) => { sectionsRef.current[5] = el }}
+        ref={(el) => { sectionsRef.current[7] = el }}
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -1336,67 +1445,8 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* Accommodation Section */}
       <section
-        ref={(el) => { sectionsRef.current[6] = el }}
-        className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
-      >
-        <div className="max-w-7xl mx-auto w-full relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-8 sm:mb-10 md:mb-12"
-          >
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-3 sm:mb-4 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
-              ACCOMMODATION
-            </h2>
-            <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
-              Stay arrangements for HIZE 2026 participants
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.92 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="relative p-6 sm:p-8 md:p-10 lg:p-12 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20"
-          >
-            <div className="text-center space-y-6 sm:space-y-7 md:space-y-8">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-2xl md:rounded-3xl bg-gradient-to-br from-orange-600 to-orange-400 flex items-center justify-center shadow-lg mx-auto">
-                <svg className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-              </div>
-
-              <div className="px-4">
-                <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 text-orange-400">
-                  Accommodation Details
-                </h3>
-                <p className="text-sm sm:text-base md:text-lg text-slate-400 font-serif max-w-3xl mx-auto leading-relaxed">
-                  Comfortable accommodation arrangements will be provided for all participants. 
-                  Details regarding check-in, check-out, and room allocations will be shared closer to the event dates.
-                </p>
-              </div>
-
-              <div className="pt-4">
-                <p className="text-sm text-slate-500 font-mono">
-                  More information coming soon
-                </p>
-              </div>
-            </div>
-
-            <motion.div
-              className="absolute -inset-[1px] bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 rounded-3xl opacity-20 blur-2xl -z-10"
-            />
-          </motion.div>
-        </div>
-      </section>
-
-      <section
-        ref={(el) => { sectionsRef.current[7] = el }}
+        ref={(el) => { sectionsRef.current[8] = el }}
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">

@@ -39,12 +39,22 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
   const regularLinks = [
     { href: "/events", label: "Events" },
     { href: "/guests", label: "Guests" },
-    { href: "/contact", label: "Contact" },
   ]
 
   const handleNavClick = (index?: number) => {
     if (isHomepage && index !== undefined && onSectionClick) {
       onSectionClick(index)
+    }
+    setMobileMenuOpen(false)
+  }
+
+  const handleContactClick = () => {
+    if (isHomepage && onSectionClick) {
+      // Contact is at index 8 in sections array
+      onSectionClick(8)
+    } else {
+      // Navigate to contact page if not on homepage
+      window.location.href = "/contact"
     }
     setMobileMenuOpen(false)
   }
@@ -111,26 +121,45 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
                 </button>
               ))
             ) : (
-              regularLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
+              <>
+                {regularLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      pathname === link.href
+                        ? "text-orange-400 bg-orange-500/10"
+                        : "text-gray-300 hover:text-orange-400 hover:bg-white/5"
+                    }`}
+                  >
+                    {link.label}
+                    {pathname === link.href && (
+                      <motion.div
+                        layoutId="activeNavIndicator"
+                        className="absolute inset-0 rounded-lg bg-orange-500/20 border border-orange-500/30 -z-10"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                  </Link>
+                ))}
+                <button
+                  onClick={handleContactClick}
                   className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    pathname === link.href
+                    isHomepage && activeSection === 8
                       ? "text-orange-400 bg-orange-500/10"
                       : "text-gray-300 hover:text-orange-400 hover:bg-white/5"
                   }`}
                 >
-                  {link.label}
-                  {pathname === link.href && (
+                  Contact
+                  {isHomepage && activeSection === 8 && (
                     <motion.div
                       layoutId="activeNavIndicator"
                       className="absolute inset-0 rounded-lg bg-orange-500/20 border border-orange-500/30 -z-10"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
-                </Link>
-              ))
+                </button>
+              </>
             )}
             <button
               onClick={() => onRegisterClick?.()}
@@ -203,6 +232,16 @@ export default function Navigation({ sections, onSectionClick, activeSection, on
                         {link.label}
                       </Link>
                     ))}
+                    <button
+                      onClick={handleContactClick}
+                      className={`px-4 py-3 rounded-lg text-base font-medium transition-all ${
+                        isHomepage && activeSection === 8
+                          ? "text-orange-400 bg-orange-500/10 border border-orange-500/30"
+                          : "text-gray-300 hover:text-orange-400 hover:bg-white/5"
+                      }`}
+                    >
+                      Contact
+                    </button>
                   </div>
                 )}
                 <button
