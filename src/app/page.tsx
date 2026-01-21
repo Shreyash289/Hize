@@ -145,6 +145,7 @@ export default function Home() {
   const [showRegistrationPopup, setShowRegistrationPopup] = useState(false)
   const [showRegistrationBanner, setShowRegistrationBanner] = useState(false)
   const [bannerDismissed, setBannerDismissed] = useState(false)
+  const [showContactPopup, setShowContactPopup] = useState(false)
   const [harshClickCount, setHarshClickCount] = useState(0)
   const [showIronMan, setShowIronMan] = useState(false)
   const harshClickTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -287,7 +288,7 @@ export default function Home() {
     }
   }, []);
 
-  const sections = ["Hero", "Venue Map", "Guests", "Partners", "Previous Events", "Student Team", "Contact"]
+  const sections = ["Hero", "Venue Map", "Guests", "Partners", "Previous Events", "Student Team", "Accommodation", "Contact"]
 
   // Cleanup harsh click timeout on unmount
   useEffect(() => {
@@ -375,6 +376,12 @@ export default function Home() {
   }, [loadingComplete, isIOS])
 
   const scrollToSection = useCallback((index: number) => {
+    // Contact section (index 7) opens popup instead of scrolling
+    if (index === 7) {
+      setShowContactPopup(true)
+      return
+    }
+
     const section = sectionsRef.current[index]
     if (!section) return
 
@@ -438,29 +445,38 @@ export default function Home() {
       <AnimatePresence>
         {showRegistrationBanner && !bannerDismissed && (
           <motion.div
-            initial={{ y: -100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -100, opacity: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 max-w-2xl w-full mx-4"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => {
+              setBannerDismissed(true)
+              setShowRegistrationBanner(false)
+            }}
           >
-            <div className="relative bg-gradient-to-r from-orange-600/95 to-orange-500/95 backdrop-blur-xl border-2 border-orange-400/50 rounded-2xl shadow-2xl shadow-orange-500/30 p-4 sm:p-5">
+            <motion.div
+              initial={{ y: 20 }}
+              animate={{ y: 0 }}
+              className="relative bg-gradient-to-br from-black/95 via-zinc-900/95 to-black/95 backdrop-blur-xl border-2 border-orange-500/30 rounded-2xl shadow-2xl shadow-orange-500/20 p-6 sm:p-8 max-w-lg w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
               <button
                 onClick={() => {
                   setBannerDismissed(true)
                   setShowRegistrationBanner(false)
                 }}
-                className="absolute top-2 right-2 p-1.5 rounded-lg hover:bg-white/20 transition-colors"
+                className="absolute top-3 right-3 p-1.5 rounded-lg hover:bg-white/10 transition-colors"
                 aria-label="Dismiss"
               >
-                <X className="w-5 h-5 text-white" />
+                <X className="w-5 h-5 text-orange-300" />
               </button>
-              <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 pr-8">
-                <div className="flex-1 text-center sm:text-left">
-                  <p className="text-white font-bold text-base sm:text-lg mb-1">
-                    🎉 Don't miss out on HIZE 2026!
+              <div className="flex flex-col items-center gap-4 pr-8">
+                <div className="text-center">
+                  <p className="text-orange-400 font-bold text-lg sm:text-xl mb-2">
+                    Don't miss out on HIZE 2026!
                   </p>
-                  <p className="text-orange-100 text-sm sm:text-base">
+                  <p className="text-orange-200/80 text-sm sm:text-base font-serif">
                     Register now to secure your spot for this amazing event
                   </p>
                 </div>
@@ -472,12 +488,12 @@ export default function Home() {
                   }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-6 py-2.5 bg-black text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
+                  className="px-8 py-3 bg-gradient-to-r from-orange-600 to-orange-400 text-black font-black rounded-xl shadow-lg shadow-orange-500/50 hover:shadow-orange-500/70 transition-all whitespace-nowrap"
                 >
                   Register Now
                 </motion.button>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -670,51 +686,45 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="relative w-full rounded-xl md:rounded-2xl overflow-hidden bg-black/40 border border-orange-500/30 shadow-2xl">
-                <div className="relative aspect-[4/3] w-full">
-                  {isIOS ? (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-black via-slate-900 to-black">
-                      <div className="text-center p-8">
-                        <p className="text-orange-200 mb-4">Map requires full browser</p>
-                        <motion.a
-                          href="https://www.google.com/maps/d/u/0/viewer?mid=18kGFk2ClDWeZPYT0rkdUHRDRw98Mj5U&ehbc=2E312F"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-orange-600 to-orange-400 font-semibold text-black shadow-lg"
-                        >
-                          Open in Maps
-                        </motion.a>
-                      </div>
+              <motion.a
+                href="https://www.google.com/maps/d/u/0/viewer?mid=18kGFk2ClDWeZPYT0rkdUHRDRw98Mj5U&ehbc=2E312F"
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="relative w-full rounded-xl md:rounded-2xl overflow-hidden bg-gradient-to-br from-black/80 via-zinc-900/80 to-black/80 border-2 border-orange-500/30 shadow-2xl shadow-orange-500/20 hover:border-orange-400/50 hover:shadow-orange-500/40 transition-all duration-300 group cursor-pointer"
+              >
+                <div className="relative aspect-[4/3] w-full flex items-center justify-center bg-gradient-to-br from-black via-slate-900 to-black">
+                  {/* Map Icon/Visual */}
+                  <div className="text-center p-8 space-y-4">
+                    <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-r from-orange-600 to-orange-400 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      <svg className="w-10 h-10 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
                     </div>
-                  ) : (
-                    <>
-                  <iframe
-                    src="https://www.google.com/maps/d/embed?mid=1UfC_a8sotHQhQRM1hjjGmziJiRXu-7c&ehbc=2E312F"
-                    className="w-full h-full absolute inset-0"
-                    title="HIZE Venue Map"
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                        sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-                        onError={(e) => {
-                          console.warn('Google Maps iframe error:', e)
-                          e.currentTarget.style.display = 'none'
-                        }}
-                  />
-                  <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                    </>
-                  )}
-                </div>
-                {!isIOS && (
-                <div className="absolute top-4 right-4">
-                  <div className="px-3 py-2 rounded-full bg-black/50 border border-white/10 text-xs text-orange-100">
-                    Drag, zoom, or open in Maps
+                    <div>
+                      <p className="text-orange-400 font-bold text-lg sm:text-xl mb-2 group-hover:text-orange-300 transition-colors">
+                        View Campus Location
+                      </p>
+                      <p className="text-orange-200/70 text-sm sm:text-base">
+                        Click to open interactive map in Google Maps
+                      </p>
+                    </div>
+                    <motion.div
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-orange-600 to-orange-400 font-bold text-black shadow-lg group-hover:shadow-xl transition-all"
+                      whileHover={{ scale: 1.05 }}
+                    >
+                      <span>Open in Maps</span>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </motion.div>
                   </div>
+                  {/* Hover overlay effect */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-orange-600/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
-                )}
-              </div>
+              </motion.a>
 
 
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -1326,9 +1336,67 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-
+      {/* Accommodation Section */}
       <section
         ref={(el) => { sectionsRef.current[6] = el }}
+        className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
+      >
+        <div className="max-w-7xl mx-auto w-full relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-8 sm:mb-10 md:mb-12"
+          >
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-3 sm:mb-4 bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 bg-clip-text text-transparent">
+              ACCOMMODATION
+            </h2>
+            <p className="text-base sm:text-lg md:text-xl text-orange-200/80 font-serif max-w-2xl mx-auto px-4">
+              Stay arrangements for HIZE 2026 participants
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="relative p-6 sm:p-8 md:p-10 lg:p-12 rounded-2xl md:rounded-3xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20"
+          >
+            <div className="text-center space-y-6 sm:space-y-7 md:space-y-8">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-2xl md:rounded-3xl bg-gradient-to-br from-orange-600 to-orange-400 flex items-center justify-center shadow-lg mx-auto">
+                <svg className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+              </div>
+
+              <div className="px-4">
+                <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 text-orange-400">
+                  Accommodation Details
+                </h3>
+                <p className="text-sm sm:text-base md:text-lg text-slate-400 font-serif max-w-3xl mx-auto leading-relaxed">
+                  Comfortable accommodation arrangements will be provided for all participants. 
+                  Details regarding check-in, check-out, and room allocations will be shared closer to the event dates.
+                </p>
+              </div>
+
+              <div className="pt-4">
+                <p className="text-sm text-slate-500 font-mono">
+                  More information coming soon
+                </p>
+              </div>
+            </div>
+
+            <motion.div
+              className="absolute -inset-[1px] bg-gradient-to-r from-orange-600 via-orange-400 to-orange-600 rounded-3xl opacity-20 blur-2xl -z-10"
+            />
+          </motion.div>
+        </div>
+      </section>
+
+      <section
+        ref={(el) => { sectionsRef.current[7] = el }}
         className="relative flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-14 md:py-16"
       >
         <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -1690,6 +1758,103 @@ export default function Home() {
         isOpen={showRegistrationPopup} 
         onClose={() => setShowRegistrationPopup(false)} 
       />
+
+      {/* Contact Popup */}
+      <AnimatePresence>
+        {showContactPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-3xl px-4 sm:px-6"
+            onClick={() => setShowContactPopup(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="relative max-w-md w-full rounded-3xl bg-gradient-to-br from-black/90 via-zinc-900/95 to-black/90 backdrop-blur-2xl shadow-2xl border border-orange-500/30 overflow-hidden"
+              onClick={e => e.stopPropagation()}
+              style={{ willChange: "transform" }}
+            >
+              {/* Animated gradient border */}
+              <div className="absolute -inset-[1px] rounded-3xl bg-gradient-to-r from-orange-500 via-orange-400 to-orange-500 opacity-50" />
+              <div className="absolute -inset-[1px] rounded-3xl bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 blur-sm opacity-30" />
+
+              {/* Content container */}
+              <div className="relative bg-gradient-to-br from-black/95 via-zinc-900/98 to-black/95 rounded-3xl">
+                {/* Header with gradient accent */}
+                <div className="h-1 w-full bg-gradient-to-r from-orange-500 via-orange-400 to-orange-500" />
+
+                {/* Close button */}
+                <motion.button
+                  className="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 rounded-full bg-gradient-to-r from-zinc-800/80 to-zinc-900/80 backdrop-blur-sm border border-orange-500/20 text-white hover:border-orange-400/40 shadow-lg transition-all duration-300 group z-10"
+                  onClick={() => setShowContactPopup(false)}
+                  aria-label="Close"
+                  type="button"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <X className="w-5 h-5 mx-auto group-hover:rotate-90 transition-transform duration-300" />
+                </motion.button>
+
+                <div className="p-6 sm:p-8 space-y-6">
+                  <div className="text-center">
+                    <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-white via-orange-100 to-orange-200 bg-clip-text text-transparent mb-2">
+                      Contact Us
+                    </h2>
+                    <p className="text-orange-200/70 text-sm">Get in touch with our team</p>
+                  </div>
+
+                  <div className="space-y-4">
+                    {/* Krishna Aggarwal */}
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 }}
+                      className="p-4 rounded-2xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20"
+                    >
+                      <h3 className="text-xl font-bold text-orange-400 mb-2">Krishna Aggarwal</h3>
+                      <motion.a
+                        href="tel:+919718212195"
+                        whileHover={{ x: 5 }}
+                        className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-orange-600 to-orange-400 flex items-center justify-center flex-shrink-0">
+                          <Phone className="w-5 h-5 text-black" />
+                        </div>
+                        <span className="text-sm font-mono text-orange-200">+91 97182 12195</span>
+                      </motion.a>
+                    </motion.div>
+
+                    {/* Adhyayan Dubey */}
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="p-4 rounded-2xl bg-gradient-to-br from-black/60 to-zinc-900/60 backdrop-blur-xl border border-orange-500/20"
+                    >
+                      <h3 className="text-xl font-bold text-orange-400 mb-2">Adhyayan Dubey</h3>
+                      <motion.a
+                        href="tel:+919906102527"
+                        whileHover={{ x: 5 }}
+                        className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-orange-400 to-orange-600 flex items-center justify-center flex-shrink-0">
+                          <Phone className="w-5 h-5 text-black" />
+                        </div>
+                        <span className="text-sm font-mono text-orange-200">+91 99061 02527</span>
+                      </motion.a>
+                    </motion.div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
